@@ -48,6 +48,13 @@ export const categories: Category[] = [
       "Aspects, sect, chart emphasis, rulers, nodes, and the structure behind the whole chart.",
     icon: "VI",
   },
+  {
+    name: "Hermetic Astrology",
+    slug: "hermetic-astrology",
+    description:
+      "Decans, planetary spirits, Hermetic Qabalah, and magical practice only where they are rooted in astrology.",
+    icon: "VII",
+  },
 ];
 
 export function getCategoryBySlug(slug: string): Category | undefined {

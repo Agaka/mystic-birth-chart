@@ -120,6 +120,42 @@ Core promise:
 
 Mystic Birth Chart helps people understand the deeper structure of their natal chart through traditional-first astrology, written in practical language.
 
+### Hermetic Astrology Boundary
+
+The brand may publish and sell content about magic, Hermetic Qabalah, decan angels, planetary spirits, alchemy, Golden Dawn-style correspondences, Arbatel, and Western esotericism only when the subject is directly tied to astrology.
+
+Allowed bridges:
+
+- planets;
+- signs;
+- houses;
+- decans;
+- planetary days and hours;
+- electional timing;
+- solar and lunar rhythm;
+- natal chart structure;
+- chart ruler;
+- planetary dignity;
+- Hermetic Qabalah as applied through astrology;
+- angelic or devotional practice tied to zodiacal decans or planets.
+
+Do not publish random occult content that cannot be explained through astrology. Even a topic like Arbatel must be framed through planetary astrology, not as general grimoire entertainment.
+
+The promise of Hermetic practice can include realistic inner qualities:
+
+- confidence;
+- joy;
+- intuition;
+- discipline;
+- courage;
+- clarity;
+- patience;
+- emotional steadiness;
+- spiritual focus;
+- devotional connection.
+
+Avoid material guarantees, coercive promises, medical claims, fear-based claims, or claims of guaranteed results.
+
 ## 4. Audience
 
 Primary audience:
@@ -281,14 +317,15 @@ Current important routes:
 
 Current content:
 
-- 40 English blog posts in `src/content/articles`.
-- 6 categories:
+- 44 English blog posts in `src/content/articles`.
+- 7 categories:
   - Chart Basics
   - Moon & Emotions
   - Love & Venus
   - Career & Purpose
   - Saturn & Growth
   - Deep Chart Patterns
+  - Hermetic Astrology
 
 The free tool:
 
@@ -600,6 +637,8 @@ Boards:
 
 - Birth Chart Basics
 - Traditional Astrology
+- Hermetic Astrology
+- Decan Angels
 - Rising Signs
 - Moon Sign Meanings
 - Venus in Astrology
@@ -750,6 +789,8 @@ Good article angles:
 - "X sign vs X house"
 - "Why X is not enough"
 - "Traditional astrology meaning of X"
+- "How X appears in Hermetic astrology"
+- "How X connects to planets, decans, timing, or the birth chart"
 - "What to expect from a birth chart reading"
 - "Free calculator vs personal chart reading"
 
@@ -761,6 +802,8 @@ Internal link rules:
 - Link career posts to 10th house/Midheaven and Complete Reading.
 - Link Saturn posts to Saturn Return and Complete Reading.
 - Link comparison posts to sample report and checkout pages.
+- Link Hermetic Astrology posts back to astrology foundations, decans, planetary dignity, the free chart tool, and reading options.
+- Do not publish magic posts unless they are directly connected to astrology.
 
 CTA examples:
 
@@ -917,6 +960,10 @@ Possible future products:
 - Career/Vocation Reading
 - Love Pattern Reading
 - Annual Astrology Guide
+- Solar Return / Year Ahead Reading
+- Decan Angel Practice Guide ebook
+- Hermetic Birth Angel Reading
+- Complete Natal + Hermetic Angel Reading
 - Monthly astrology membership
 - Transit update PDF
 - Synastry/couple reading
@@ -1057,7 +1104,7 @@ When another AI works on this project:
 - Protect readability and contrast.
 - Keep checkout custom until the final Stripe payment step.
 - Do not invent fake testimonials.
+- Do not let magic content drift away from astrology; every esoteric topic must be tied to planets, decans, timing, signs, houses, or natal chart structure.
 - Do not make medical, legal, financial, psychological, or guaranteed predictive claims.
 - Do not commit secrets.
 - Update this file after major changes to product, positioning, channels, or technical setup.
-

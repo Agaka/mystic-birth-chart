@@ -9,7 +9,7 @@ An English-language astrology journal and sales funnel for personalized natal ch
 Mystic Birth Chart is an editorial astrology site that teaches real chart concepts and guides readers toward paid written readings. The site includes:
 
 - Home page with hero, free chart CTA, featured articles, category browsing, and reading offers
-- Blog with 40 articles across 6 astrology categories
+- Blog with 44 articles across 7 astrology categories
 - Free birth chart snapshot tool with city search and static interpretations
 - Reading sales page for Basic ($29) and Complete ($97) reports
 - Sample report preview with fictional data
@@ -131,6 +131,7 @@ featured: false
 | Career & Purpose | `career-purpose` |
 | Saturn & Growth | `saturn-growth` |
 | Deep Chart Patterns | `deep-chart-patterns` |
+| Hermetic Astrology | `hermetic-astrology` |
 
 ## Project Structure
 

@@ -52,6 +52,7 @@ export const siteConfig = {
       { label: "Career & Purpose", href: "/blog/category/career-purpose" },
       { label: "Saturn & Growth", href: "/blog/category/saturn-growth" },
       { label: "Deep Chart Patterns", href: "/blog/category/deep-chart-patterns" },
+      { label: "Hermetic Astrology", href: "/blog/category/hermetic-astrology" },
     ],
     legal: [
       { label: "Privacy Policy", href: "/privacy" },
