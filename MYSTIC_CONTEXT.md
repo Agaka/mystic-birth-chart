@@ -1,0 +1,1063 @@
+# Mystic Birth Chart - AI Context and Growth Bible
+
+Last updated: 2026-07-03
+
+This file is the long-term memory for Mystic Birth Chart. Any AI, developer, designer, copywriter, or content assistant working on this project should read it before making decisions about copy, design, content, social media, SEO, conversion, or product strategy.
+
+Do not store passwords, API keys, personal accounts, Stripe secrets, Vercel tokens, or private customer data in this file.
+
+## 1. Project Summary
+
+Mystic Birth Chart is an English-language astrology content site and sales funnel for personalized natal chart readings paid in USD.
+
+The business goal is direct:
+
+- Bring qualified traffic from Google, Instagram, Pinterest, YouTube, and other channels.
+- Give real astrology education, not thin sales copy.
+- Convert readers into paid written natal chart readings.
+- Prioritize sales of personalized readings while keeping the site credible, useful, and aesthetically distinct.
+
+Current public site:
+
+- Vercel: `https://mystic-birth-chart.vercel.app`
+- GitHub repo: `https://github.com/Agaka/mystic-birth-chart`
+- Repo name: `mystic-birth-chart`
+- Vercel workspace: `allansobrero-2788's projects`
+
+Current tech stack:
+
+- Next.js 16 App Router
+- React 19
+- TypeScript
+- Tailwind CSS 4
+- Markdown articles in `src/content/articles`
+- Stripe package installed, but live Stripe credentials are not configured yet
+
+Important repo rule:
+
+- This project has an `AGENTS.md` warning that this Next.js version may have breaking changes.
+- Before editing Next.js code, read the relevant docs in `node_modules/next/dist/docs/`.
+
+## 2. Business Model
+
+The primary paid products are personalized written birth chart readings:
+
+### Basic Natal Reading
+
+- Price: `$29`
+- Positioning: entry reading, fast first interpretation
+- Delivery promise currently used in the site: within 48 hours
+- Format: personalized PDF report
+- Scope:
+  - Core natal chart synthesis
+  - Sun, Moon, Rising
+  - Chart ruler
+  - Key aspects
+  - Purpose, emotional patterns, love, and direction
+  - Clear practical English
+
+### Complete Natal Reading
+
+- Price: `$97`
+- Positioning: deeper and more complete interpretation
+- Delivery promise currently used in the site: within 72 hours
+- Format: expanded personalized PDF report
+- Scope:
+  - Traditional-first natal analysis
+  - House rulers
+  - Dignities
+  - Aspects
+  - Chart emphasis
+  - Love, career, money, temperament, vocation themes
+  - Prioritized integration notes and next-step guidance
+
+### Capacity
+
+The owner can produce about 5 readings per day. This can be used as real operational scarcity, but it should not be overused or made manipulative.
+
+Good wording:
+
+- "5 hand-prepared readings available per day."
+- "Readings are prepared by hand, so the daily queue is limited."
+
+Avoid:
+
+- Fake countdown timers.
+- Aggressive scarcity.
+- Claims that cannot be fulfilled.
+
+## 3. Core Positioning
+
+The site should not feel like a generic purple mystical astrology template.
+
+The intended feeling:
+
+- A Victorian mystic studying astrology at an old wooden desk.
+- Old books, old papers, candlelight, ink, parchment, chart wheels, handwritten notes.
+- Warm, serious, intimate, intelligent, and slightly mysterious.
+- A place where the reader feels like they are entering an old study and learning real astrology.
+
+Main differentiator:
+
+### The Old Study Method
+
+This is the brand's editorial and product method. It means:
+
+- Read the chart as a whole, not as isolated placements.
+- Start with structure: Ascendant, chart ruler, sect, houses, dignities, aspects, and repeated patterns.
+- Translate traditional astrology into clear modern language.
+- Give the client an interpretation they can actually use.
+- Avoid generic automated chart text.
+
+Possible tagline variants:
+
+- "Traditional astrology readings for modern questions."
+- "Enter the old study of your birth chart."
+- "A hand-prepared chart reading, written in clear English."
+- "Traditional astrology, practical synthesis, no generic app report."
+
+Core promise:
+
+Mystic Birth Chart helps people understand the deeper structure of their natal chart through traditional-first astrology, written in practical language.
+
+## 4. Audience
+
+Primary audience:
+
+- English-speaking buyers, mostly US/Canada/UK/Australia or people comfortable paying in USD.
+- Age range likely 20-45.
+- Interested in astrology beyond sun signs.
+- Often comes through Instagram, Pinterest, YouTube, or Google search.
+- Wants insight about identity, love, purpose, career, emotional patterns, timing, and self-understanding.
+- Has probably used Co-Star, Cafe Astrology, Astro-Seek, astro.com, TikTok astrology, or a free birth chart calculator before.
+- Feels that automated reports are interesting but fragmented or generic.
+
+Emotional state:
+
+- Curious, reflective, sometimes overwhelmed.
+- Wants the chart to feel personal.
+- Wants serious interpretation without cold academic language.
+- Wants the comfort of meaning and the clarity of practical synthesis.
+
+What they need to believe before buying:
+
+- This site understands astrology beyond memes.
+- The reading is not automated.
+- The reading will be written clearly.
+- The reader will synthesize the chart, not copy and paste isolated placement descriptions.
+- The purchase feels safe and professional.
+- The price feels accessible compared with higher-end astrologers.
+
+## 5. Brand Voice
+
+Voice should be:
+
+- Intelligent
+- Warm
+- Clear
+- Slightly literary
+- Traditional-first but not elitist
+- Practical
+- Calm
+- Specific
+- Human
+
+Voice should not be:
+
+- Overly witchy
+- Generic New Age
+- Overly purple/mystical
+- Academic to the point of being dry
+- Fear-based
+- Meme-only
+- Fake guru
+- Hyperbolic
+
+Good language:
+
+- "chart ruler"
+- "house topics"
+- "sect"
+- "dignity"
+- "condition of a planet"
+- "the chart as a whole"
+- "pattern"
+- "testimony"
+- "temperament"
+- "vocation"
+- "emotional rhythm"
+- "practical synthesis"
+- "hand-prepared"
+- "not a generic app report"
+- "old study"
+
+Avoid or use carefully:
+
+- "manifest"
+- "high vibration"
+- "divine feminine"
+- "soulmate guaranteed"
+- "your destiny is fixed"
+- "this placement means you will..."
+- "cursed"
+- "bad chart"
+- "100% accurate prediction"
+
+Ethical stance:
+
+- Astrology is for self-reflection and education.
+- Do not provide medical, legal, financial, psychological, or guaranteed predictive advice.
+- Do not create fear around placements.
+- Do not tell users they are doomed.
+
+## 6. Visual Direction
+
+Visual goal:
+
+The interface should feel like an old astrological study, not a modern SaaS dashboard and not a purple spiritual template.
+
+Current direction:
+
+- Dark wooden surfaces
+- Warm ivory/parchment reading areas
+- Antique gold accents
+- Deep ink and midnight backgrounds
+- Aubergine/rose used sparingly
+- Serif headings
+- Clear body copy
+- Strong contrast
+
+Important user feedback:
+
+- The user liked the old-study/Victorian direction.
+- The user disliked fake-looking heavy wood texture.
+- Use wood texture only when it feels subtle, natural, and not like a forged pattern.
+- Contrast matters: some previous text was too hard to read.
+
+Design tokens currently in `src/app/globals.css`:
+
+- `--color-midnight: #120e0a`
+- `--color-aubergine: #301b17`
+- `--color-ivory: #f4ead7`
+- `--color-gold: #b88a3a`
+- `--color-rose: #8e4f45`
+- `--color-lavender: #8a927f`
+- `--color-ink: #090705`
+
+Fonts:
+
+- Headings: Cormorant Garamond
+- Body: Lora
+- UI: Inter
+
+Design rules:
+
+- Prioritize readability over atmosphere.
+- Never place low-contrast gold text on gray-brown backgrounds.
+- Use parchment/ivory surfaces for long reading.
+- Use wood panels sparingly for atmosphere or product cards.
+- Avoid generic neon astrology gradients.
+- Avoid too much purple.
+- Avoid decorative clutter that slows reading or hurts conversion.
+
+## 7. Site Structure
+
+Current important routes:
+
+- `/` - home page
+- `/blog` - article index
+- `/blog/[slug]` - individual article pages
+- `/blog/category/[category]` - category pages
+- `/free-birth-chart` - free birth chart snapshot tool
+- `/birth-chart-report` - sales page for readings
+- `/sample-report` - sample report preview
+- `/checkout/basic` - custom checkout pre-payment page
+- `/checkout/complete` - custom checkout pre-payment page
+- `/checkout/pending` - fallback page when Stripe is not configured
+- `/thank-you` - post-purchase birth details page
+- `/about` - brand/methodology page
+- `/privacy` - privacy policy
+- `/terms` - terms of service
+
+Current content:
+
+- 40 English blog posts in `src/content/articles`.
+- 6 categories:
+  - Chart Basics
+  - Moon & Emotions
+  - Love & Venus
+  - Career & Purpose
+  - Saturn & Growth
+  - Deep Chart Patterns
+
+The free tool:
+
+- Route: `/free-birth-chart`
+- Uses city search, not manual latitude/longitude.
+- Uses Open-Meteo geocoding.
+- Gives static sample interpretations.
+- It is a lead magnet, not a full reading replacement.
+
+## 8. Funnel Strategy
+
+Primary traffic path:
+
+Social or Google -> free birth chart tool or blog post -> internal CTA -> reading sales page -> custom checkout -> Stripe payment -> thank-you birth details -> PDF delivery by email.
+
+Best landing pages for traffic:
+
+- `/free-birth-chart`
+- `/blog`
+- Strong individual blog posts
+- `/birth-chart-report`
+- `/sample-report`
+
+Primary CTA:
+
+- "Get My Chart Reading"
+- "Order Your Birth Chart Reading"
+- "Start With a Free Chart Snapshot"
+- "Order Basic Reading"
+- "Order Complete Reading"
+
+CTA logic:
+
+- Cold social traffic should usually go to `/free-birth-chart`.
+- Warm blog readers can go to `/birth-chart-report`.
+- People comparing offers should go to `/sample-report` or `/checkout/basic`.
+- Pinterest users should often land on specific blog posts or the free chart tool.
+
+Do not make the site feel like only a sales page. It must feel like a real astrology library with a paid reading offer naturally available.
+
+## 9. Checkout Status
+
+The site already has custom checkout pages before Stripe:
+
+- `/checkout/basic`
+- `/checkout/complete`
+
+The card payment step is handled by Stripe Checkout through:
+
+- `src/app/api/checkout/route.ts`
+
+Stripe is not fully configured yet. Required Vercel environment variables:
+
+- `STRIPE_SECRET_KEY`
+- `STRIPE_BASIC_PRICE_ID`
+- `STRIPE_COMPLETE_PRICE_ID`
+
+If those are missing, the API redirects to:
+
+- `/checkout/pending`
+
+The user wants checkout to feel custom to the site, with Stripe only at the payment moment. Keep that direction.
+
+Public seller name for now:
+
+- `Mystic Birth Chart`
+
+This can change later if the owner decides to use a personal astrologer name.
+
+## 10. Analytics Status
+
+The site has analytics hooks, but GA4/Search Console still need environment setup.
+
+Environment variables:
+
+- `NEXT_PUBLIC_GA_MEASUREMENT_ID`
+- `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION`
+
+Tracked events include:
+
+- `cta_click`
+- `reading_offer_click`
+- `checkout_submit_attempt`
+- `free_chart_city_search`
+- `free_chart_snapshot_generated`
+- `birth_details_submit_attempt`
+
+Important privacy rule:
+
+- Do not send birth date, birth time, birth city, full name, email, or other sensitive personal data to analytics events.
+
+## 11. Email and Newsletter Strategy
+
+The user does not yet own the final domain or email.
+
+Recommended setup:
+
+- Use a professional mailbox for support/contact after buying the domain.
+- Use a marketing email service for newsletters and automations.
+- Brevo is a practical first option for marketing emails.
+- Hostinger email is acceptable for a basic mailbox, but not ideal as the main newsletter/automation engine.
+
+Send about 2 emails per week:
+
+1. One educational email:
+   - chart concept
+   - house/planet lesson
+   - traditional astrology explanation
+   - link to a blog post
+
+2. One conversion email:
+   - sample interpretation
+   - reading invitation
+   - FAQ
+   - testimonial when available
+   - limited reading queue if true
+
+Possible welcome sequence:
+
+Email 1: "Your birth chart is not a list of placements"
+Email 2: "The Ascendant and chart ruler: where a reading begins"
+Email 3: "Why automated chart reports feel incomplete"
+Email 4: "How the Old Study Method reads your chart"
+Email 5: "Choose your reading: Basic or Complete"
+
+## 12. Competitor Notes
+
+### Typewriter Astrology
+
+Important competitor because it has:
+
+- Strong vintage/typewriter aesthetic.
+- Clear personal voice.
+- Product ladder.
+- Annual guide.
+- Membership.
+- Higher-priced chart reports.
+- Anonymous submissions/community prompts.
+- Instagram account with strong visual identity.
+
+What to learn:
+
+- A distinctive aesthetic makes the brand memorable.
+- A product ladder lets buyers start small and upgrade later.
+- A personal/editorial voice builds trust.
+- Submissions create repeatable social content.
+
+What not to copy directly:
+
+- Do not clone the exact typewriter look.
+- Do not copy product names.
+- Do not copy posts or visual layouts.
+
+### Co-Star
+
+What works:
+
+- Extremely shareable blunt language.
+- Minimal black/white brand.
+- Simple app CTA.
+
+What to learn:
+
+- Short, sharp copy is very shareable.
+- People share astrology when it feels personal and specific.
+
+What not to copy:
+
+- Do not become another detached app.
+- Mystic Birth Chart should feel human, hand-prepared, and old-study.
+
+### Meme Accounts
+
+Examples from screenshots:
+
+- `astrhology`
+- `thezodiacstea`
+
+What works:
+
+- Identity-based humor.
+- Shareability.
+- Fast growth through relatable posts.
+
+Risk:
+
+- Meme traffic does not always convert.
+- Reposted/unoriginal meme content can be downranked.
+
+Use the lesson, not the lazy version:
+
+- Make original or meaningfully transformed astrology memes.
+- Tie memes back to a chart concept or reading CTA.
+- Avoid relying only on reposts.
+
+### Niche/Gimmick Accounts
+
+One screenshot showed a highly specific astrology gimmick account. The useful lesson is not the NSFW subject, but the strategy:
+
+- A strange, clear hook can make an account memorable.
+- Anonymous submissions can create repeatable content.
+- People like seeing charts applied to real stories.
+
+Clean version for Mystic Birth Chart:
+
+- Anonymous chart confessions.
+- "What your 12th house hides."
+- "Venus stories."
+- "Saturn lessons."
+- "Guess the chart pattern."
+
+## 13. Social Media Strategy
+
+The user plans:
+
+- Instagram
+- YouTube
+- Pinterest
+
+TikTok is not a priority right now because the user believes reaching English-speaking traffic there would require a foreign phone number and VPS setup.
+
+Main link for social:
+
+- Use `/free-birth-chart` as the default cold-traffic link.
+
+Secondary links:
+
+- `/birth-chart-report`
+- `/sample-report`
+- Best blog posts for the topic being discussed
+
+### Instagram
+
+Profile direction:
+
+Name:
+
+- Mystic Birth Chart
+
+Bio draft:
+
+```text
+Traditional astrology for modern questions
+Free birth chart snapshot below
+Hand-prepared natal readings from $29
+```
+
+Highlights:
+
+- Start Here
+- Readings
+- Sample
+- Reviews
+- FAQ
+- Chart Basics
+
+Content pillars:
+
+1. Relatable astrology
+   - original memes
+   - sign/house/planet humor
+   - identity content people share
+
+2. Old Study mini-lessons
+   - chart ruler
+   - sect
+   - houses
+   - dignities
+   - aspects
+   - why one placement is not enough
+
+3. Anonymous chart confessions
+   - user-submitted stories
+   - anonymized chart patterns
+   - "what placement would explain this?"
+
+4. Sales/proof
+   - sample reading snippets
+   - queue updates
+   - FAQ
+   - before/after: "free calculator vs hand synthesis"
+
+5. Aesthetic authority posts
+   - old paper
+   - chart wheels
+   - study notes
+   - short quotes from the brand method
+
+Posting rhythm:
+
+- 1 feed post or Reel per day if possible.
+- Stories several times per week.
+- Reuse blog ideas as carousel posts.
+- Use Reels/Shorts scripts across Instagram and YouTube Shorts.
+
+Good Instagram post formats:
+
+- "Your Sun sign is not the whole sentence."
+- "The Ascendant is the door. The chart ruler is where the story starts moving."
+- "A free chart calculator can list your placements. It cannot decide which ones matter most."
+- "If your Venus sign never made sense, check the house and condition of Venus."
+- "Saturn is not punishment. Saturn is where life asks for form."
+
+### Pinterest
+
+Pinterest should be treated as search traffic, not only social media.
+
+Boards:
+
+- Birth Chart Basics
+- Traditional Astrology
+- Rising Signs
+- Moon Sign Meanings
+- Venus in Astrology
+- Saturn Return
+- Astrology Houses
+- Astrology Aesthetic
+- Free Birth Chart
+- Astrology Journal Prompts
+
+Pin strategy:
+
+- Every blog post should become 5-10 pins over time.
+- Pins should link to blog posts or `/free-birth-chart`.
+- Use vertical 1000x1500 or 1080x1920 formats.
+- Use old-paper, chart-wheel, book, desk, and type/ink motifs.
+- Keep text large and readable on mobile.
+
+Pin title examples:
+
+- "How to Read Your Birth Chart Without Getting Lost"
+- "Why Your Rising Sign Matters More Than You Think"
+- "The Chart Ruler: The Planet That Leads Your Birth Chart"
+- "What Saturn Means in Traditional Astrology"
+- "Free Birth Chart Calculators Are Not Enough"
+- "Traditional Astrology vs Modern Astrology"
+- "Venus Is Not Just Love"
+- "The 10th House and Your Public Life"
+- "What Your Moon Sign Actually Describes"
+- "Birth Chart Reading Online: What to Expect"
+
+### YouTube
+
+YouTube should build authority. Shorts can bring discovery; longer videos build trust.
+
+Suggested cadence:
+
+- 3 Shorts per week.
+- 2 longer videos per month.
+
+Shorts structure:
+
+1. Hook in first 1-2 seconds.
+2. One concrete astrology idea.
+3. One example.
+4. CTA to free birth chart snapshot or full reading.
+
+Long video structure:
+
+1. Title answers a search query.
+2. Open with the problem.
+3. Teach one clear framework.
+4. Show a simple example.
+5. Mention the free chart tool.
+6. Invite viewers to order a reading.
+
+Good long video topics:
+
+- "How to Read a Birth Chart: Where Traditional Astrologers Start"
+- "Why Your Rising Sign Changes the Whole Chart"
+- "Chart Ruler Explained: The Planet That Leads Your Life Story"
+- "Saturn Return Meaning Without Fear-Based Astrology"
+- "Why Automated Birth Chart Reports Feel Generic"
+
+## 14. AI Video Workflow
+
+The user has access to AI tools such as ElevenLabs and Leonardo.ai through a shared AI package. The site/content strategy should assume videos can be produced with AI voice and AI visuals.
+
+Recommended video style:
+
+- 9:16 vertical format for Shorts/Reels.
+- Old study visuals.
+- Slow desk/candle/paper/book movement.
+- Typewriter-style text overlays.
+- Warm but readable subtitles.
+- Avoid purple mystical stock-video style.
+
+Voice style:
+
+- Calm, intelligent, intimate.
+- English language.
+- Not too theatrical.
+- Not fake horror/mystery.
+- Pace: medium-slow but not sleepy.
+
+Shorts script template:
+
+```text
+Hook:
+Most people read their birth chart backwards.
+
+Body:
+They start with random placements: Moon in Libra, Venus in Scorpio, Mars in Gemini.
+But a real reading starts with the structure of the chart.
+The Ascendant shows the doorway.
+The chart ruler shows where the life story begins to move.
+The houses show the topics.
+
+CTA:
+If you want a clear first look at your chart, use the free birth chart snapshot on Mystic Birth Chart.
+```
+
+Video prompt template:
+
+```text
+Vertical 9:16 cinematic shot of an old Victorian astrology study, dark wooden desk, parchment birth chart, antique books, brass candle holder, warm candlelight, ink pen, subtle dust in the air, realistic texture, no modern objects, no neon, no purple fantasy glow, elegant and quiet, shallow depth of field, premium editorial mood
+```
+
+Negative prompt:
+
+```text
+neon, purple glow, modern laptop, plastic, cheap fantasy, cartoon, cluttered UI, illegible text, fake symbols, distorted hands, horror, skulls, low contrast
+```
+
+Subtitle style:
+
+- Ivory or parchment text.
+- Dark shadow or translucent ink backing.
+- Large enough for mobile.
+- Never cover important chart/desk detail.
+
+## 15. Content Strategy for Blog
+
+The blog must bring real traffic and build authority.
+
+Every article should:
+
+- Answer a concrete search intent.
+- Teach something useful.
+- Use clear English.
+- Include internal links to related articles.
+- Include a relevant CTA to the free chart tool or paid reading.
+- Avoid thin SEO filler.
+- Avoid making claims astrology cannot responsibly make.
+
+Article structure:
+
+1. Clear intro that names the problem.
+2. Explain the concept.
+3. Give examples.
+4. Show why isolated placements are not enough.
+5. Link to related topics.
+6. Soft CTA to free chart snapshot or full reading.
+
+Good article angles:
+
+- "What is X in astrology?"
+- "How to read X in your birth chart"
+- "X sign vs X house"
+- "Why X is not enough"
+- "Traditional astrology meaning of X"
+- "What to expect from a birth chart reading"
+- "Free calculator vs personal chart reading"
+
+Internal link rules:
+
+- Link Chart Basics posts to free chart tool.
+- Link advanced/traditional posts to paid reading.
+- Link love posts to Venus articles and Complete Reading.
+- Link career posts to 10th house/Midheaven and Complete Reading.
+- Link Saturn posts to Saturn Return and Complete Reading.
+- Link comparison posts to sample report and checkout pages.
+
+CTA examples:
+
+- "If you want the chart read as a whole, order a personalized birth chart reading."
+- "Start with the free chart snapshot, then choose a full reading if the pattern resonates."
+- "A calculator can name your placements. A reading decides what matters most."
+
+## 16. Content Production Templates
+
+### Instagram Carousel Template
+
+Slide 1:
+
+- Strong claim or question.
+
+Slide 2:
+
+- The common mistake.
+
+Slide 3:
+
+- The traditional astrology principle.
+
+Slide 4:
+
+- Example.
+
+Slide 5:
+
+- What this means for the reader.
+
+Slide 6:
+
+- CTA: free chart snapshot or reading.
+
+Example:
+
+```text
+Slide 1: Your Venus sign is not your whole love style.
+Slide 2: Most people stop at "Venus in Scorpio" or "Venus in Libra."
+Slide 3: But Venus has a house, aspects, condition, and a role in the whole chart.
+Slide 4: Venus in the 10th speaks differently than Venus in the 4th.
+Slide 5: A real reading asks: where does Venus act, what supports it, and what complicates it?
+Slide 6: Get your chart read as a whole at Mystic Birth Chart.
+```
+
+### Instagram Caption Template
+
+```text
+Most birth chart advice treats placements like separate personality traits.
+
+Traditional astrology asks a better question:
+what is this planet doing in the structure of the whole chart?
+
+That is why two people with the same Moon sign can experience it very differently.
+
+If you want your chart read as a whole, start with the free birth chart snapshot or order a hand-prepared reading.
+```
+
+### YouTube Short Template
+
+```text
+Hook:
+Your Rising sign is not just your "first impression."
+
+Body:
+In traditional astrology, the Rising sign sets the entire house structure.
+It decides which topics belong to which parts of life.
+It also points to the chart ruler, one of the first planets an astrologer studies.
+
+CTA:
+That is why a real chart reading starts there. Try the free chart snapshot at Mystic Birth Chart.
+```
+
+### Pinterest Pin Copy Template
+
+Title:
+
+```text
+What Your Chart Ruler Means in Astrology
+```
+
+Overlay:
+
+```text
+The planet that leads your birth chart
+```
+
+Description:
+
+```text
+Learn why traditional astrologers begin with the Ascendant and chart ruler, and how this changes the way you read your whole birth chart.
+```
+
+Destination:
+
+- Relevant blog post or `/free-birth-chart`.
+
+## 17. Product Copy Bank
+
+Use these ideas across the site, emails, social posts, and ads.
+
+### Short CTAs
+
+- "Start with a free chart snapshot"
+- "Order a hand-prepared reading"
+- "Read your chart as a whole"
+- "Get the Basic Natal Reading"
+- "Go deeper with the Complete Reading"
+- "See a sample report"
+
+### Offer Headlines
+
+- "A birth chart reading that does not stop at your Sun sign."
+- "Your chart is not a list of placements."
+- "Traditional astrology, translated into clear modern guidance."
+- "A hand-prepared natal report for people who want the whole pattern."
+- "Know where your chart begins, what it repeats, and what it asks of you."
+
+### Objection Handling
+
+Objection: "Why pay if calculators are free?"
+
+Answer:
+
+```text
+A free calculator can list placements. A reading decides which placements matter most, how they connect, and what the chart is emphasizing as a whole.
+```
+
+Objection: "Will this predict my future?"
+
+Answer:
+
+```text
+The reading is not a guaranteed prediction service. It is a structured interpretation of your natal chart for self-reflection, clarity, and practical insight.
+```
+
+Objection: "I do not know my birth time."
+
+Answer:
+
+```text
+A birth time makes the reading more precise, especially for houses and the Ascendant. If the time is unknown, the reading can still discuss planets and aspects, but some parts will be limited.
+```
+
+## 18. Future Product Ladder
+
+Do not build these before the core funnel works, but keep them in mind.
+
+Possible future products:
+
+- Mini Venus Reading
+- Saturn Return Reading
+- Career/Vocation Reading
+- Love Pattern Reading
+- Annual Astrology Guide
+- Monthly astrology membership
+- Transit update PDF
+- Synastry/couple reading
+- Anonymous chart submission paid feature
+
+Priority order:
+
+1. Make Basic and Complete readings sell consistently.
+2. Add testimonials and sample excerpts.
+3. Add email capture and welcome flow.
+4. Add small digital products or mini readings.
+5. Add membership only if there is repeat demand.
+
+## 19. Growth Priorities
+
+Highest priority before serious traffic:
+
+1. Buy domain.
+2. Connect domain to Vercel.
+3. Configure professional support email.
+4. Configure Stripe.
+5. Configure GA4 and Search Console.
+6. Configure newsletter capture.
+7. Add at least one real sample/testimonial after first clients.
+
+Content priority:
+
+1. Keep improving high-intent blog posts.
+2. Create Pinterest assets for existing posts.
+3. Create Instagram/Reels/Shorts from existing articles.
+4. Build an anonymous submissions page or form.
+5. Create a repeatable weekly content calendar.
+
+Conversion priority:
+
+1. Ensure every major page has a clear CTA.
+2. Ensure checkout is simple on mobile.
+3. Add trust details: delivery time, what is included, refund policy, sample report.
+4. Add testimonials when available.
+5. Test Basic vs Complete emphasis.
+
+## 20. Technical Operations
+
+Important commands:
+
+```bash
+npm run dev
+npm run lint
+npm run build
+```
+
+Before pushing:
+
+- Run lint.
+- Run build if code changed.
+- Check key routes if possible.
+
+Known issue:
+
+- `npm audit --omit=dev` previously showed moderate vulnerabilities related to `postcss` under `next`.
+- Do not run `npm audit fix --force` blindly because it may downgrade or break Next.
+- Wait for compatible Next updates or evaluate carefully.
+
+Environment variables from `.env.example`:
+
+```text
+NEXT_PUBLIC_SITE_URL=https://mystic-birth-chart.vercel.app
+NEXT_PUBLIC_GA_MEASUREMENT_ID=
+NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=
+NEXT_PUBLIC_SUPPORT_EMAIL=hello@mysticbirthchart.com
+STRIPE_SECRET_KEY=
+STRIPE_BASIC_PRICE_ID=
+STRIPE_COMPLETE_PRICE_ID=
+NEXT_PUBLIC_BIRTH_DETAILS_FORM_URL=
+```
+
+Do not commit real `.env.local` secrets.
+
+## 21. Pending Setup Checklist
+
+Domain:
+
+- Buy final domain.
+- Connect in Vercel.
+- Update `NEXT_PUBLIC_SITE_URL`.
+
+Email:
+
+- Create professional mailbox.
+- Update `NEXT_PUBLIC_SUPPORT_EMAIL`.
+- Configure SPF, DKIM, DMARC when domain/email service is selected.
+
+Stripe:
+
+- Create Basic product/price.
+- Create Complete product/price.
+- Add Stripe env vars in Vercel.
+- Test checkout.
+
+Analytics:
+
+- Create GA4 property/web stream.
+- Add measurement ID to Vercel.
+- Verify events.
+- Add Search Console token.
+- Submit sitemap.
+
+Newsletter:
+
+- Choose service, likely Brevo first.
+- Add signup form/integration.
+- Create welcome sequence.
+
+Social:
+
+- Create Instagram.
+- Create Pinterest business account.
+- Create YouTube channel.
+- Use same handle if available.
+- Make `/free-birth-chart` the default link-in-bio destination.
+
+Proof:
+
+- Add testimonials after first real readings.
+- Add anonymized sample excerpts.
+- Add delivery screenshots or review snippets if allowed.
+
+## 22. AI Collaboration Rules
+
+When another AI works on this project:
+
+- Read this file first.
+- Preserve the old-study/Victorian astrology direction.
+- Do not turn the site into a generic purple mystical design.
+- Do not remove the real educational angle to make it only a sales page.
+- Keep English copy aimed at USD buyers.
+- Keep the free chart tool easy: city input, no latitude/longitude requirement.
+- Protect readability and contrast.
+- Keep checkout custom until the final Stripe payment step.
+- Do not invent fake testimonials.
+- Do not make medical, legal, financial, psychological, or guaranteed predictive claims.
+- Do not commit secrets.
+- Update this file after major changes to product, positioning, channels, or technical setup.
+

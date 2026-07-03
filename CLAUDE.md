@@ -1,1 +1,2 @@
 @AGENTS.md
+@MYSTIC_CONTEXT.md
