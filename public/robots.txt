@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://mystic-birth-chart.vercel.app/sitemap.xml
+Sitemap: https://mysticbirthchart.com/sitemap.xml

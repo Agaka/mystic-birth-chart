@@ -19,7 +19,8 @@ The business goal is direct:
 
 Current public site:
 
-- Vercel: `https://mystic-birth-chart.vercel.app`
+- Public brand domain to use in copy, images, bios, pins, posts, SEO defaults, and customer-facing links: `https://mysticbirthchart.com`
+- The Vercel preview URL is infrastructure only. Never use the Vercel URL in public-facing copy, images, social bios, social captions, Pinterest pins, screenshots, videos, or branded assets.
 - GitHub repo: `https://github.com/Agaka/mystic-birth-chart`
 - Repo name: `mystic-birth-chart`
 - Vercel workspace: `allansobrero-2788's projects`
@@ -419,7 +420,7 @@ Important privacy rule:
 
 ## 11. Email and Newsletter Strategy
 
-The user does not yet own the final domain or email.
+The intended public domain is `mysticbirthchart.com`.
 
 Recommended setup:
 
@@ -1030,7 +1031,7 @@ Known issue:
 Environment variables from `.env.example`:
 
 ```text
-NEXT_PUBLIC_SITE_URL=https://mystic-birth-chart.vercel.app
+NEXT_PUBLIC_SITE_URL=https://mysticbirthchart.com
 NEXT_PUBLIC_GA_MEASUREMENT_ID=
 NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=
 NEXT_PUBLIC_SUPPORT_EMAIL=hello@mysticbirthchart.com

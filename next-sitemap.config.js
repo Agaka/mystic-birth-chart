@@ -1,6 +1,6 @@
 /** @type {import('next-sitemap').IConfig} */
 const config = {
-  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://mystic-birth-chart.vercel.app',
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://mysticbirthchart.com',
   generateRobotsTxt: false, // We have a manual robots.txt
   generateIndexSitemap: false,
   exclude: ['/thank-you', '/checkout/pending'],

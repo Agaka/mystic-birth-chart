@@ -3,7 +3,7 @@ export const siteConfig = {
   tagline: "Traditional astrology readings for modern questions.",
   description:
     "Premium English-language birth chart readings grounded in traditional astrology, practical synthesis, and clear written guidance.",
-  url: process.env.NEXT_PUBLIC_SITE_URL || "https://mystic-birth-chart.vercel.app",
+  url: process.env.NEXT_PUBLIC_SITE_URL || "https://mysticbirthchart.com",
   author: "Mystic Birth Chart",
   supportEmail: process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "hello@mysticbirthchart.com",
   capacity: "5 hand-prepared readings available per day",

@@ -54,7 +54,7 @@ Create a `.env.local` file in the project root. See `.env.example` for all avail
 
 | Variable | Description | Required |
 |---|---|---|
-| `NEXT_PUBLIC_SITE_URL` | Production URL, for example `https://mystic-birth-chart.vercel.app` | Recommended |
+| `NEXT_PUBLIC_SITE_URL` | Production URL, for example `https://mysticbirthchart.com` | Recommended |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Google Analytics 4 measurement ID, for example `G-...` | Recommended |
 | `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | Google Search Console HTML tag token | Recommended |
 | `NEXT_PUBLIC_SUPPORT_EMAIL` | Public support email shown in legal pages and mailto fallbacks | Recommended |
