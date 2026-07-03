@@ -3,7 +3,7 @@ const config = {
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://mystic-birth-chart.vercel.app',
   generateRobotsTxt: false, // We have a manual robots.txt
   generateIndexSitemap: false,
-  exclude: ['/thank-you'],
+  exclude: ['/thank-you', '/checkout/pending'],
   outDir: './public',
   transform: async (_config, path) => {
     const isBlogPost = path.startsWith('/blog/') && !path.startsWith('/blog/category/');

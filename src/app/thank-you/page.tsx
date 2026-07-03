@@ -1,13 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/Button";
 import { trackEvent } from "@/lib/analytics";
-import { getFormUrl } from "@/lib/site";
+import { getFormUrl, siteConfig } from "@/lib/site";
+
+interface CheckoutDraft {
+  tier?: string;
+  name?: string;
+  email?: string;
+  birthDate?: string;
+  birthTime?: string;
+  birthCity?: string;
+  focus?: string;
+  notes?: string;
+}
+
+const draftStorageKey = "mysticBirthChartCheckoutDraft";
 
 export default function ThankYouPage() {
   const formUrl = getFormUrl();
+  const supportEmail = siteConfig.supportEmail;
   const [submitted, setSubmitted] = useState(false);
+  const [draft, setDraft] = useState<CheckoutDraft | null>(null);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      try {
+        const stored = window.localStorage.getItem(draftStorageKey);
+        if (stored) {
+          setDraft(JSON.parse(stored) as CheckoutDraft);
+        }
+      } catch {
+        window.localStorage.removeItem(draftStorageKey);
+      }
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -21,6 +51,7 @@ export default function ThankYouPage() {
     }
 
     const formData = new FormData(e.currentTarget);
+    const tier = formData.get("tier") || "";
     const name = formData.get("name") || "";
     const email = formData.get("email") || "";
     const birthDate = formData.get("birthDate") || "";
@@ -30,9 +61,18 @@ export default function ThankYouPage() {
     const notes = formData.get("notes") || "";
 
     const subject = `Birth Chart Reading - ${name}`;
-    const body = `Name: ${name}%0AEmail: ${email}%0ABirth Date: ${birthDate}%0ABirth Time: ${birthTime}%0ABirth City: ${birthCity}%0AFocus: ${focus}%0ANotes: ${notes}`;
+    const body = [
+      `Reading tier: ${tier}`,
+      `Name: ${name}`,
+      `Email: ${email}`,
+      `Birth Date: ${birthDate}`,
+      `Birth Time: ${birthTime}`,
+      `Birth City: ${birthCity}`,
+      `Focus: ${focus}`,
+      `Notes: ${notes}`,
+    ].join("\n");
 
-    window.location.href = `mailto:hello@mysticbirthchart.com?subject=${encodeURIComponent(String(subject))}&body=${body}`;
+    window.location.href = `mailto:${supportEmail}?subject=${encodeURIComponent(String(subject))}&body=${encodeURIComponent(body)}`;
     setSubmitted(true);
   };
 
@@ -57,18 +97,19 @@ export default function ThankYouPage() {
           {submitted ? (
             <div className="border border-gold/20 bg-ivory-dark p-8 text-center">
               <p className="font-ui text-xs font-semibold uppercase tracking-[0.2em] text-gold-dark">
-                Details received
+                Details prepared
               </p>
               <h2 className="mt-4 font-heading text-3xl font-medium text-aubergine">
-                Your chart can now be prepared.
+                Your email draft is ready to send.
               </h2>
               <p className="mt-4 text-ink/60">
-                You will receive your reading within the delivery window for
-                your selected option.
+                Send the email draft so your reading details can be matched to
+                your payment.
               </p>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form key={draft?.email || "empty"} onSubmit={handleSubmit} className="space-y-6">
+              <input type="hidden" name="tier" value={draft?.tier || ""} />
               <div>
                 <label
                   htmlFor="name"
@@ -81,6 +122,7 @@ export default function ThankYouPage() {
                   id="name"
                   name="name"
                   required
+                  defaultValue={draft?.name || ""}
                   className="w-full border border-ink/15 bg-white px-4 py-3 font-body text-ink transition-colors placeholder:text-ink/30 focus:border-gold focus:outline-none"
                   placeholder="Your name"
                 />
@@ -98,6 +140,7 @@ export default function ThankYouPage() {
                   id="email"
                   name="email"
                   required
+                  defaultValue={draft?.email || ""}
                   className="w-full border border-ink/15 bg-white px-4 py-3 font-body text-ink transition-colors placeholder:text-ink/30 focus:border-gold focus:outline-none"
                   placeholder="your@email.com"
                 />
@@ -116,6 +159,7 @@ export default function ThankYouPage() {
                     id="birthDate"
                     name="birthDate"
                     required
+                    defaultValue={draft?.birthDate || ""}
                     className="w-full border border-ink/15 bg-white px-4 py-3 font-body text-ink transition-colors focus:border-gold focus:outline-none"
                   />
                 </div>
@@ -130,6 +174,7 @@ export default function ThankYouPage() {
                     type="time"
                     id="birthTime"
                     name="birthTime"
+                    defaultValue={draft?.birthTime || ""}
                     className="w-full border border-ink/15 bg-white px-4 py-3 font-body text-ink transition-colors focus:border-gold focus:outline-none"
                   />
                   <p className="mt-1 text-xs text-ink/40">
@@ -150,6 +195,7 @@ export default function ThankYouPage() {
                   id="birthCity"
                   name="birthCity"
                   required
+                  defaultValue={draft?.birthCity || ""}
                   className="w-full border border-ink/15 bg-white px-4 py-3 font-body text-ink transition-colors placeholder:text-ink/30 focus:border-gold focus:outline-none"
                   placeholder="e.g. Sao Paulo, Brazil"
                 />
@@ -165,6 +211,7 @@ export default function ThankYouPage() {
                 <select
                   id="focus"
                   name="focus"
+                  defaultValue={draft?.focus || "general"}
                   className="w-full border border-ink/15 bg-white px-4 py-3 font-body text-ink transition-colors focus:border-gold focus:outline-none"
                 >
                   <option value="general">General overview</option>
@@ -188,6 +235,7 @@ export default function ThankYouPage() {
                   id="notes"
                   name="notes"
                   rows={4}
+                  defaultValue={draft?.notes || ""}
                   className="w-full resize-y border border-ink/15 bg-white px-4 py-3 font-body text-ink transition-colors placeholder:text-ink/30 focus:border-gold focus:outline-none"
                   placeholder="Specific questions, areas of interest, or anything you want included."
                 />

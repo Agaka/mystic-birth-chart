@@ -70,7 +70,7 @@ const faqItems = [
   {
     question: "Can I get a refund?",
     answer:
-      "Because each reading is personalized to your birth data, refunds are generally not offered after delivery. If there is a clear issue with your report, contact us and we will address it.",
+      "Refunds are available before the reading work begins. Once a personalized reading is prepared or delivered, refunds are generally not offered unless there is a clear fulfillment issue.",
   },
 ];
 

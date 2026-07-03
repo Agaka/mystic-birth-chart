@@ -5,6 +5,7 @@ export const siteConfig = {
     "Premium English-language birth chart readings grounded in traditional astrology, practical synthesis, and clear written guidance.",
   url: process.env.NEXT_PUBLIC_SITE_URL || "https://mystic-birth-chart.vercel.app",
   author: "Mystic Birth Chart",
+  supportEmail: process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "hello@mysticbirthchart.com",
   capacity: "5 hand-prepared readings available per day",
   product: {
     basic: {
@@ -64,18 +65,11 @@ export function getCheckoutUrl(): string {
 }
 
 export function getBasicCheckoutUrl(): string {
-  return (
-    process.env.NEXT_PUBLIC_STRIPE_BASIC_PAYMENT_LINK ||
-    process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK ||
-    "/birth-chart-report#basic-reading"
-  );
+  return "/checkout/basic";
 }
 
 export function getCompleteCheckoutUrl(): string {
-  return (
-    process.env.NEXT_PUBLIC_STRIPE_COMPLETE_PAYMENT_LINK ||
-    "/birth-chart-report#complete-reading"
-  );
+  return "/checkout/complete";
 }
 
 export function getFormUrl(): string {

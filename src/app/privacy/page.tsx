@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -92,7 +93,7 @@ export default function PrivacyPage() {
           <h2>Contact</h2>
           <p>
             For privacy-related questions or requests, contact us at
-            hello@mysticbirthchart.com.
+            {siteConfig.supportEmail}.
           </p>
         </div>
       </div>

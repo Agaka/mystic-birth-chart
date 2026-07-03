@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
@@ -71,7 +72,7 @@ export default function TermsPage() {
           </p>
           <p>
             If your reading has not yet been prepared, you may request a refund
-            by contacting hello@mysticbirthchart.com.
+            by contacting {siteConfig.supportEmail}.
           </p>
 
           <h2>Intellectual Property</h2>
@@ -102,7 +103,7 @@ export default function TermsPage() {
           <h2>Contact</h2>
           <p>
             For questions about these terms, contact us at
-            hello@mysticbirthchart.com.
+            {siteConfig.supportEmail}.
           </p>
         </div>
       </div>

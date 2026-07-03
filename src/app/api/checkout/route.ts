@@ -1,39 +1,54 @@
+import Stripe from "stripe";
 import { NextResponse } from "next/server";
+import { getReadingOffer, isReadingTier } from "@/lib/orders";
+import { siteConfig } from "@/lib/site";
 
-export async function POST() {
+export async function POST(request: Request) {
   const secretKey = process.env.STRIPE_SECRET_KEY;
-  const priceId = process.env.STRIPE_PRICE_ID;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || siteConfig.url;
+  const body = (await request.json().catch(() => ({}))) as {
+    tier?: string;
+    name?: string;
+    email?: string;
+  };
+
+  if (!isReadingTier(body.tier)) {
+    return NextResponse.json({ message: "Invalid reading tier." }, { status: 400 });
+  }
+
+  const offer = getReadingOffer(body.tier);
+  const priceId = offer.priceId;
 
   if (!secretKey || !priceId) {
     return NextResponse.json(
       {
         message:
-          "Stripe is not configured. Set STRIPE_SECRET_KEY and STRIPE_PRICE_ID environment variables.",
-        redirectUrl: `${siteUrl}/thank-you`,
+          "Stripe is not configured. Set STRIPE_SECRET_KEY and the reading price IDs in Vercel.",
+        redirectUrl: `${siteUrl}/checkout/pending?tier=${offer.tier}`,
       },
       { status: 200 }
     );
   }
 
-  // When Stripe is configured, install the stripe package and enable this block.
-  //
-  // const Stripe = (await import("stripe")).default;
-  // const stripe = new Stripe(secretKey);
-  //
-  // const session = await stripe.checkout.sessions.create({
-  //   payment_method_types: ["card"],
-  //   line_items: [{ price: priceId, quantity: 1 }],
-  //   mode: "payment",
-  //   success_url: `${siteUrl}/thank-you?session_id={CHECKOUT_SESSION_ID}`,
-  //   cancel_url: `${siteUrl}/birth-chart-report`,
-  // });
-  //
-  // return NextResponse.json({ url: session.url });
-
-  return NextResponse.json({
-    message:
-      "Stripe integration ready. Install stripe package and uncomment the checkout code.",
-    redirectUrl: `${siteUrl}/thank-you`,
+  const stripe = new Stripe(secretKey);
+  const session = await stripe.checkout.sessions.create({
+    mode: "payment",
+    customer_email: body.email,
+    line_items: [{ price: priceId, quantity: 1 }],
+    success_url: `${siteUrl}/thank-you?tier=${offer.tier}&session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${siteUrl}${offer.checkoutPath}`,
+    client_reference_id: offer.tier,
+    metadata: {
+      reading_tier: offer.tier,
+      reading_name: offer.product.name,
+    },
+    branding_settings: {
+      display_name: siteConfig.name,
+      button_color: "#b88a3a",
+      border_style: "rectangular",
+      font_family: "lora",
+    },
   });
+
+  return NextResponse.json({ url: session.url });
 }

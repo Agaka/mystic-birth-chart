@@ -54,15 +54,14 @@ Create a `.env.local` file in the project root. See `.env.example` for all avail
 
 | Variable | Description | Required |
 |---|---|---|
-| `NEXT_PUBLIC_SITE_URL` | Production URL, for example `https://mysticbirthchart.com` | Recommended |
+| `NEXT_PUBLIC_SITE_URL` | Production URL, for example `https://mystic-birth-chart.vercel.app` | Recommended |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Google Analytics 4 measurement ID, for example `G-...` | Recommended |
 | `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | Google Search Console HTML tag token | Recommended |
-| `NEXT_PUBLIC_STRIPE_PAYMENT_LINK` | Fallback Stripe Payment Link URL | For payment |
-| `NEXT_PUBLIC_STRIPE_BASIC_PAYMENT_LINK` | Stripe Payment Link for Basic Reading | For payment |
-| `NEXT_PUBLIC_STRIPE_COMPLETE_PAYMENT_LINK` | Stripe Payment Link for Complete Reading | For payment |
+| `NEXT_PUBLIC_SUPPORT_EMAIL` | Public support email shown in legal pages and mailto fallbacks | Recommended |
 | `NEXT_PUBLIC_BIRTH_DETAILS_FORM_URL` | External form URL, such as Tally, Formspree, or Google Forms | Optional |
-| `STRIPE_SECRET_KEY` | Stripe secret key for API checkout | Optional |
-| `STRIPE_PRICE_ID` | Stripe price ID for API checkout | Optional |
+| `STRIPE_SECRET_KEY` | Stripe secret key for API checkout | For payment |
+| `STRIPE_BASIC_PRICE_ID` | Stripe price ID for Basic Reading | For payment |
+| `STRIPE_COMPLETE_PRICE_ID` | Stripe price ID for Complete Reading | For payment |
 
 ## Analytics Setup
 
@@ -75,6 +74,7 @@ Tracked events:
 
 - `cta_click`
 - `reading_offer_click`
+- `checkout_submit_attempt`
 - `free_chart_city_search`
 - `free_chart_snapshot_generated`
 - `birth_details_submit_attempt`
@@ -83,23 +83,15 @@ The free chart tool does not send birth date, birth time, or birth city to GA ev
 
 ## Payment Setup
 
-Checkout can stay disabled until the content and analytics base is ready.
+The site uses custom checkout pages at `/checkout/basic` and `/checkout/complete`.
+The final card payment step is handled by Stripe Checkout through `/api/checkout`.
 
-### Option A: Stripe Payment Links
+1. Create one Stripe product/price for Basic Reading.
+2. Create one Stripe product/price for Complete Reading.
+3. Set `STRIPE_SECRET_KEY`, `STRIPE_BASIC_PRICE_ID`, and `STRIPE_COMPLETE_PRICE_ID`.
+4. Redeploy.
 
-1. Create one Payment Link for Basic Reading and one for Complete Reading.
-2. Set `NEXT_PUBLIC_STRIPE_BASIC_PAYMENT_LINK`.
-3. Set `NEXT_PUBLIC_STRIPE_COMPLETE_PAYMENT_LINK`.
-4. Reading buttons will link directly to the matching Stripe offer.
-
-### Option B: Stripe Checkout API
-
-1. Set `STRIPE_SECRET_KEY` and `STRIPE_PRICE_ID`.
-2. Install Stripe with `npm install stripe`.
-3. Finish the `/api/checkout` route.
-4. Update CTA buttons to POST to `/api/checkout`.
-
-Without payment variables, buttons fall back to the reading options section on `/birth-chart-report`.
+Without Stripe variables, the checkout form redirects to `/checkout/pending` instead of failing.
 
 ## Form Setup
 
@@ -152,6 +144,7 @@ src/
 |   |   |-- [slug]/         # Individual article pages
 |   |   `-- category/
 |   |       `-- [category]/ # Category pages
+|   |-- checkout/           # Custom checkout pages before Stripe payment
 |   |-- free-birth-chart/   # Free chart snapshot tool
 |   |-- privacy/            # Privacy policy
 |   |-- sample-report/      # Sample report preview
