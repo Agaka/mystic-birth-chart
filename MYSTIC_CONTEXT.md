@@ -1,6 +1,6 @@
 # Mystic Birth Chart - AI Context and Growth Bible
 
-Last updated: 2026-07-03
+Last updated: 2026-07-04
 
 This file is the long-term memory for Mystic Birth Chart. Any AI, developer, designer, copywriter, or content assistant working on this project should read it before making decisions about copy, design, content, social media, SEO, conversion, or product strategy.
 
@@ -456,6 +456,10 @@ Email 5: "Choose your reading: Basic or Complete"
 
 ### Typewriter Astrology
 
+Detailed content analysis file:
+
+- `marketing/content-strategy/typewriter-astrology-analysis.md`
+
 Important competitor because it has:
 
 - Strong vintage/typewriter aesthetic.
@@ -466,6 +470,8 @@ Important competitor because it has:
 - Higher-priced chart reports.
 - Anonymous submissions/community prompts.
 - Instagram account with strong visual identity.
+- Dense, useful carousel posts tied to current or yearly astrology timing.
+- Rising-sign breakdowns that translate major transits into concrete house topics.
 
 What to learn:
 
@@ -473,12 +479,15 @@ What to learn:
 - A product ladder lets buyers start small and upgrade later.
 - A personal/editorial voice builds trust.
 - Submissions create repeatable social content.
+- Timely posts about planets entering signs, retrogrades, lunations, and yearly transits feel more useful than generic evergreen astrology.
+- Future Mystic carousels should be more text-rich when the subject benefits from explanation, especially for transit notes, rising-sign forecasts, and planet/sign columns.
 
 What not to copy directly:
 
 - Do not clone the exact typewriter look.
 - Do not copy product names.
 - Do not copy posts or visual layouts.
+- Do not copy exact wording, captions, CTA mechanics, or brand marks.
 
 ### Co-Star
 
