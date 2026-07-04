@@ -20,10 +20,15 @@ The business goal is direct:
 Current public site:
 
 - Public brand domain to use in copy, images, bios, pins, posts, SEO defaults, and customer-facing links: `https://mysticbirthchart.com`
+- Domain status: purchased at Hostinger and connected to Vercel on 2026-07-04. Both `https://mysticbirthchart.com` and `https://www.mysticbirthchart.com` showed valid Vercel configuration and loaded the live site.
+- DNS status: Hostinger nameservers remain active so Hostinger email records stay in place. The root `A` record points to Vercel at `216.198.79.1`; `www` is configured as a CNAME to `mysticbirthchart.com`.
 - The Vercel preview URL is infrastructure only. Never use the Vercel URL in public-facing copy, images, social bios, social captions, Pinterest pins, screenshots, videos, or branded assets.
 - GitHub repo: `https://github.com/Agaka/mystic-birth-chart`
 - Repo name: `mystic-birth-chart`
 - Vercel workspace: `allansobrero-2788's projects`
+- Vercel public environment variables configured on 2026-07-04:
+  - `NEXT_PUBLIC_SITE_URL=https://mysticbirthchart.com`
+  - `NEXT_PUBLIC_SUPPORT_EMAIL=hello@mysticbirthchart.com`
 
 Current tech stack:
 
@@ -1065,15 +1070,16 @@ Do not commit real `.env.local` secrets.
 
 Domain:
 
-- Buy final domain.
-- Connect in Vercel.
-- Update `NEXT_PUBLIC_SITE_URL`.
+- Done: buy final domain.
+- Done: connect root domain and `www` in Vercel.
+- Done: update `NEXT_PUBLIC_SITE_URL` in Vercel.
 
 Email:
 
-- Create professional mailbox.
-- Update `NEXT_PUBLIC_SUPPORT_EMAIL`.
-- Configure SPF, DKIM, DMARC when domain/email service is selected.
+- Done: create `hello@mysticbirthchart.com` mailbox.
+- Done: update `NEXT_PUBLIC_SUPPORT_EMAIL` in Vercel.
+- Done: Hostinger MX, SPF, DKIM, and DMARC records are present in DNS.
+- Pending: manually test sending and receiving from `hello@mysticbirthchart.com`.
 
 Stripe:
 
