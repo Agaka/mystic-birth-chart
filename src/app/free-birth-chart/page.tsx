@@ -5,23 +5,23 @@ import { CTASection } from "@/components/CTASection";
 import { getBasicCheckoutUrl, getCompleteCheckoutUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Free Birth Chart Snapshot",
+  title: "Free Birth Chart Preview",
   description:
-    "Calculate a free natal chart snapshot with Sun, Moon, Rising, chart ruler, and a short traditional-first interpretation.",
+    "Begin a free birth chart preview with Sun, Moon, Rising, chart ruler, sect, and a traditional-first interpretation that points toward the full chart.",
 };
 
 const reasons = [
   {
-    title: "It gives the surface",
-    body: "Sun, Moon, Rising, chart ruler, and day or night chart are enough to feel the language of your chart without pretending to replace a full synthesis.",
+    title: "It gives you a real opening",
+    body: "Sun, Moon, Rising, chart ruler, and day or night chart can already feel personal when they are written as a reading, not as a list of keywords.",
   },
   {
     title: "It stays private",
-    body: "The sample runs in your browser. It does not require an account, email signup, or a stored profile.",
+    body: "The preview runs in your browser. It does not require an account, email signup, or a stored profile before you know whether the tone feels right.",
   },
   {
-    title: "It points to the real work",
-    body: "A complete reading studies houses, rulers, aspects, condition, emphasis, and how the placements speak to each other.",
+    title: "It leaves the deeper questions open",
+    body: "A complete reading studies houses, rulers, aspects, condition, emphasis, and how the placements speak to each other instead of stopping at three signs.",
   },
 ];
 
@@ -32,16 +32,17 @@ export default function FreeBirthChartPage() {
         <div className="mx-auto grid max-w-7xl gap-12 px-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
           <div>
             <p className="mb-4 font-ui text-xs font-semibold uppercase tracking-[0.22em] text-gold/70">
-              Free natal chart snapshot
+              Free birth chart preview
             </p>
             <h1 className="font-heading text-4xl font-semibold leading-tight text-ivory md:text-6xl">
-              Take a first look at your chart before ordering a reading.
+              Start with a first reading of your chart.
             </h1>
           </div>
           <p className="max-w-2xl text-lg leading-relaxed text-ivory/68">
-            Enter your birth details and receive a quick traditional-first
-            snapshot: Sun, Moon, Rising, chart ruler, day or night chart, and a
-            short interpretation of what those placements suggest.
+            Enter your birth details and receive a denser traditional-first
+            preview: Sun, Moon, Rising, chart ruler, day or night chart, and an
+            interpretation written to feel personal without pretending to be the
+            complete map.
           </p>
         </div>
       </section>
@@ -65,9 +66,9 @@ export default function FreeBirthChartPage() {
               A chart is not three signs. It is a pattern.
             </h2>
             <p className="mt-5 text-lg leading-relaxed text-ink/62">
-              The snapshot is intentionally useful but incomplete. It helps you
-              recognize the main doorway, then shows why a hand-prepared reading
-              can go much deeper.
+              The free preview is intentionally useful but incomplete. It should
+              help you recognize the main doorway, then make the deeper question
+              obvious: how do these placements connect inside the whole chart?
             </p>
           </div>
 
@@ -112,7 +113,7 @@ export default function FreeBirthChartPage() {
       </section>
 
       <CTASection
-        title="A free snapshot can name the doorway. A reading opens the room."
+        title="A free preview can name the doorway. A reading opens the room."
         body="Order a written chart interpretation prepared with traditional structure and practical clarity."
         buttonLabel="Order a Reading"
         buttonHref={getBasicCheckoutUrl()}

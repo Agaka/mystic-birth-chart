@@ -92,4 +92,4 @@ The work is facing what operates quietly.
 
 Saturn's sign, aspects, sect, and role in the chart matter. If Saturn rules the chart, its house becomes even more important.
 
-For a first look, use the [free chart snapshot](/free-birth-chart). For Saturn inside the whole chart, compare the [reading options](/birth-chart-report).
+For a first look, use the [free chart preview](/free-birth-chart). For Saturn inside the whole chart, compare the [reading options](/birth-chart-report).

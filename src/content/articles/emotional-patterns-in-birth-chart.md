@@ -64,4 +64,4 @@ If the Moon, 4th house ruler, Venus, and Saturn all point toward similar themes,
 
 That emphasis is what a good reading should name.
 
-Start with the [free chart snapshot](/free-birth-chart), then use a full [birth chart reading](/birth-chart-report) if you want emotional patterns connected to career, love, family, and direction.
+Start with the [free chart preview](/free-birth-chart), then use a full [birth chart reading](/birth-chart-report) if you want emotional patterns connected to career, love, family, and direction.

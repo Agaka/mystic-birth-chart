@@ -60,4 +60,4 @@ Career is not only reputation. A vocation must also support life.
 
 The 10th house may show public direction, but the 2nd house shows how resources are built. The 6th house shows daily labor. A useful career reading should consider all three.
 
-Start with the [free chart snapshot](/free-birth-chart), then compare the [reading options](/birth-chart-report) if you want money, value, and vocation interpreted together.
+Start with the [free chart preview](/free-birth-chart), then compare the [reading options](/birth-chart-report) if you want money, value, and vocation interpreted together.

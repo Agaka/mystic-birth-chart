@@ -56,4 +56,4 @@ That is not useful astrology.
 
 A birth chart reading should place the nodes inside the whole chart. If the North Node repeats themes already shown by the chart ruler, Midheaven, or Saturn, then it may be especially important. If not, it is one factor among many.
 
-Use the [free birth chart snapshot](/free-birth-chart) to begin with the main structure. For purpose and direction as a full synthesis, compare the [reading options](/birth-chart-report).
+Use the [free birth chart preview](/free-birth-chart) to begin with the main structure. For purpose and direction as a full synthesis, compare the [reading options](/birth-chart-report).

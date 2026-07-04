@@ -62,4 +62,4 @@ The work is not to escape the stellium. It is to understand how to use it consci
 
 Generic stellium descriptions can be misleading because every stellium has a different ruler, house, condition, and aspect pattern.
 
-If you suspect you have a stellium, start with the [free chart snapshot](/free-birth-chart), then consider a full [reading](/birth-chart-report) if you want to know whether that concentration is actually central in your chart.
+If you suspect you have a stellium, start with the [free chart preview](/free-birth-chart), then consider a full [reading](/birth-chart-report) if you want to know whether that concentration is actually central in your chart.

@@ -56,4 +56,4 @@ Saturn-ruled charts often make more sense with age. The person may feel heavy, d
 
 The question is not how to avoid Saturn. The question is what Saturn is asking you to build.
 
-You can identify your Rising sign with the [free chart snapshot](/free-birth-chart). If Saturn rules your chart, a full [birth chart reading](/birth-chart-report) can help connect Saturn to the rest of the pattern.
+You can identify your Rising sign with the [free chart preview](/free-birth-chart). If Saturn rules your chart, a full [birth chart reading](/birth-chart-report) can help connect Saturn to the rest of the pattern.

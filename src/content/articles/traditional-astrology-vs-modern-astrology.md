@@ -64,7 +64,7 @@ Modern psychological language is still useful. A reading should be understandabl
 
 That is the difference between a stylish horoscope and a serious chart reading.
 
-If you want a quick first look at your own structure, use the [free chart snapshot](/free-birth-chart). It calculates your Sun, Moon, Rising, chart ruler, and sect. If you want the whole pattern interpreted, compare the [reading options](/birth-chart-report).
+If you want a quick first look at your own structure, use the [free chart preview](/free-birth-chart). It calculates your Sun, Moon, Rising, chart ruler, and sect. If you want the whole pattern interpreted, compare the [reading options](/birth-chart-report).
 
 ## The Best Reading Uses Both Carefully
 

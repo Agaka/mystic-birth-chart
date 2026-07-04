@@ -190,7 +190,7 @@ export function NatalChartSnapshotTool({
     const validTime = /^([01]\d|2[0-3]):[0-5]\d$/.test(time);
 
     if (!date || !time) {
-      setError("Enter your birth date and birth time to reveal the snapshot.");
+      setError("Enter your birth date and birth time to begin the free chart reading.");
       setResult(null);
       return;
     }
@@ -219,7 +219,7 @@ export function NatalChartSnapshotTool({
 
     setError("");
     setResult(snapshot);
-    trackEvent("free_chart_snapshot_generated", {
+    trackEvent("free_chart_preview_generated", {
       sun_sign: snapshot.sunSign,
       moon_sign: snapshot.moonSign,
       rising_sign: snapshot.risingSign,
@@ -237,15 +237,17 @@ export function NatalChartSnapshotTool({
       >
         <div>
           <p className="font-ui text-xs font-semibold uppercase tracking-[0.2em] text-gold/72">
-            Free chart snapshot
+            Free chart preview
           </p>
           <h2 className="mt-3 font-heading text-3xl font-semibold leading-tight text-ivory md:text-4xl">
-            Reveal the surface of your chart.
+            Begin with the first layer of your chart.
           </h2>
           <p className="mt-4 text-sm leading-relaxed text-ivory/58">
-            No account, no email wall. This quick sample calculates locally in
-            your browser and gives a short interpretation of your Sun, Moon,
-            Rising, chart ruler, and day or night chart.
+            No account, no email wall. This free preview calculates your chart
+            in the browser and gives a real first reading of your Sun, Moon,
+            Rising, chart ruler, and day or night chart. It is meant to feel
+            personal enough to matter, but incomplete enough to show why the
+            full chart needs synthesis.
           </p>
         </div>
 
@@ -380,7 +382,7 @@ export function NatalChartSnapshotTool({
 
         <div className="mt-7">
           <Button type="submit" size="lg" className="w-full" disabled={isFindingCity}>
-            {isFindingCity ? "Finding City..." : "Reveal My Snapshot"}
+            {isFindingCity ? "Finding City..." : "Begin My Free Reading"}
           </Button>
         </div>
       </form>
@@ -414,9 +416,9 @@ function EmptyResult() {
         Your first chart notes will appear here.
       </h3>
       <p className="mt-5 max-w-xl text-base leading-relaxed text-ink/62">
-        The free snapshot is designed to give a real taste without pretending to
-        be a full reading. It shows the main doorway, then points toward the
-        synthesis a hand-prepared report can provide.
+        The free preview is designed to give a real first taste without
+        pretending to be a full reading. It should name something recognizable,
+        then show where the deeper questions begin.
       </p>
       <div className="mt-8 grid gap-3 text-sm text-ink/62 sm:grid-cols-3">
         {["Sun sign", "Moon sign", "Rising sign"].map((item) => (
@@ -445,7 +447,7 @@ function SnapshotResult({
       <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
         <div>
           <p className="font-ui text-xs font-semibold uppercase tracking-[0.2em] text-gold-dark/80">
-            Your free snapshot
+            Your first chart reading
           </p>
           <h3 className="mt-3 font-heading text-3xl font-semibold leading-tight text-aubergine md:text-5xl">
             {result.sunSign} Sun. {result.moonSign} Moon. {result.risingSign} Rising.
@@ -454,20 +456,26 @@ function SnapshotResult({
         <div className="border border-gold/35 px-4 py-3 font-ui text-xs uppercase tracking-[0.16em] text-ink/58 md:text-right">
           <span className="block normal-case tracking-normal">{birthplaceLabel}</span>
           <span className="mt-1 block">
-            UTC {formatOffset(result.utcOffset)} · {result.timezone}
+            UTC {formatOffset(result.utcOffset)} / {result.timezone}
           </span>
         </div>
       </div>
 
       <p className="mt-6 text-lg leading-relaxed text-ink/70">{result.summary}</p>
+      <p className="mt-4 text-base leading-relaxed text-ink/58">
+        Read this as the opening page, not the final verdict. If it feels close,
+        the reason is that the chart is already speaking. The paid reading goes
+        further by deciding which parts of the chart deserve priority and how
+        these placements actually connect.
+      </p>
 
-      <div className="mt-8 grid gap-4 md:grid-cols-3">
+      <div className="mt-8 grid gap-4">
         {result.placements.map((placement) => (
-          <article key={placement.title} className="border border-gold/24 bg-white/28 p-5">
+          <article key={placement.title} className="border border-gold/24 bg-white/34 p-5 md:p-6">
             <h4 className="font-heading text-2xl font-semibold text-aubergine">
               {placement.title}
             </h4>
-            <p className="mt-3 text-sm leading-relaxed text-ink/66">
+            <p className="mt-3 text-base leading-relaxed text-ink/68">
               {placement.body}
             </p>
           </article>
@@ -476,11 +484,11 @@ function SnapshotResult({
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         {[result.rulerInterpretation, result.sectInterpretation].map((item) => (
-          <article key={item.title} className="border border-aubergine/18 bg-aubergine/[0.04] p-5">
+          <article key={item.title} className="border border-aubergine/18 bg-aubergine/[0.04] p-5 md:p-6">
             <h4 className="font-heading text-2xl font-semibold text-aubergine">
               {item.title}
             </h4>
-            <p className="mt-3 text-sm leading-relaxed text-ink/66">{item.body}</p>
+            <p className="mt-3 text-base leading-relaxed text-ink/68">{item.body}</p>
           </article>
         ))}
       </div>
@@ -494,8 +502,13 @@ function SnapshotResult({
           What a paid reading adds
         </p>
         <h4 className="mt-3 font-heading text-3xl font-semibold">
-          The real value is synthesis.
+          The part this preview cannot do is synthesis.
         </h4>
+        <p className="mt-3 text-sm leading-relaxed text-ivory/68">
+          A complete reading does not simply add more paragraphs. It decides
+          which placements matter most, which houses carry the story, and where
+          your chart repeats the same theme through different symbols.
+        </p>
         <ul className="mt-5 grid gap-3 text-sm leading-relaxed text-ivory/68 md:grid-cols-2">
           <li>+ House placements and angular emphasis</li>
           <li>+ Traditional rulers and planetary condition</li>

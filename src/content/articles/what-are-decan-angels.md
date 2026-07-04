@@ -97,4 +97,4 @@ Then, the practice is chosen.
 
 The result is not random occult content. It is astrology becoming devotional and practical.
 
-If you want the foundation first, start with the [free chart snapshot](/free-birth-chart). If you want the whole pattern interpreted, compare the [reading options](/birth-chart-report).
+If you want the foundation first, start with the [free chart preview](/free-birth-chart). If you want the whole pattern interpreted, compare the [reading options](/birth-chart-report).

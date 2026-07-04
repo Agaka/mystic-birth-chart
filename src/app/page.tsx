@@ -96,14 +96,14 @@ export default function HomePage() {
               Try your own chart first
             </p>
             <h2 className="font-heading text-3xl font-semibold leading-tight text-aubergine md:text-5xl">
-              Get a free Sun, Moon, and Rising snapshot.
+              Begin with a free chart preview.
             </h2>
           </div>
           <div>
             <p className="text-lg leading-relaxed text-ink/62">
-              Before ordering, use the free chart tool to see the surface of
-              your pattern. It gives a quick sample of the interpretive style,
-              then shows what a full hand-prepared reading adds.
+              Before ordering, use the free chart tool to read the first layer
+              of your pattern. It gives a richer sample of the interpretive
+              style, then shows why a full hand-prepared reading can go deeper.
             </p>
             <div className="mt-6">
               <Button
@@ -112,12 +112,12 @@ export default function HomePage() {
                 analytics={{
                   event: "cta_click",
                   params: {
-                    cta_label: "Calculate My Free Snapshot",
+                    cta_label: "Begin My Free Chart Preview",
                     cta_location: "homepage_free_chart_section",
                   },
                 }}
               >
-                Calculate My Free Snapshot
+                Begin My Free Chart Preview
               </Button>
             </div>
           </div>

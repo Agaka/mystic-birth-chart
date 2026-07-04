@@ -70,4 +70,4 @@ This is why a full chart reading matters.
 
 If you want one practical question, ask: what does my Moon need before I can respond wisely?
 
-You can find your Moon sign with the [free chart snapshot](/free-birth-chart). For a full synthesis of Moon, houses, and aspects, compare the [reading options](/birth-chart-report).
+You can find your Moon sign with the [free chart preview](/free-birth-chart). For a full synthesis of Moon, houses, and aspects, compare the [reading options](/birth-chart-report).

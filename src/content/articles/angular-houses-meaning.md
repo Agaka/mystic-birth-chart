@@ -56,4 +56,4 @@ This does not mean non-angular planets do not matter. But angular planets usuall
 
 If your chart has several angular planets, those planets may define the main story.
 
-Use the [free chart snapshot](/free-birth-chart) for your first placements. A full [birth chart reading](/birth-chart-report) can identify angular emphasis and explain why some planets speak louder than others.
+Use the [free chart preview](/free-birth-chart) for your first placements. A full [birth chart reading](/birth-chart-report) can identify angular emphasis and explain why some planets speak louder than others.

@@ -305,7 +305,7 @@ Current important routes:
 - `/blog` - article index
 - `/blog/[slug]` - individual article pages
 - `/blog/category/[category]` - category pages
-- `/free-birth-chart` - free birth chart snapshot tool
+- `/free-birth-chart` - free birth chart preview tool
 - `/birth-chart-report` - sales page for readings
 - `/sample-report` - sample report preview
 - `/checkout/basic` - custom checkout pre-payment page
@@ -333,8 +333,10 @@ The free tool:
 - Route: `/free-birth-chart`
 - Uses city search, not manual latitude/longitude.
 - Uses Open-Meteo geocoding.
-- Gives static sample interpretations.
+- Gives static but dense first-reading interpretations.
 - It is a lead magnet, not a full reading replacement.
+- Public copy should call it a "free chart preview" or "first chart reading", not a "snapshot".
+- The output must feel personal enough to create recognition, but incomplete enough to make the user want the full chart interpreted.
 
 ## 8. Funnel Strategy
 
@@ -354,7 +356,7 @@ Primary CTA:
 
 - "Get My Chart Reading"
 - "Order Your Birth Chart Reading"
-- "Start With a Free Chart Snapshot"
+- "Begin My Free Chart Preview"
 - "Order Basic Reading"
 - "Order Complete Reading"
 
@@ -411,7 +413,7 @@ Tracked events include:
 - `reading_offer_click`
 - `checkout_submit_attempt`
 - `free_chart_city_search`
-- `free_chart_snapshot_generated`
+- `free_chart_preview_generated`
 - `birth_details_submit_attempt`
 
 Important privacy rule:
@@ -579,7 +581,7 @@ Bio draft:
 
 ```text
 Traditional astrology for modern questions
-Free birth chart snapshot below
+Free birth chart preview below
 Hand-prepared natal readings from $29
 ```
 
@@ -693,7 +695,7 @@ Shorts structure:
 1. Hook in first 1-2 seconds.
 2. One concrete astrology idea.
 3. One example.
-4. CTA to free birth chart snapshot or full reading.
+4. CTA to free birth chart preview or full reading.
 
 Long video structure:
 
@@ -747,7 +749,7 @@ The chart ruler shows where the life story begins to move.
 The houses show the topics.
 
 CTA:
-If you want a clear first look at your chart, use the free birth chart snapshot on Mystic Birth Chart.
+If you want a clear first look at your chart, use the free birth chart preview on Mystic Birth Chart.
 ```
 
 Video prompt template:
@@ -782,15 +784,22 @@ Every article should:
 - Include a relevant CTA to the free chart tool or paid reading.
 - Avoid thin SEO filler.
 - Avoid making claims astrology cannot responsibly make.
+- Speak directly to the reader and make them ask, "how does this work in my chart?"
+- Feel like a partial reading, not a cold encyclopedia entry.
+- Show why the concept becomes personal only when the whole chart is interpreted.
+- Lead toward the paid reading through affinity and recognition, not pressure.
 
 Article structure:
 
-1. Clear intro that names the problem.
-2. Explain the concept.
-3. Give examples.
-4. Show why isolated placements are not enough.
-5. Link to related topics.
-6. Soft CTA to free chart snapshot or full reading.
+1. Clear intro that names the problem in the reader's life.
+2. Explain the concept in plain language.
+3. Give examples that feel lived, not only technical.
+4. Show how the reader can look for the theme in their own chart.
+5. Show why isolated placements are not enough.
+6. Link to related topics.
+7. Soft CTA to the free chart preview or full reading.
+
+High-intent articles should usually be 1,200-1,800 words when the topic deserves it. Short 400-600 word posts are acceptable for small glossary topics, but priority articles should feel dense enough to hold attention and build trust.
 
 Good article angles:
 
@@ -818,7 +827,7 @@ Internal link rules:
 CTA examples:
 
 - "If you want the chart read as a whole, order a personalized birth chart reading."
-- "Start with the free chart snapshot, then choose a full reading if the pattern resonates."
+- "Start with the free chart preview, then choose a full reading if the pattern resonates."
 - "A calculator can name your placements. A reading decides what matters most."
 
 ## 16. Content Production Templates
@@ -847,7 +856,7 @@ Slide 5:
 
 Slide 6:
 
-- CTA: free chart snapshot or reading.
+- CTA: free chart preview or reading.
 
 Example:
 
@@ -870,7 +879,7 @@ what is this planet doing in the structure of the whole chart?
 
 That is why two people with the same Moon sign can experience it very differently.
 
-If you want your chart read as a whole, start with the free birth chart snapshot or order a hand-prepared reading.
+If you want your chart read as a whole, start with the free birth chart preview or order a hand-prepared reading.
 ```
 
 ### YouTube Short Template
@@ -885,7 +894,7 @@ It decides which topics belong to which parts of life.
 It also points to the chart ruler, one of the first planets an astrologer studies.
 
 CTA:
-That is why a real chart reading starts there. Try the free chart snapshot at Mystic Birth Chart.
+That is why a real chart reading starts there. Try the free chart preview at Mystic Birth Chart.
 ```
 
 ### Pinterest Pin Copy Template
@@ -918,7 +927,7 @@ Use these ideas across the site, emails, social posts, and ads.
 
 ### Short CTAs
 
-- "Start with a free chart snapshot"
+- "Start with a free chart preview"
 - "Order a hand-prepared reading"
 - "Read your chart as a whole"
 - "Get the Basic Natal Reading"

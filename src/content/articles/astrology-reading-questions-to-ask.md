@@ -79,7 +79,7 @@ If you want a general reading but still want focus, try one of these:
 - What are the strongest tensions and supports?
 - What does my chart ask me to mature into?
 
-You can start with the [free birth chart snapshot](/free-birth-chart) to identify your Sun, Moon, Rising, chart ruler, and sect before choosing a focus.
+You can start with the [free birth chart preview](/free-birth-chart) to identify your Sun, Moon, Rising, chart ruler, and sect before choosing a focus.
 
 ## The Best Question
 

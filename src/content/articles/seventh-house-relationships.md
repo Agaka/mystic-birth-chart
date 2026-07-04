@@ -63,4 +63,4 @@ The 7th house is important, but relationship also involves Venus, the Moon, Mars
 
 That is why compatibility alone is not enough. Your own chart shows what kind of relationship pattern you bring with you.
 
-Use the [free chart snapshot](/free-birth-chart) to identify your Rising sign and chart ruler. For deeper relationship synthesis, compare the [reading options](/birth-chart-report).
+Use the [free chart preview](/free-birth-chart) to identify your Rising sign and chart ruler. For deeper relationship synthesis, compare the [reading options](/birth-chart-report).

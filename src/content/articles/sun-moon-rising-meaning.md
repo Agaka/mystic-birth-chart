@@ -48,7 +48,7 @@ If you have Libra Rising, Venus rules your chart. If you have Pisces Rising, Jup
 
 The Rising sign tells the reader where to begin.
 
-You can calculate your Big Three with the [free birth chart snapshot](/free-birth-chart).
+You can calculate your Big Three with the [free birth chart preview](/free-birth-chart).
 
 ## Why the Big Three Can Feel Contradictory
 

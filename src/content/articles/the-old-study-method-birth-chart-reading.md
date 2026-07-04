@@ -36,7 +36,7 @@ The Old Study Method asks a better question: if this chart were a single life pa
 
 The Ascendant or Rising sign is the doorway of the chart. It sets the houses and gives the chart ruler. This is why birth time matters so much.
 
-If you do not know your Rising sign yet, start with the [free birth chart snapshot](/free-birth-chart). It gives you a first look at Sun, Moon, Rising, chart ruler, and day or night chart.
+If you do not know your Rising sign yet, start with the [free birth chart preview](/free-birth-chart). It gives you a first look at Sun, Moon, Rising, chart ruler, and day or night chart.
 
 The Rising sign is not just a social mask. It is the beginning of the map. It shows how the life is entered and which planet steers the chart.
 

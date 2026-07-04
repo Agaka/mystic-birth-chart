@@ -14,7 +14,7 @@ A birth chart contains too much information to read all at once. If you start by
 
 The better approach is sequence. Read the chart in layers.
 
-You can begin with the [free birth chart snapshot](/free-birth-chart), but even a free tool should be treated as a doorway, not the full reading. The full chart needs order.
+You can begin with the [free birth chart preview](/free-birth-chart), but even a free tool should be treated as a doorway, not the full reading. The full chart needs order.
 
 ## Step One: Ascendant and Chart Ruler
 

@@ -66,4 +66,4 @@ But a serious reading should never use these words to scare someone. A chart wit
 
 The key is function.
 
-Use the [free chart snapshot](/free-birth-chart) to find whether you have a day or night chart. For a full synthesis, compare the [reading options](/birth-chart-report).
+Use the [free chart preview](/free-birth-chart) to find whether you have a day or night chart. For a full synthesis, compare the [reading options](/birth-chart-report).

@@ -69,4 +69,4 @@ Good career questions include:
 - What work pattern drains me?
 - What kind of visibility fits my chart?
 
-Start with the [free chart snapshot](/free-birth-chart), then compare the [reading options](/birth-chart-report) if you want career interpreted inside the whole chart.
+Start with the [free chart preview](/free-birth-chart), then compare the [reading options](/birth-chart-report) if you want career interpreted inside the whole chart.

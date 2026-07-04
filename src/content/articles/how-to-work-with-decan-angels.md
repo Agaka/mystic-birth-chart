@@ -25,7 +25,7 @@ Start with the basics:
 - Which house topic is asking for work right now?
 - Which decan contains the planet or point being studied?
 
-If you do not know these yet, use the [free chart snapshot](/free-birth-chart) as a starting point.
+If you do not know these yet, use the [free chart preview](/free-birth-chart) as a starting point.
 
 ## Choose the Quality, Not the Fantasy
 

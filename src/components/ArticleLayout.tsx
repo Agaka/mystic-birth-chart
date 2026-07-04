@@ -67,6 +67,25 @@ function splitContentForCTA(content: string): [string, string] {
   ];
 }
 
+function readerPromptForCategory(category: string): string {
+  switch (category) {
+    case "Moon & Emotions":
+      return "If this article touches something familiar, do not stop at the Moon sign. In a real chart, emotional patterns become personal through the Moon's house, aspects, sect, and relationship with the chart ruler.";
+    case "Love & Venus":
+      return "If this sounds like your love life, your Venus sign is only the first clue. A full reading asks where Venus is placed, what she rules, which aspects reach her, and how love, money, desire, and self-worth repeat through the chart.";
+    case "Career & Purpose":
+      return "If this makes you think about work or direction, the chart needs more than one career placement. A full reading connects the 10th house, Midheaven, Saturn, Mars, the 2nd house, and the ruler that ties the story together.";
+    case "Saturn & Growth":
+      return "If this feels accurate, Saturn may be more than a generic lesson in your chart. A full reading asks where Saturn sits, what it rules, whether it belongs to a day or night chart, and whether pressure is becoming mastery or fear.";
+    case "Hermetic Astrology":
+      return "If this pulls you toward practice, the birth chart should still come first. Hermetic work becomes useful when the planet, decan, timing, and house topics are actually relevant to your own chart.";
+    case "Deep Chart Patterns":
+      return "If this article names a pattern you recognize, the next question is whether that pattern is central in your chart or only one note among many. A full reading decides priority, repetition, and context.";
+    default:
+      return "If this article feels familiar, treat it as a doorway, not the whole room. Your chart decides whether this theme is central, supportive, pressured, or only one piece of a larger pattern.";
+  }
+}
+
 export function ArticleLayout({
   title,
   excerpt,
@@ -110,6 +129,15 @@ export function ArticleLayout({
             dangerouslySetInnerHTML={{ __html: renderMarkdown(firstPart) }}
           />
 
+          <div className="my-10 border-l-2 border-gold bg-white/30 px-5 py-5 md:px-6">
+            <p className="font-ui text-xs font-semibold uppercase tracking-[0.18em] text-gold-dark/80">
+              Read this in your own chart
+            </p>
+            <p className="mt-3 text-base leading-relaxed text-ink/66">
+              {readerPromptForCategory(category)}
+            </p>
+          </div>
+
           <div className="my-10 border border-gold/25 bg-white/28 p-5 md:p-6">
             <p className="font-ui text-xs font-semibold uppercase tracking-[0.18em] text-gold-dark/80">
               Reader path
@@ -119,7 +147,7 @@ export function ArticleLayout({
                 href="/free-birth-chart"
                 className="border border-gold/22 px-4 py-3 font-ui font-semibold text-aubergine transition-colors hover:border-gold hover:bg-gold/10"
               >
-                Calculate your free snapshot
+                Begin your free chart preview
               </Link>
               <Link
                 href="/sample-report"

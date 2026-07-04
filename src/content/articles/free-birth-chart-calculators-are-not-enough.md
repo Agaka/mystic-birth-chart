@@ -14,7 +14,7 @@ Free birth chart calculators are useful. They can tell you your Sun sign, Moon s
 
 For many people, a calculator is the first doorway into astrology.
 
-That is why Mystic Birth Chart includes a [free birth chart snapshot](/free-birth-chart). A useful site should let you begin without paying.
+That is why Mystic Birth Chart includes a [free birth chart preview](/free-birth-chart). A useful site should let you begin without paying.
 
 But a calculator is not the same as a reading.
 

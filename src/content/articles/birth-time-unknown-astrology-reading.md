@@ -66,7 +66,7 @@ If a report uses noon, it should say so.
 
 ## How Mystic Birth Chart Handles Unknown Time
 
-The [free chart snapshot](/free-birth-chart) needs birth time to calculate the Rising sign. If you do not know the time, you can enter an estimate, but the Rising sign should be treated cautiously.
+The [free chart preview](/free-birth-chart) needs birth time to calculate the Rising sign. If you do not know the time, you can enter an estimate, but the Rising sign should be treated cautiously.
 
 For a paid report, the best approach is transparency. If your time is unknown, the reading can focus on planetary signs, aspects, and themes that do not depend heavily on houses. House-based interpretation may be limited or omitted.
 

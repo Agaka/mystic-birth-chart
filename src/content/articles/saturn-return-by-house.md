@@ -70,4 +70,4 @@ Ask: what is Saturn asking me to make real?
 
 The answer depends on the whole chart, not only the house. Saturn's sign, aspects, sect, and rulerships all matter.
 
-Start with your [free chart snapshot](/free-birth-chart), then consider a full [reading](/birth-chart-report) if Saturn is one of the main themes you want understood.
+Start with your [free chart preview](/free-birth-chart), then consider a full [reading](/birth-chart-report) if Saturn is one of the main themes you want understood.

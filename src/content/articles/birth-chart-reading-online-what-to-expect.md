@@ -27,7 +27,7 @@ For a birth chart reading, you usually need:
 
 Birth time is especially important because it affects the Rising sign, houses, and Midheaven. If you do not know the exact time, the reading should say what can still be interpreted and what becomes uncertain.
 
-You can test the surface of your data with the [free birth chart snapshot](/free-birth-chart) before ordering.
+You can test the surface of your data with the [free birth chart preview](/free-birth-chart) before ordering.
 
 ## What a Good Online Reading Should Include
 

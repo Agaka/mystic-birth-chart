@@ -99,4 +99,4 @@ It should never drift into random occult spectacle.
 
 The sky remains the map. The birth chart remains the personal gate. Practice is what turns the map into lived discipline.
 
-For the astrological foundation, use the [free birth chart snapshot](/free-birth-chart). For a deeper natal synthesis, compare the [reading options](/birth-chart-report).
+For the astrological foundation, use the [free birth chart preview](/free-birth-chart). For a deeper natal synthesis, compare the [reading options](/birth-chart-report).

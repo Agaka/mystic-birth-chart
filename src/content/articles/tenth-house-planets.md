@@ -70,4 +70,4 @@ The career story may be carried by a planet elsewhere in the chart.
 
 Planets in the 10th house are important, but they still need context. Sign, ruler, aspects, sect, and the chart ruler all matter.
 
-For a first look, use the [free birth chart snapshot](/free-birth-chart). For a full career reading, compare the [reading options](/birth-chart-report).
+For a first look, use the [free birth chart preview](/free-birth-chart). For a full career reading, compare the [reading options](/birth-chart-report).

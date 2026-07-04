@@ -90,4 +90,4 @@ This placement needs gentleness and time.
 
 ## The Moon Is Never Generic
 
-The Moon is one of the fastest ways to make a reading feel personal. If you know your Moon house, study it carefully. If you do not, use the [free birth chart snapshot](/free-birth-chart) as a starting point, then consider a full [birth chart reading](/birth-chart-report) for house-based synthesis.
+The Moon is one of the fastest ways to make a reading feel personal. If you know your Moon house, study it carefully. If you do not, use the [free birth chart preview](/free-birth-chart) as a starting point, then consider a full [birth chart reading](/birth-chart-report) for house-based synthesis.

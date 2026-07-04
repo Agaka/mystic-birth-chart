@@ -10,11 +10,12 @@ export function ProductCTA({ compact = false }: ProductCTAProps) {
     return (
       <div className="wood-grain border border-gold/24 p-6 text-center">
         <p className="font-heading text-lg text-ivory/80 italic">
-          This is one placement. Your full chart shows the pattern behind it.
+          The article explains the symbol. Your chart decides how personal it is.
         </p>
         <p className="mt-3 text-sm text-ivory/72">
-          Order a written natal reading that connects your planets, houses,
-          rulers, aspects, and life themes into one clear story.
+          A written natal reading connects the planet, house, ruler, aspects,
+          and repeated themes so the interpretation belongs to your chart, not
+          to a generic placement description.
         </p>
         <div className="mt-5">
           <Button

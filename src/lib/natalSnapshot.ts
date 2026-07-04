@@ -112,86 +112,86 @@ const signProfiles: Record<
   Aries: {
     element: "Fire",
     mode: "Cardinal",
-    sun: "Your vitality grows through direct action, courage, and the willingness to begin before every detail is perfect.",
-    moon: "Emotionally, you need movement, honesty, and the freedom to respond quickly when something matters.",
-    rising: "You meet life through initiative. People may experience you as direct, alert, and ready to open the next door.",
+    sun: "Your life force strengthens when you are allowed to begin, act, test courage, and answer life directly. You can lose vitality when you are kept waiting for permission or forced to over-explain an instinct that already knows it needs movement. A full reading would ask where Mars is placed, because Aries fire can become clean initiative, constant conflict, or a heroic refusal to stay small depending on the rest of the chart.",
+    moon: "Your emotional system needs honesty, motion, and enough freedom to respond before the feeling goes stale. Anger, impatience, and sudden enthusiasm may all be signals that something in you wants to move now, not after everyone else agrees. A full reading would look at Mars, the Moon's house, and its aspects to see whether this emotional fire is protecting you, rushing you, or trying to wake you up.",
+    rising: "You meet life through initiative. People may experience you as direct, alert, self-starting, or difficult to ignore, even when you do not feel as confident inside as you look from the outside. A full reading would follow Mars, your chart ruler, to see where the story actually goes after that first impact.",
   },
   Taurus: {
     element: "Earth",
     mode: "Fixed",
-    sun: "Your vitality grows through steadiness, craft, patience, and building something that can actually last.",
-    moon: "Emotionally, you need calm, texture, trust, and a body-level sense that life is not rushing you.",
-    rising: "You meet life through presence. People may experience you as grounded, tactile, and quietly self-possessed.",
+    sun: "Your life force strengthens through steadiness, craft, patience, and the quiet proof that something can actually last. You may not come alive through pressure or spectacle; you come alive when your senses, values, body, and time are treated with respect. A full reading would ask what Venus is doing, because Taurus can describe peace, pleasure, loyalty, or stubborn self-protection depending on how the chart supports it.",
+    moon: "Your emotional body needs calm, texture, consistency, and a pace that does not constantly rip you away from yourself. You may process feelings through the body first: appetite, tension, fatigue, comfort, touch, beauty, and the need to feel safe in your own skin. A full reading would look at Venus and the Moon's house to see where you seek stability and where life asks you to soften without losing ground.",
+    rising: "You meet life through presence. People may experience you as grounded, tactile, steady, attractive, or quietly resistant to being hurried. A full reading would follow Venus, your chart ruler, because the real story is not only that you seem calm; it is where your desire, value, and attachment are leading the chart.",
   },
   Gemini: {
     element: "Air",
     mode: "Mutable",
-    sun: "Your vitality grows through language, curiosity, exchange, and the ability to hold more than one idea at once.",
-    moon: "Emotionally, you need conversation, variety, and a way to name what is moving through your mind.",
-    rising: "You meet life through observation. People may experience you as bright, responsive, and mentally alive.",
+    sun: "Your life force strengthens through language, curiosity, exchange, and the ability to keep more than one door open. You may feel most alive when you are learning, comparing, asking, translating, or moving between worlds that other people keep separate. A full reading would examine Mercury, because Gemini brightness can become skill, restlessness, anxiety, comedy, teaching, or clever survival depending on the whole chart.",
+    moon: "Your emotional life needs words, movement, and the relief of naming what is happening inside before it becomes too heavy. You may think your feelings before you feel them, or need conversation to understand what your body already knows. A full reading would study Mercury, the Moon's house, and the aspects to see whether your mind is helping your emotions breathe or keeping them in constant motion.",
+    rising: "You meet life through observation. People may experience you as quick, responsive, curious, talkative, or mentally awake to every small change in the room. A full reading would follow Mercury, your chart ruler, to see whether this life path is organized around study, communication, trade, nervous adaptation, or the art of moving between identities.",
   },
   Cancer: {
     element: "Water",
     mode: "Cardinal",
-    sun: "Your vitality grows through protection, memory, emotional intelligence, and devotion to what feels like home.",
-    moon: "Emotionally, you need safety, tenderness, privacy, and permission to move with your changing tides.",
-    rising: "You meet life through sensitivity. People may experience you as protective, perceptive, and difficult to read too quickly.",
+    sun: "Your life force strengthens through protection, memory, emotional intelligence, and devotion to what feels worthy of care. You may be more motivated by belonging, ancestry, family, privacy, and loyalty than by abstract achievement. A full reading would ask where the Moon is placed, because Cancer can be tenderness, guardedness, leadership through care, or a life organized around emotional inheritance.",
+    moon: "Your emotional life needs safety, tenderness, privacy, and permission to change shape without being called inconsistent. Your moods may carry information, especially about belonging, memory, attachment, and what your body experiences as home. A full reading would study the Moon's house, phase, and aspects to see whether you are protecting what is sacred or protecting yourself from being seen.",
+    rising: "You meet life through sensitivity. People may experience you as protective, perceptive, watchful, and difficult to read too quickly. A full reading would follow the Moon, your chart ruler, because your path often moves through tides: memory, family, care, retreat, return, and the question of where you truly belong.",
   },
   Leo: {
     element: "Fire",
     mode: "Fixed",
-    sun: "Your vitality grows through creative dignity, loyal expression, and the courage to be seen without apologizing.",
-    moon: "Emotionally, you need warmth, recognition, play, and a sense that your heart has room to perform honestly.",
-    rising: "You meet life through radiance. People may experience you as warm, proud, expressive, or naturally theatrical.",
+    sun: "Your life force strengthens through creative dignity, loyal expression, and the courage to be seen without apologizing for having a center. You may feel drained when life asks you to hide your warmth, mute your pride, or perform for approval instead of creating from the heart. A full reading would study the Sun by house and aspect to see where your radiance is natural and where it has become a wound around recognition.",
+    moon: "Your emotional life needs warmth, play, appreciation, and a place where your heart can express itself without being mocked or minimized. You may not only want attention; you may need proof that your feeling has an audience that cares. A full reading would look at the Moon's house and the Sun's condition to understand whether your need for recognition is nourishing, theatrical, private, or complicated by pride.",
+    rising: "You meet life through radiance. People may experience you as warm, proud, expressive, dramatic, loyal, or hard to miss. A full reading would follow the Sun, your chart ruler, because the question is not only how visible you are; it is where your life is asking you to become coherent, dignified, and creatively alive.",
   },
   Virgo: {
     element: "Earth",
     mode: "Mutable",
-    sun: "Your vitality grows through skill, discernment, useful work, and improving what others might leave vague.",
-    moon: "Emotionally, you need order, clarity, practical care, and a way to reduce anxiety through useful action.",
-    rising: "You meet life through refinement. People may experience you as careful, observant, precise, and quietly helpful.",
+    sun: "Your life force strengthens through skill, discernment, useful work, and the quiet satisfaction of making something cleaner, clearer, or more functional than it was before. You may suffer when your care turns into constant self-correction. A full reading would study Mercury, because Virgo can describe devotion to craft, nervous perfectionism, healing intelligence, or a life organized around service and refinement.",
+    moon: "Your emotional life needs order, clarity, practical care, and a way to make anxiety useful instead of letting it circle endlessly. You may process feeling by fixing, sorting, improving, or trying to understand what went wrong. A full reading would study Mercury and the Moon's aspects to see whether your precision is protecting your sensitivity or quietly exhausting it.",
+    rising: "You meet life through refinement. People may experience you as observant, careful, precise, modest, analytical, and quietly helpful. A full reading would follow Mercury, your chart ruler, to see where your intelligence is being spent: on service, study, worry, healing, critique, or the lifelong work of separating what matters from what merely nags.",
   },
   Libra: {
     element: "Air",
     mode: "Cardinal",
-    sun: "Your vitality grows through proportion, social intelligence, beauty, and the art of choosing with grace.",
-    moon: "Emotionally, you need harmony, fairness, companionship, and a relational mirror that does not erase you.",
-    rising: "You meet life through balance. People may experience you as elegant, diplomatic, receptive, and socially aware.",
+    sun: "Your life force strengthens through proportion, social intelligence, beauty, and the difficult art of choosing without losing grace. You may be more decisive than people assume, but your decisions often pass through relationship, fairness, and consequence first. A full reading would study Venus, because Libra can describe charm, diplomacy, aesthetic judgment, relational intelligence, or the burden of keeping peace at your own expense.",
+    moon: "Your emotional life needs harmony, fairness, companionship, and a relational mirror that does not erase you. You may feel unsettled when the atmosphere is ugly, unjust, or socially tense, even if nobody else admits something is wrong. A full reading would study Venus and the Moon's house to see where you seek balance and where life asks you to stop negotiating against your own need.",
+    rising: "You meet life through balance. People may experience you as elegant, receptive, diplomatic, visually aware, and socially intelligent. A full reading would follow Venus, your chart ruler, because the deeper question is where your desire for harmony leads the life: relationship, art, justice, public grace, or the hard lesson of choosing.",
   },
   Scorpio: {
     element: "Water",
     mode: "Fixed",
-    sun: "Your vitality grows through depth, loyalty, emotional truth, and the courage to face what others avoid.",
-    moon: "Emotionally, you need trust, privacy, intensity, and relationships where nothing important is kept superficial.",
-    rising: "You meet life through intensity. People may experience you as magnetic, guarded, penetrating, or hard to fool.",
+    sun: "Your life force strengthens through depth, loyalty, emotional truth, and the courage to face what other people prefer to keep buried. You may not be satisfied with surface explanations, and you may feel false around anything too polite to be honest. A full reading would study Mars, because Scorpio can become strategy, protection, obsession, healing, secrecy, or the power to endure transformation.",
+    moon: "Your emotional life needs trust, privacy, intensity, and relationships where the important thing is not treated like an inconvenience. You may feel deeply, but you may reveal that feeling only after testing whether the other person can handle truth. A full reading would study Mars, the Moon's house, and aspects to see whether your emotional intensity is guarding a wound, protecting loyalty, or asking to become clean power.",
+    rising: "You meet life through intensity. People may experience you as magnetic, guarded, penetrating, private, or hard to fool. A full reading would follow Mars, your chart ruler, because your first impression is only the surface of a deeper question: where is your life asking for courage, confrontation, protection, and transformation?",
   },
   Sagittarius: {
     element: "Fire",
     mode: "Mutable",
-    sun: "Your vitality grows through meaning, movement, study, travel, and the search for a wider horizon.",
-    moon: "Emotionally, you need possibility, humor, openness, and the feeling that life still has room to expand.",
-    rising: "You meet life through vision. People may experience you as candid, restless, generous, and future-facing.",
+    sun: "Your life force strengthens through meaning, movement, study, travel, and the search for a horizon wide enough to believe in. You may feel trapped when life becomes too small, too literal, or too committed to fear. A full reading would study Jupiter, because Sagittarius can become wisdom, exaggeration, teaching, faith, escape, or the refusal to live without a larger story.",
+    moon: "Your emotional life needs possibility, humor, spaciousness, and the feeling that the future has not closed. You may recover through movement, learning, laughter, or a change of perspective that reminds you life is bigger than the current room. A full reading would study Jupiter and the Moon's house to see whether your need for freedom is nourishment, avoidance, philosophy, or a genuine spiritual appetite.",
+    rising: "You meet life through vision. People may experience you as candid, restless, generous, blunt, hopeful, or always oriented toward the next horizon. A full reading would follow Jupiter, your chart ruler, because the important question is where your life seeks meaning, where it overreaches, and where faith becomes a path instead of a slogan.",
   },
   Capricorn: {
     element: "Earth",
     mode: "Cardinal",
-    sun: "Your vitality grows through discipline, competence, time, and the private pride of earning your authority.",
-    moon: "Emotionally, you need reliability, respect, long-term structure, and space to feel without losing composure.",
-    rising: "You meet life through gravity. People may experience you as composed, serious, capable, and self-directed.",
+    sun: "Your life force strengthens through discipline, competence, time, and the private pride of earning authority rather than pretending to have it. You may come alive slowly, especially when life gives you a mountain worth climbing. A full reading would study Saturn, because Capricorn can describe maturity, pressure, ambition, loneliness, mastery, or the long work of becoming someone you can respect.",
+    moon: "Your emotional life needs reliability, respect, long-term structure, and enough privacy to feel without losing composure. You may not trust feelings that arrive without form, and you may have learned early to become capable before you felt ready. A full reading would study Saturn and the Moon's house to see where emotional restraint protects you and where it quietly withholds nourishment.",
+    rising: "You meet life through gravity. People may experience you as composed, serious, capable, reserved, self-directed, or older than your years. A full reading would follow Saturn, your chart ruler, because the deeper story is where life asks you to build authority slowly, carry weight wisely, and stop confusing pressure with purpose.",
   },
   Aquarius: {
     element: "Air",
     mode: "Fixed",
-    sun: "Your vitality grows through distance, pattern recognition, friendship, and refusing to think exactly as expected.",
-    moon: "Emotionally, you need perspective, mental space, community, and the freedom to process feelings in your own way.",
-    rising: "You meet life through difference. People may experience you as unusual, observant, principled, or quietly contrary.",
+    sun: "Your life force strengthens through distance, pattern recognition, friendship, and the refusal to think exactly as expected. You may need enough separation from the crowd to see the system clearly. A full reading would study Saturn, because Aquarius can describe principle, exile, intelligence, social vision, emotional distance, or the burden of belonging to the future before the present understands you.",
+    moon: "Your emotional life needs perspective, mental space, community, and the freedom to process feelings in your own way. You may not want to be swallowed by emotion; you may need to understand the pattern before you can admit the feeling. A full reading would study Saturn, the Moon's house, and aspects to see whether detachment is wisdom, self-protection, loneliness, or a genuine need for clean air.",
+    rising: "You meet life through difference. People may experience you as unusual, observant, principled, cool, inventive, or quietly contrary. A full reading would follow Saturn, your chart ruler, because the real story is not only that you are different; it is where that difference becomes discipline, responsibility, community, or distance.",
   },
   Pisces: {
     element: "Water",
     mode: "Mutable",
-    sun: "Your vitality grows through imagination, compassion, surrender, and sensitivity to invisible atmospheres.",
-    moon: "Emotionally, you need softness, art, spiritual space, and permission to feel what cannot be neatly explained.",
-    rising: "You meet life through permeability. People may experience you as gentle, elusive, intuitive, and hard to define.",
+    sun: "Your life force strengthens through imagination, compassion, surrender, and sensitivity to atmospheres that other people may not notice until much later. You may feel most alive when life has meaning, beauty, music, prayer, myth, or mercy in it. A full reading would study Jupiter, because Pisces can become devotion, confusion, artistry, spiritual hunger, porous boundaries, or the gift of seeing what cannot be reduced to facts.",
+    moon: "Your emotional life needs softness, art, spiritual space, and permission to feel what cannot be explained neatly. You may absorb more than you realize, and you may need solitude or ritual to know which feelings are actually yours. A full reading would study Jupiter and the Moon's house to see whether your sensitivity is intuition, overwhelm, compassion, escape, or a doorway into real inner guidance.",
+    rising: "You meet life through permeability. People may experience you as gentle, elusive, intuitive, imaginative, or difficult to define in one fixed role. A full reading would follow Jupiter, your chart ruler, because the deeper question is where your life asks for faith, meaning, protection from confusion, and a path large enough for your sensitivity.",
   },
 };
 
@@ -211,13 +211,20 @@ const traditionalRulers: Record<ZodiacSign, Planet> = {
 };
 
 const rulerInterpretations: Record<Planet, string> = {
-  Sun: "A solar chart ruler asks for visibility, self-command, and a life shaped by what strengthens your core identity.",
-  Moon: "A lunar chart ruler makes feeling, memory, body rhythm, and emotional safety central to how the chart operates.",
-  Mercury: "A Mercurial chart ruler points to language, learning, trade, analysis, and adaptability as major life tools.",
-  Venus: "A Venusian chart ruler emphasizes desire, taste, relationship, harmony, pleasure, and the value of what you choose.",
-  Mars: "A Martial chart ruler brings courage, conflict, appetite, protection, and decisive action into the foreground.",
-  Jupiter: "A Jupiterian chart ruler seeks meaning, faith, teaching, generosity, growth, and a larger story to live inside.",
-  Saturn: "A Saturnian chart ruler asks for time, maturity, discipline, boundaries, and authority built through endurance.",
+  Sun: "Because the Sun rules your Ascendant, visibility, self-command, dignity, and the question of what makes you feel alive become central to the chart. This preview can name the ruler, but the real interpretation depends on the Sun's house, aspects, strength, and role in the whole pattern. A complete reading would ask where your life is asking you to become coherent rather than merely visible.",
+  Moon: "Because the Moon rules your Ascendant, feeling, memory, body rhythm, instinct, and emotional safety become central to how the chart operates. This preview can name that lunar doorway, but a complete reading would ask where the Moon is placed, what phase it carries, and which areas of life are shaped by mood, attachment, care, and repetition.",
+  Mercury: "Because Mercury rules your Ascendant, language, learning, analysis, trade, movement, and adaptation become major life tools. This preview can name the Mercurial thread, but a complete reading would ask where Mercury lives, what it rules, and whether your mind is serving clarity, survival, craft, nervous motion, or a deeper vocation of interpretation.",
+  Venus: "Because Venus rules your Ascendant, desire, taste, relationship, beauty, pleasure, value, and the ability to receive become central to the chart. This preview can name the Venusian thread, but a complete reading would ask where Venus is placed, what she rules, and whether love, money, aesthetics, or self-worth are carrying more of your life story than you realize.",
+  Mars: "Because Mars rules your Ascendant, courage, appetite, anger, protection, conflict, and decisive action move toward the foreground. This preview can name the Martial thread, but a complete reading would ask where Mars is placed, what it is fighting for, and whether your fire is defending your life, creating friction, or asking for cleaner direction.",
+  Jupiter: "Because Jupiter rules your Ascendant, meaning, faith, teaching, generosity, growth, and the need for a larger story become central to the chart. This preview can name the Jupiterian thread, but a complete reading would ask where Jupiter expands life, where it overpromises, and where wisdom has to become more practical than hope alone.",
+  Saturn: "Because Saturn rules your Ascendant, time, maturity, discipline, boundaries, responsibility, and earned authority become central to the chart. This preview can name the Saturnian thread, but a complete reading would ask where Saturn is placed, what it rules, and whether pressure is becoming mastery, fear, loneliness, or a serious calling.",
+};
+
+const sectInterpretations: Record<NatalSnapshotResult["sect"], string> = {
+  "Day chart":
+    "With the Sun above the horizon, the chart has a diurnal emphasis: visibility, purpose, public direction, and conscious agency tend to matter strongly. In traditional astrology, sect also changes how planets behave, especially Jupiter, Saturn, Mars, and Venus. This preview can identify the broad day-chart condition, but a complete reading would ask which planets are helped by the daylight and which ones still need careful handling.",
+  "Night chart":
+    "With the Sun below the horizon, the chart has a nocturnal emphasis: instinct, privacy, memory, emotional weather, and the hidden life often carry more weight than the outer performance suggests. In traditional astrology, sect changes how the planets act, especially Venus, Mars, Saturn, and Jupiter. This preview can identify the broad night-chart condition, but a complete reading would ask which planets become more personal after dark.",
 };
 
 function normalizeDegrees(value: number): number {
@@ -354,12 +361,19 @@ function placementTitle(body: "Sun" | "Moon" | "Rising", sign: ZodiacSign): stri
   return `${body} in ${sign}`;
 }
 
+function articleFor(word: string): "a" | "an" {
+  return /^[aeiou]/i.test(word) ? "an" : "a";
+}
+
 function buildSummary(sunSign: ZodiacSign, moonSign: ZodiacSign, risingSign: ZodiacSign): string {
   const sun = signProfiles[sunSign];
   const moon = signProfiles[moonSign];
   const rising = signProfiles[risingSign];
+  const sunElement = sun.element.toLowerCase();
+  const moonElement = moon.element.toLowerCase();
+  const risingMode = rising.mode.toLowerCase();
 
-  return `A ${sun.element.toLowerCase()} Sun, ${moon.element.toLowerCase()} Moon, and ${rising.mode.toLowerCase()} ${risingSign} rising gives this snapshot its first shape: vitality through ${sunSign}, instinct through ${moonSign}, and a visible doorway through ${risingSign}.`;
+  return `The first pattern is ${articleFor(sunElement)} ${sunElement} Sun, ${articleFor(moonElement)} ${moonElement} Moon, and ${articleFor(risingMode)} ${risingMode} ${risingSign} Rising. That means your chart begins with vitality moving through ${sunSign}, instinct moving through ${moonSign}, and a visible doorway shaped by ${risingSign}. This is not the whole chart. It is the first edge of the map: enough to recognize yourself, but not enough to know which placements are strongest, which houses are activated, or where the chart repeats its deepest theme.`;
 }
 
 export function calculateNatalSnapshot(input: NatalSnapshotInput): NatalSnapshotResult {
@@ -401,14 +415,11 @@ export function calculateNatalSnapshot(input: NatalSnapshotInput): NatalSnapshot
     },
     sectInterpretation: {
       title: sect,
-      body:
-        sect === "Day chart"
-          ? "With the Sun above the horizon, the chart leans toward visibility, purpose, social role, and the work of acting from conscious direction."
-          : "With the Sun below the horizon, the chart leans toward instinct, privacy, emotional weather, and the inner life that quietly steers decisions.",
+      body: sectInterpretations[sect],
     },
     timezone: input.timezone,
     utcOffset,
     calculationNote:
-      "This free snapshot uses a lightweight browser calculation, city-based geocoding, and static interpretations. A paid reading verifies the birth data and interprets the whole chart, including houses, rulers, aspects, condition, and emphasis.",
+      "This free chart preview uses a lightweight browser calculation, city-based geocoding, and static interpretations. It is designed to give a real first reading, not a complete report. A paid reading verifies the birth data and interprets the whole chart, including houses, rulers, aspects, condition, angularity, repeated themes, and chart emphasis.",
   };
 }

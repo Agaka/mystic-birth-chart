@@ -58,4 +58,4 @@ But a generic Venus description often leaves the real question unanswered: where
 
 That question requires sign, house, aspects, and rulership.
 
-Use the [free birth chart snapshot](/free-birth-chart) to begin with the basics. If you want Venus interpreted inside the full chart, compare the [reading options](/birth-chart-report).
+Use the [free birth chart preview](/free-birth-chart) to begin with the basics. If you want Venus interpreted inside the full chart, compare the [reading options](/birth-chart-report).

@@ -66,4 +66,4 @@ Ask what kind of public role feels both meaningful and demanding. Ask what kind 
 
 The Midheaven often describes the version of yourself you become through time.
 
-To begin, use the [free chart snapshot](/free-birth-chart). For a full career synthesis, compare the [reading options](/birth-chart-report).
+To begin, use the [free chart preview](/free-birth-chart). For a full career synthesis, compare the [reading options](/birth-chart-report).

@@ -60,4 +60,4 @@ The question is not whether a placement is good or bad. The question is how the 
 
 This is one reason the [Old Study Method](/blog/the-old-study-method-birth-chart-reading) focuses on structure before personality labels.
 
-To see how your chart begins, use the [free chart snapshot](/free-birth-chart). For a full dignity and ruler synthesis, compare the [reading options](/birth-chart-report).
+To see how your chart begins, use the [free chart preview](/free-birth-chart). For a full dignity and ruler synthesis, compare the [reading options](/birth-chart-report).

@@ -78,4 +78,4 @@ For example:
 
 This is not separate from astrology. It is astrology put into practice.
 
-Start with the [free birth chart snapshot](/free-birth-chart) if you do not know your chart ruler yet. For a full interpretation of the chart as a whole, compare the [reading options](/birth-chart-report).
+Start with the [free birth chart preview](/free-birth-chart) if you do not know your chart ruler yet. For a full interpretation of the chart as a whole, compare the [reading options](/birth-chart-report).

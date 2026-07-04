@@ -68,4 +68,4 @@ Before asking whether someone else is right for you, ask:
 
 Those questions make love astrology practical.
 
-You can start with your [free chart snapshot](/free-birth-chart). For a deeper synthesis of love, Venus, Moon, and relationship houses, compare the [reading options](/birth-chart-report).
+You can start with your [free chart preview](/free-birth-chart). For a deeper synthesis of love, Venus, Moon, and relationship houses, compare the [reading options](/birth-chart-report).
