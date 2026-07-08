@@ -40,3 +40,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# marketing assets (local only)
+/marketing
+
+# codex
+.codex-remote-attachments/
