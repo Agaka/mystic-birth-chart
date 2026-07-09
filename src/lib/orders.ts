@@ -1,6 +1,6 @@
 import { siteConfig } from "@/lib/site";
 
-export type ReadingTier = "basic" | "love" | "career" | "year-ahead" | "synastry" | "complete" | "kabbalah" | "dossier";
+export type ReadingTier = "basic" | "love" | "career" | "year-ahead" | "synastry" | "complete" | "kabbalah" | "dossier" | "almanac";
 
 export const readingTiers: ReadingTier[] = [
   "basic",
@@ -11,6 +11,7 @@ export const readingTiers: ReadingTier[] = [
   "complete",
   "kabbalah",
   "dossier",
+  "almanac",
 ];
 
 export function isReadingTier(value: string | undefined): value is ReadingTier {
@@ -105,6 +106,17 @@ export function getReadingOffer(tier: ReadingTier) {
         "Beautifully bound digital volume delivered in 10 days",
       ];
       break;
+    case "almanac":
+      product = siteConfig.product.almanac;
+      priceId = process.env.STRIPE_ALMANAC_PRICE_ID || "";
+      features = [
+        "Monthly transit forecast tailored to your Ascendant",
+        "Astrological election windows for important tasks",
+        "Focused Hermetic practice (Psalms/Meditations)",
+        "Delivered directly to your inbox every month",
+        "Cancel your subscription at any time",
+      ];
+      break;
   }
 
   return {
@@ -113,5 +125,6 @@ export function getReadingOffer(tier: ReadingTier) {
     checkoutPath: `/checkout/${tier}`,
     priceId,
     features,
+    isSubscription: tier === "almanac",
   };
 }

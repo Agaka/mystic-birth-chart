@@ -68,6 +68,17 @@ const offers = [
       },
     ],
   },
+  {
+    category: "Ongoing Guidance",
+    description: "Continuous celestial tracking and timing.",
+    items: [
+      {
+        id: "almanac",
+        offer: getReadingOffer("almanac"),
+        featured: true,
+      },
+    ],
+  },
 ];
 
 export function ReadingOfferCards() {
@@ -165,7 +176,7 @@ export function ReadingOfferCards() {
                       },
                     }}
                   >
-                    Secure {offer.product.name}
+                    {offer.isSubscription ? `Subscribe to ${offer.product.name}` : `Secure ${offer.product.name}`}
                   </Button>
                 </div>
 

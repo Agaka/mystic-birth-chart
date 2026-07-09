@@ -58,6 +58,16 @@ export const siteConfig = {
         "An in-depth study of the interaction between two charts. We examine how your temperaments blend, where your lives intersect, and the inherent strengths and tensions of the dynamic.",
       disclosure: "Requires birth data for two individuals. Prepared by hand.",
     },
+    almanac: {
+      name: "The Hermetic Almanac",
+      price: "$19 / month",
+      priceNote: "Monthly recurring subscription",
+      delivery: "Delivered monthly to your inbox",
+      format: "Monthly personalized workbook",
+      summary:
+        "An ongoing subscription focused on your specific transits. Includes a monthly forecast tailored to your Ascendant, magical election windows for important tasks, and focused Hermetic practice based on the current sky.",
+      disclosure: "Cancel anytime. Prepared in rhythm with the celestial month.",
+    },
     complete: {
       name: "Complete Natal Reading",
       price: "$97",

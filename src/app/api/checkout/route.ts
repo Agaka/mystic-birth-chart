@@ -35,8 +35,10 @@ export async function POST(request: Request) {
 
   try {
     const stripe = new Stripe(secretKey);
-    const checkoutParams = {
-      mode: "payment",
+    const isSubscription = offer.isSubscription;
+
+    const checkoutParams: Stripe.Checkout.SessionCreateParams = {
+      mode: isSubscription ? "subscription" : "payment",
       customer_email: body.email,
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${siteUrl}/thank-you?tier=${offer.tier}&session_id={CHECKOUT_SESSION_ID}`,
@@ -47,25 +49,37 @@ export async function POST(request: Request) {
         reading_name: offer.product.name,
         customer_name: body.name || "",
       },
-      payment_intent_data: {
-        description: `${offer.product.name} - ${siteConfig.name}`,
-        statement_descriptor: "MYSTICBIRTHCHART",
-        receipt_email: body.email,
-      },
+      ...(isSubscription
+        ? {
+            subscription_data: {
+              description: `${offer.product.name} - ${siteConfig.name}`,
+            },
+          }
+        : {
+            payment_intent_data: {
+              description: `${offer.product.name} - ${siteConfig.name}`,
+              statement_descriptor: "MYSTICBIRTHCHART",
+              receipt_email: body.email,
+            },
+          }),
       custom_text: {
         submit: {
-          message: isEssential
+          message: isSubscription
+            ? `Your ${offer.product.name} will be delivered to your inbox every month. You can cancel your subscription at any time. Questions? hello@mysticbirthchart.com`
+            : isEssential
             ? `Your ${offer.product.name} is generated automatically and delivered instantly by email after payment. It is not hand-prepared. Questions? hello@mysticbirthchart.com`
             : `Your ${offer.product.name} is hand-prepared and delivered as a personalized PDF to your email within 72 hours. Questions? hello@mysticbirthchart.com`,
         },
         after_submit: {
-          message: isEssential
+          message: isSubscription
+            ? "Thank you! Your first month's almanac will be delivered soon."
+            : isEssential
             ? "Thank you! Your birth details will be sent automatically so your instant email reading can be generated."
             : "Thank you! Your birth details will be sent automatically. You'll see a confirmation on the next page.",
         },
       },
       allow_promotion_codes: true,
-    } satisfies Stripe.Checkout.SessionCreateParams;
+    };
 
     const session = await stripe.checkout.sessions.create(checkoutParams);
 
