@@ -55,6 +55,11 @@ const actions = [
   { text: "started a free chart preview", icon: "✨" },
   { text: "ordered a Complete Reading", icon: "📖" },
   { text: "ordered an Essential Reading", icon: "📖" },
+  { text: "ordered a Love & Relationship Pattern study", icon: "🤍" },
+  { text: "ordered a Career & Vocation reading", icon: "🧭" },
+  { text: "received their 12-Month Transit Forecast", icon: "⏳" },
+  { text: "ordered a Synastry & Compatibility reading", icon: "⚖️" },
+  { text: "secured a Full Chart Dossier", icon: "🗝️" },
 ];
 
 function randomItem<T>(array: T[]): T {
