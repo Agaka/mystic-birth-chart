@@ -68,6 +68,16 @@ export const siteConfig = {
         "A profound structural analysis of your entire chart. Love, vocation, and money are viewed not as isolated parts, but as connected themes stemming from your core planetary rulers and aspects.",
       disclosure: "Prepared by hand in a limited daily queue.",
     },
+    kabbalah: {
+      name: "Hermetic Kabbalah Reading",
+      price: "$149",
+      priceNote: "Esoteric synthesis",
+      delivery: "Hand-prepared and delivered within 7 days",
+      format: "Specialized PDF reading",
+      summary:
+        "A deep esoteric mapping of your personal Shem HaMephorash angels, Sephirot pathworking, and specific invocatory practices (Psalms, hours, and letters) tailored precisely to your chart.",
+      disclosure: "Highly specialized esoteric work. Prepared by hand.",
+    },
     dossier: {
       name: "Full Chart Dossier",
       price: "$197",

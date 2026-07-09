@@ -1,6 +1,6 @@
 import { siteConfig } from "@/lib/site";
 
-export type ReadingTier = "basic" | "love" | "career" | "year-ahead" | "synastry" | "complete" | "dossier";
+export type ReadingTier = "basic" | "love" | "career" | "year-ahead" | "synastry" | "complete" | "kabbalah" | "dossier";
 
 export const readingTiers: ReadingTier[] = [
   "basic",
@@ -9,6 +9,7 @@ export const readingTiers: ReadingTier[] = [
   "year-ahead",
   "synastry",
   "complete",
+  "kabbalah",
   "dossier",
 ];
 
@@ -81,6 +82,16 @@ export function getReadingOffer(tier: ReadingTier) {
         "House rulers, dignities, aspects, and chart emphasis",
         "Love, career, money, temperament, and vocation themes",
         "Prioritized integration notes and next-step guidance",
+      ];
+      break;
+    case "kabbalah":
+      product = siteConfig.product.kabbalah;
+      priceId = process.env.STRIPE_KABBALAH_PRICE_ID || "";
+      features = [
+        "Mapping of your personal Shem HaMephorash angels",
+        "Tree of Life (Sephirot) pathworking based on your chart",
+        "Specific psalms and invocation practices for your natal decans",
+        "Hand-prepared esoteric synthesis of your spiritual architecture",
       ];
       break;
     case "dossier":

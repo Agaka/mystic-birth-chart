@@ -57,6 +57,17 @@ const offers = [
       },
     ],
   },
+  {
+    category: "Esoteric Practice",
+    description: "Specialized spiritual mapping and Hermetic invocation.",
+    items: [
+      {
+        id: "kabbalah",
+        offer: getReadingOffer("kabbalah"),
+        featured: true,
+      },
+    ],
+  },
 ];
 
 export function ReadingOfferCards() {

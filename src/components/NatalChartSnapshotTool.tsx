@@ -239,6 +239,16 @@ const intentOptions = [
     recommendation: "Complete Natal Reading",
   },
   {
+    id: "esoteric",
+    label: "Spiritual practice & Esotericism",
+    shortLabel: "Esoteric",
+    eyebrow: "Esoteric focus",
+    title: "Astrology is the map; theurgy is the practice.",
+    body:
+      "For esoteric work, the chart reveals which angels of the Shem HaMephorash govern your pattern, mapping directly to the Tree of Life. We look at the architecture of the soul and the practices to elevate it.",
+    recommendation: "Hermetic Kabbalah Reading",
+  },
+  {
     id: "shadow-growth",
     label: "Shadow and personal growth",
     shortLabel: "Growth",
@@ -260,6 +270,7 @@ const intentIconMap = {
   "life-direction": IconCompass,
   "current-phase": IconPlanet,
   "shadow-growth": IconShadow,
+  esoteric: IconSparkles,
 } satisfies Record<ChartIntent, typeof IconSun>;
 
 const calculationMessages = [
@@ -357,7 +368,9 @@ const intentEssentialBridge: Record<ChartIntent, string> = {
     "Timing makes more sense after the natal pattern is clear. The automated Essential Reading gives you the foundation before you decide whether deeper timing work is needed.",
   "shadow-growth":
     "Growth work needs clarity before intensity. The automated Essential Reading shows the first places where the chart asks for form, steadiness, courage, and attention.",
-};
+  esoteric:
+    "The next useful step is not more isolated placements, but mapping the specific spiritual intelligences that govern your chart. The Essential Reading provides the exact structure for this work.",
+} satisfies Record<ChartIntent, string>;
 
 const freeVsEssentialRows = [
   {
@@ -1819,7 +1832,7 @@ function SnapshotResult({
   onRestart: () => void;
   onBack: () => void;
 }) {
-  let primaryTierKey: "basic" | "love" | "career" | "yearAhead" | "complete" = "complete";
+  let primaryTierKey: "basic" | "love" | "career" | "yearAhead" | "complete" | "kabbalah" = "complete";
   let alternativeTierKey: "basic" | "complete" = "basic";
 
   if (rawIntent === "love") {
@@ -1828,6 +1841,8 @@ function SnapshotResult({
     primaryTierKey = "career";
   } else if (rawIntent === "current-phase") {
     primaryTierKey = "yearAhead";
+  } else if (rawIntent === "esoteric") {
+    primaryTierKey = "kabbalah";
   }
 
   const primaryProduct = siteConfig.product[primaryTierKey];
