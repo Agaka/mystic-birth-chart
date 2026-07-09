@@ -104,7 +104,7 @@ export const siteConfig = {
       { label: "Blog", href: "/blog" },
       { label: "Free Chart", href: "/free-birth-chart" },
       { label: "Readings", href: "/birth-chart-report" },
-      { label: "Sample Reading", href: "/sample-report" },
+      { label: "Planetary Hours", href: "/planetary-hours" },
       { label: "About", href: "/about" },
     ],
     categories: [

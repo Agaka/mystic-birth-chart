@@ -38,6 +38,9 @@ To work with a decan angel associated with a specific planet in your chart, you 
 
 This aligns your personal intention with the macroscopic rhythm of the cosmos.
 
+> [!TIP]
+> You do not need to calculate this by hand. Use our free **[Planetary Hours Calculator](/planetary-hours)** to instantly find the correct timing for any city.
+
 ## A Basic Ritual Structure
 
 If you wish to invoke the angel governing your natal chart ruler to ask for clarity, protection, or elevation of that planet's themes, you can use the following structure:
