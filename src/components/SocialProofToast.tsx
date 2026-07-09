@@ -8,6 +8,22 @@ const cities = [
   "Austin", "Chicago", "San Francisco", "Seattle", "Dublin",
   "Melbourne", "Vancouver", "Portland", "Denver", "Miami",
   "Edinburgh", "Nashville", "Boston", "Manchester", "Brisbane",
+  "Paris", "Berlin", "Madrid", "Barcelona", "Rome",
+  "Milan", "Lisbon", "Amsterdam", "Copenhagen", "Stockholm",
+  "Oslo", "Helsinki", "Vienna", "Prague", "Budapest",
+  "Warsaw", "Brussels", "Zurich", "Geneva", "Munich",
+  "Hamburg", "Frankfurt", "Athens", "Istanbul", "Dubai",
+  "Abu Dhabi", "Doha", "Singapore", "Tokyo", "Kyoto",
+  "Osaka", "Seoul", "Bangkok", "Hong Kong", "Taipei",
+  "Beijing", "Shanghai", "Mumbai", "Delhi", "Bangalore",
+  "São Paulo", "Rio de Janeiro", "Buenos Aires", "Santiago", "Lima",
+  "Bogotá", "Mexico City", "Monterrey", "Guadalajara", "Panama City",
+  "Cape Town", "Johannesburg", "Cairo", "Casablanca", "Nairobi",
+  "Auckland", "Wellington", "Perth", "Adelaide", "Canberra",
+  "Montreal", "Ottawa", "Calgary", "Quebec City", "Philadelphia",
+  "Washington", "Atlanta", "Dallas", "Houston", "Phoenix",
+  "San Diego", "Las Vegas", "Orlando", "New Orleans", "Detroit",
+  "Minneapolis", "Salt Lake City", "Charlotte", "Raleigh", "Pittsburgh",
 ];
 
 const names = [
@@ -15,6 +31,22 @@ const names = [
   "Sophia", "Mia", "Liam", "Noah", "Isabella",
   "Charlotte", "Amelia", "Ethan", "Ava", "Grace",
   "Maya", "Leo", "Zoe", "Aria", "Luna",
+  "Emily", "Daniel", "Benjamin", "Chloe", "Henry",
+  "Victoria", "Alexander", "Ella", "Jack", "Sophie",
+  "William", "Ruby", "Thomas", "Lily", "Samuel",
+  "Layla", "David", "Hannah", "Matthew", "Nora",
+  "Joseph", "Lucy", "Sebastian", "Alice", "Gabriel",
+  "Eva", "Julian", "Clara", "Nathan", "Stella",
+  "Michael", "Ivy", "Adam", "Elena", "Oscar",
+  "Naomi", "Andrew", "Julia", "Isaac", "Aurora",
+  "Ryan", "Hazel", "Caleb", "Violet", "Dylan",
+  "Freya", "Logan", "Rose", "Aaron", "Iris",
+  "Connor", "Jade", "Adrian", "Elise", "Felix",
+  "Camila", "Simon", "Leah", "Marcus", "Fiona",
+  "Arthur", "Celine", "Theo", "Diana", "Max",
+  "Bianca", "Eric", "Laura", "Nicolas", "Sienna",
+  "Jonathan", "Maeve", "Patrick", "Phoebe", "Robert",
+  "Skye", "George", "Tessa", "Vincent", "Willow",
 ];
 
 const actions = [
@@ -93,11 +125,10 @@ export function SocialProofToast() {
 
   return (
     <div
-      className={`fixed bottom-4 left-4 z-50 max-w-[320px] transition-all duration-500 ease-out md:bottom-6 md:left-6 ${
-        visible
+      className={`fixed bottom-4 left-4 z-50 max-w-[320px] transition-all duration-500 ease-out md:bottom-6 md:left-6 ${visible
           ? "translate-y-0 opacity-100"
           : "translate-y-4 opacity-0 pointer-events-none"
-      }`}
+        }`}
       role="status"
       aria-live="polite"
     >

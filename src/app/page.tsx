@@ -7,7 +7,6 @@ import { ReadingOfferCards } from "@/components/ReadingOfferCards";
 import { SampleReportPreview } from "@/components/SampleReportPreview";
 import { Button } from "@/components/Button";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import { ScarcityBadge } from "@/components/ScarcityBadge";
 import { getAllArticles, getFeaturedArticles } from "@/lib/articles";
 import { categories } from "@/lib/categories";
 import { getBasicCheckoutUrl, siteConfig } from "@/lib/site";
@@ -262,9 +261,6 @@ export default function HomePage() {
                 the deeper $97 hand-prepared option when you want the full chart
                 treated with more time and detail.
               </p>
-              <div className="mt-4 flex justify-center">
-                <ScarcityBadge variant="light" />
-              </div>
             </div>
           </ScrollReveal>
 
