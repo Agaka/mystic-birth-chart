@@ -1381,6 +1381,15 @@ function BirthDataStep({
   onCityBlur: () => void;
   onChoosePlace: (place: BirthplaceOption) => void;
 }) {
+  function handleTimeInput(e: React.ChangeEvent<HTMLInputElement>) {
+    let val = e.target.value.replace(/\D/g, "");
+    val = val.slice(0, 4);
+    if (val.length >= 3) {
+      val = `${val.slice(0, 2)}:${val.slice(2)}`;
+    }
+    onTimeChange(val);
+  }
+
   return (
     <StepShell
       eyebrow="Step III - The exact chart"
@@ -1419,11 +1428,11 @@ function BirthDataStep({
               required
               type="text"
               inputMode="numeric"
-              pattern="([01][0-9]|2[0-3]):[0-5][0-9]"
+              pattern="([01]?[0-9]|2[0-3]):[0-5][0-9]"
               placeholder="14:35"
               maxLength={5}
               value={time}
-              onChange={(event) => onTimeChange(event.target.value)}
+              onChange={handleTimeInput}
               className="min-h-12 border border-ivory/14 bg-midnight px-4 font-ui text-sm text-ivory outline-none transition-colors focus:border-gold"
             />
           </label>
@@ -1554,7 +1563,7 @@ function AnimatedChartFigure({
   ];
 
   return (
-    <div className="relative flex h-64 w-64 items-center justify-center sm:h-72 sm:w-72 lg:h-80 lg:w-80 2xl:h-[400px] 2xl:w-[400px]">
+    <div className="relative flex h-64 w-64 items-center justify-center sm:h-72 sm:w-72 lg:h-80 lg:w-80 xl:h-[320px] xl:w-[320px]">
       <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(184,138,58,0.18),transparent_58%)] blur-sm" />
       <svg
         aria-hidden="true"
@@ -1648,11 +1657,11 @@ function CalculationStep({
     calculationMessages[calculationIndex] ?? calculationMessages[calculationMessages.length - 1];
 
   return (
-    <div className="relative flex w-full min-w-0 flex-col overflow-hidden p-6 text-center animate-fade-in md:p-10">
+    <div className="relative flex w-full min-w-0 flex-col overflow-hidden p-5 text-center animate-fade-in sm:p-8">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(184,138,58,0.14),transparent_34%),linear-gradient(180deg,transparent,rgba(9,7,5,0.32))]" />
 
-      <div className="relative z-10 grid w-full items-center gap-7 2xl:grid-cols-[minmax(340px,0.48fr)_minmax(0,0.52fr)] 2xl:text-left">
-        <div className="flex justify-center 2xl:justify-end">
+      <div className="relative z-10 flex w-full flex-col items-center gap-8 xl:flex-row xl:items-center xl:text-left">
+        <div className="flex w-full justify-center xl:w-5/12 xl:justify-end">
           <AnimatedChartFigure
             progress={progress}
             centerSign={selectedSign}
@@ -1660,7 +1669,7 @@ function CalculationStep({
           />
         </div>
 
-        <div className="mx-auto w-full max-w-2xl">
+        <div className="mx-auto w-full max-w-xl xl:w-7/12">
           <p className="font-ui text-xs font-semibold uppercase tracking-[0.24em] text-gold/72">
             {currentMessage.eyebrow}
           </p>
