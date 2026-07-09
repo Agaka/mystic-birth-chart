@@ -39,8 +39,9 @@ export default function SampleReportPage() {
             Ready for your own chart table?
           </h2>
           <p className="mt-6 text-lg leading-relaxed text-ink/62">
-            Start with the {siteConfig.product.basic.price} Basic Reading or
-            upgrade to the {siteConfig.product.complete.price} Complete Reading
+            Start with the {siteConfig.product.basic.price} automated Essential
+            Reading for instant email delivery, or upgrade to the{" "}
+            {siteConfig.product.complete.price} hand-prepared Complete Reading
             for deeper chart synthesis.
           </p>
           <div className="mt-10">
@@ -50,13 +51,13 @@ export default function SampleReportPage() {
               analytics={{
                 event: "cta_click",
                 params: {
-                  cta_label: "Order a Reading",
+                  cta_label: "Get Instant Essential Reading",
                   cta_location: "sample_report_page",
                   offer_tier: "basic",
                 },
               }}
             >
-              Order a Reading
+              Get Instant Essential Reading
             </Button>
           </div>
         </div>

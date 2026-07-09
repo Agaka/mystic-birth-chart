@@ -20,15 +20,15 @@ const authorityNotes = [
     body: "The reading connects symbolic patterns to love, career, temperament, money, purpose, and personal timing.",
   },
   {
-    title: "Prepared in a limited queue",
-    body: "Only five hand-prepared readings are available each day, so each chart can be treated with care.",
+    title: "Instant first step, manual depth",
+    body: "Essential is automated and delivered instantly. Complete is hand-prepared in a limited daily queue.",
   },
 ];
 
 const processSteps = [
-  "Order Basic or Complete",
+  "Order Essential automated or Complete hand-prepared",
   "Send birth date, exact time, city, and focus",
-  "Receive a written reading you can revisit",
+  "Receive an instant email reading or a hand-prepared PDF",
 ];
 
 export default function HomePage() {
@@ -42,15 +42,15 @@ export default function HomePage() {
         eyebrow="Private natal chart readings"
         headline="Enter the old study. Leave with your chart understood."
         subheadline="Premium English-language astrology readings with a traditional foundation, written for people who want more than generic signs, vague predictions, or copy-paste interpretations."
-        primaryCta={{ label: "Order a Reading", href: getBasicCheckoutUrl() }}
+        primaryCta={{ label: "Get Instant Essential Reading", href: getBasicCheckoutUrl() }}
         secondaryCta={{ label: "View Sample", href: "/sample-report" }}
         imageSrc="/images/birth-chart-reading-hero.png"
         imageAlt="An antique-style birth chart reading laid across a dark wooden desk with old books and brass tools."
         note={`${siteConfig.product.basic.name} ${siteConfig.product.basic.price}. ${siteConfig.product.complete.name} ${siteConfig.product.complete.price}.`}
         trustItems={[
           "Method|Traditional astrology plus modern synthesis",
-          "Delivery|Written PDF within 48-72 hours",
-          "Queue|5 hand-prepared readings per day",
+          "Delivery|Essential instant email / Complete within 72 hours",
+          "Queue|5 hand-prepared Complete readings per day",
         ]}
       />
 
@@ -103,7 +103,7 @@ export default function HomePage() {
             <p className="text-lg leading-relaxed text-ink/62">
               Before ordering, use the free chart tool to read the first layer
               of your pattern. It gives a richer sample of the interpretive
-              style, then shows why a full hand-prepared reading can go deeper.
+              style, then shows why a paid reading can go deeper.
             </p>
             <div className="mt-6">
               <Button
@@ -132,8 +132,9 @@ export default function HomePage() {
               Choose the depth of your reading.
             </h2>
             <p className="mt-5 text-lg leading-relaxed text-ink/62">
-              Start with a focused $29 reading, or choose the deeper $97 option
-              when you want the full chart treated with more time and detail.
+              Start with the focused $17 automated Essential reading, or choose
+              the deeper $97 hand-prepared option when you want the full chart
+              treated with more time and detail.
             </p>
           </div>
 
@@ -154,8 +155,8 @@ export default function HomePage() {
             </h2>
             <p className="mt-5 text-lg leading-relaxed text-ivory/62">
               A sample reading lets you feel the tone before you buy. This is
-              not a horoscope feed. It is a private document you can save,
-              revisit, and keep on your own study table.
+              not a horoscope feed. It shows the kind of document the deeper
+              hand-prepared Complete reading becomes.
             </p>
             <ol className="mt-8 space-y-3">
               {processSteps.map((step, index) => (
@@ -233,8 +234,8 @@ export default function HomePage() {
 
       <CTASection
         title="Your chart is not a list of signs. It is a pattern."
-        body="Order a natal chart reading that connects the pieces into one coherent story."
-        buttonLabel="Order a Reading"
+        body="Start with the instant automated Essential reading, then upgrade when you want deeper hand-prepared synthesis."
+        buttonLabel="Get Instant Essential Reading"
         buttonHref={getBasicCheckoutUrl()}
         variant="gradient"
         analyticsLocation="homepage_final_cta"

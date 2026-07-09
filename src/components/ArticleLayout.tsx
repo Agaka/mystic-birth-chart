@@ -178,8 +178,8 @@ export function ArticleLayout({
               Ready to read your own chart?
             </h3>
             <p className="mt-4 leading-relaxed text-ink/55">
-              Order a natal reading that connects your placements into one
-              coherent story.
+              Start with the instant Essential Reading, or compare the
+              hand-prepared Complete option when you want the whole chart.
             </p>
             <div className="mt-8">
               <Button
@@ -188,13 +188,13 @@ export function ArticleLayout({
                 analytics={{
                   event: "cta_click",
                   params: {
-                    cta_label: "Order Your Birth Chart Reading",
+                    cta_label: "Get Instant Essential Reading",
                     cta_location: "article_final_cta",
                     offer_tier: "basic",
                   },
                 }}
               >
-                Order Your Birth Chart Reading
+                Get Instant Essential Reading
               </Button>
             </div>
           </div>

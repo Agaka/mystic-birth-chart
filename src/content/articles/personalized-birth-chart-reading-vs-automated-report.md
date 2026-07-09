@@ -134,11 +134,11 @@ That is when astrology becomes more than entertainment.
 
 ## Where Mystic Birth Chart Fits
 
-Mystic Birth Chart is built for written, personalized natal readings. The goal is not to replace every form of astrology consultation. A live session has its own value. A quick calculator has its own value.
+Mystic Birth Chart is built as a ladder, not a trick. A quick calculator has its own value. An automated first report has its own value. A hand-prepared reading has another kind of value.
 
-The purpose here is a focused written report that connects your chart into clear English.
+The Essential Birth Chart Reading is the transparent automated step: $17, generated from your birth data, and delivered instantly by email. It is not presented as handmade. Its purpose is to give you a stronger first synthesis than the free preview.
 
-The Basic reading is for a first coherent interpretation. The Complete reading is for a deeper synthesis across houses, rulers, aspects, love, career, money, temperament, and direction.
+The Complete Natal Reading is the hand-prepared option. That is where the chart is weighed with more judgment across houses, rulers, aspects, love, career, money, temperament, and direction.
 
 The reading is not a guaranteed prediction service. It is not medical, legal, financial, or psychological advice. It is a structured symbolic interpretation for self-reflection and clarity.
 
@@ -146,17 +146,19 @@ That boundary matters. It keeps the reading useful instead of manipulative.
 
 ## How to Know Which You Need
 
-Use an automated report or free tool when you need vocabulary.
+Use a free tool when you need vocabulary.
 
-Order a personalized reading when you need synthesis.
+Order the automated Essential Reading when you want the first synthesis quickly and at a lower price.
 
-You may be ready for a personalized reading if:
+Order the hand-prepared Complete Reading when you need deeper human judgment.
+
+You may be ready for the Complete Reading if:
 
 - your separate placement descriptions all feel partly true but disconnected
 - you want to know which placements matter most
 - you want love, career, money, or emotional patterns interpreted inside the whole chart
 - you want the chart ruler, houses, aspects, and repeated themes explained together
-- you want a written reading you can revisit
+- you want a hand-prepared written reading you can revisit
 
 Start with the [free birth chart preview](/free-birth-chart) if you want to feel the tone. Read the [sample report](/sample-report) if you want to see how synthesis looks in writing. Then compare the [reading options](/birth-chart-report) when you want your own map read as a whole.
 

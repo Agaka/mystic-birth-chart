@@ -53,6 +53,53 @@
   50% { opacity: 1; }
 }
 
+@keyframes astro-draw {
+  0% {
+    stroke-dashoffset: 180;
+    opacity: 0;
+  }
+  24% {
+    opacity: 0.75;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0.75;
+  }
+}
+
+@keyframes astro-float-soft {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: 0.82;
+  }
+  50% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+.astro-chart-draw line {
+  stroke-dasharray: 180;
+  stroke-dashoffset: 180;
+  animation: astro-draw 2.4s ease-in-out infinite alternate;
+}
+
+.astro-float-soft {
+  animation: astro-float-soft 4s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;

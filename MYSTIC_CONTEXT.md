@@ -1,6 +1,6 @@
 # Mystic Birth Chart - AI Context and Growth Bible
 
-Last updated: 2026-07-04
+Last updated: 2026-07-09
 
 This file is the long-term memory for Mystic Birth Chart. Any AI, developer, designer, copywriter, or content assistant working on this project should read it before making decisions about copy, design, content, social media, SEO, conversion, or product strategy.
 
@@ -37,7 +37,8 @@ Current tech stack:
 - TypeScript
 - Tailwind CSS 4
 - Markdown articles in `src/content/articles`
-- Stripe package installed, but live Stripe credentials are not configured yet
+- Stripe Checkout is now configured, with two current paid products and order email notifications working according to the owner.
+- GA4 is still pending.
 
 Important repo rule:
 
@@ -46,28 +47,36 @@ Important repo rule:
 
 ## 2. Business Model
 
-The primary paid products are personalized written birth chart readings:
+The primary paid products are an automated entry reading and a hand-prepared complete reading:
 
-### Basic Natal Reading
+### Essential Birth Chart Reading
 
-- Price: `$29`
-- Positioning: entry reading, fast first interpretation
-- Delivery promise currently used in the site: within 48 hours
-- Format: personalized PDF report
+- Price: `$17`
+- Positioning: accessible automated entry reading, the first paid synthesis after the free preview
+- Delivery promise: instant email delivery
+- Format: automated email reading
+- Disclosure: must be clearly described as generated automatically, not hand-prepared
 - Scope:
-  - Core natal chart synthesis
+  - First natal chart synthesis
   - Sun, Moon, Rising
   - Chart ruler
-  - Key aspects
-  - Purpose, emotional patterns, love, and direction
+  - Sect/day or night chart
+  - First core themes connected to the selected focus
   - Clear practical English
+
+Important naming rule:
+
+- Public copy should use "Essential Birth Chart Reading" or "Essential Natal Reading".
+- Avoid "Simple Chart" because it lowers perceived value.
+- Existing Stripe/product internals may still use older names like `basic`, but customer-facing copy should say "Essential".
+- Essential must not be described as hand-prepared, handmade, manually written, or delivered in 48 hours.
 
 ### Complete Natal Reading
 
 - Price: `$97`
 - Positioning: deeper and more complete interpretation
-- Delivery promise currently used in the site: within 72 hours
-- Format: expanded personalized PDF report
+- Delivery promise currently used in the site: hand-prepared and delivered within 72 hours
+- Format: expanded hand-prepared PDF report
 - Scope:
   - Traditional-first natal analysis
   - House rulers
@@ -79,12 +88,12 @@ The primary paid products are personalized written birth chart readings:
 
 ### Capacity
 
-The owner can produce about 5 readings per day. This can be used as real operational scarcity, but it should not be overused or made manipulative.
+The owner can produce about 5 hand-prepared Complete readings per day. This can be used as real operational scarcity for the manual product, but it should not be applied to the automated Essential offer.
 
 Good wording:
 
-- "5 hand-prepared readings available per day."
-- "Readings are prepared by hand, so the daily queue is limited."
+- "5 hand-prepared Complete readings available per day."
+- "Complete readings are prepared by hand, so the daily queue is limited."
 
 Avoid:
 
@@ -119,7 +128,7 @@ Possible tagline variants:
 
 - "Traditional astrology readings for modern questions."
 - "Enter the old study of your birth chart."
-- "A hand-prepared chart reading, written in clear English."
+- "Start instantly, then go deeper by hand."
 - "Traditional astrology, practical synthesis, no generic app report."
 
 Core promise:
@@ -184,9 +193,10 @@ Emotional state:
 What they need to believe before buying:
 
 - This site understands astrology beyond memes.
-- The reading is not automated.
+- The Essential reading is transparently automated and instant.
+- The Complete reading is hand-prepared, not automated.
 - The reading will be written clearly.
-- The reader will synthesize the chart, not copy and paste isolated placement descriptions.
+- The product will synthesize the chart, not copy and paste isolated placement descriptions.
 - The purchase feels safe and professional.
 - The price feels accessible compared with higher-end astrologers.
 
@@ -229,7 +239,8 @@ Good language:
 - "vocation"
 - "emotional rhythm"
 - "practical synthesis"
-- "hand-prepared"
+- "automated Essential reading"
+- "hand-prepared Complete reading"
 - "not a generic app report"
 - "old study"
 
@@ -345,6 +356,16 @@ The free tool:
 
 ## 8. Funnel Strategy
 
+The newest funnel strategy is documented in:
+
+- `docs/strategy/free-chart-funnel-and-product-ladder.md`
+
+The key shift is that the free chart should become a guided, progressive experience:
+
+Social/search/ad/blog traffic -> zodiac sign entry -> intention -> birth data -> calculation screen -> useful free preview -> optional email/PDF capture -> personalized paid reading recommendation.
+
+The experience should borrow the conversion psychology of astrology quizzes without using predatory tactics, fake proof, hidden subscriptions, or guaranteed prediction claims.
+
 Primary traffic path:
 
 Social or Google -> free birth chart tool or blog post -> internal CTA -> reading sales page -> custom checkout -> Stripe payment -> thank-you birth details -> PDF delivery by email.
@@ -359,10 +380,9 @@ Best landing pages for traffic:
 
 Primary CTA:
 
-- "Get My Chart Reading"
-- "Order Your Birth Chart Reading"
+- "Get Instant Essential Reading"
 - "Begin My Free Chart Preview"
-- "Order Basic Reading"
+- "Order Essential Reading"
 - "Order Complete Reading"
 
 CTA logic:
@@ -385,13 +405,15 @@ The card payment step is handled by Stripe Checkout through:
 
 - `src/app/api/checkout/route.ts`
 
-Stripe is not fully configured yet. Required Vercel environment variables:
+Stripe Checkout is configured according to the owner, with two current products ready for purchase and email notifications working after purchase.
+
+Environment variables used by the app:
 
 - `STRIPE_SECRET_KEY`
 - `STRIPE_BASIC_PRICE_ID`
 - `STRIPE_COMPLETE_PRICE_ID`
 
-If those are missing, the API redirects to:
+If those are missing in an environment, the API redirects to:
 
 - `/checkout/pending`
 
@@ -405,7 +427,7 @@ This can change later if the owner decides to use a personal astrologer name.
 
 ## 10. Analytics Status
 
-The site has analytics hooks, but GA4/Search Console still need environment setup.
+The site has analytics hooks. Search Console has been handled by the owner. GA4 has not been configured yet.
 
 Environment variables:
 
@@ -420,6 +442,28 @@ Tracked events include:
 - `free_chart_city_search`
 - `free_chart_preview_generated`
 - `birth_details_submit_attempt`
+
+Next tracking expansion should support the guided free-chart funnel:
+
+- `chart_entry_viewed`
+- `zodiac_selected`
+- `intent_selected`
+- `birth_data_started`
+- `birth_data_completed`
+- `chart_calculation_started`
+- `chart_preview_viewed`
+- `locked_section_viewed`
+- `email_capture_started`
+- `email_captured`
+- `pdf_sent`
+- `pdf_send_failed`
+- `product_recommended`
+- `product_viewed`
+- `checkout_started`
+- `purchase_completed`
+- `subscription_started`
+
+Capture UTMs and origin, but never send birth date, birth time, birth city, full name, email, or other sensitive personal data to analytics.
 
 Important privacy rule:
 
@@ -457,7 +501,7 @@ Email 1: "Your birth chart is not a list of placements"
 Email 2: "The Ascendant and chart ruler: where a reading begins"
 Email 3: "Why automated chart reports feel incomplete"
 Email 4: "How the Old Study Method reads your chart"
-Email 5: "Choose your reading: Basic or Complete"
+Email 5: "Choose your reading: Essential or Complete"
 
 ## 12. Competitor Notes
 
@@ -512,7 +556,7 @@ What to learn:
 What not to copy:
 
 - Do not become another detached app.
-- Mystic Birth Chart should feel human, hand-prepared, and old-study.
+- Mystic Birth Chart should feel human and old-study even when the Essential offer is automated. Complete must remain clearly hand-prepared.
 
 ### Meme Accounts
 
@@ -587,7 +631,7 @@ Bio draft:
 ```text
 Traditional astrology for modern questions
 Free birth chart preview below
-Hand-prepared natal readings from $29
+Instant Essential reading from $17
 ```
 
 Highlights:
@@ -884,7 +928,7 @@ what is this planet doing in the structure of the whole chart?
 
 That is why two people with the same Moon sign can experience it very differently.
 
-If you want your chart read as a whole, start with the free birth chart preview or order a hand-prepared reading.
+If you want your chart read as a whole, start with the free birth chart preview, then choose the automated Essential reading or the hand-prepared Complete reading.
 ```
 
 ### YouTube Short Template
@@ -933,9 +977,10 @@ Use these ideas across the site, emails, social posts, and ads.
 ### Short CTAs
 
 - "Start with a free chart preview"
-- "Order a hand-prepared reading"
+- "Get the instant Essential Reading"
+- "Order a hand-prepared Complete Reading"
 - "Read your chart as a whole"
-- "Get the Basic Natal Reading"
+- "Get the Essential Birth Chart Reading"
 - "Go deeper with the Complete Reading"
 - "See a sample report"
 
@@ -944,7 +989,8 @@ Use these ideas across the site, emails, social posts, and ads.
 - "A birth chart reading that does not stop at your Sun sign."
 - "Your chart is not a list of placements."
 - "Traditional astrology, translated into clear modern guidance."
-- "A hand-prepared natal report for people who want the whole pattern."
+- "An instant automated first reading for people who want more than the free preview."
+- "A hand-prepared Complete report for people who want the whole pattern."
 - "Know where your chart begins, what it repeats, and what it asks of you."
 
 ### Objection Handling
@@ -995,7 +1041,7 @@ Possible future products:
 
 Priority order:
 
-1. Make Basic and Complete readings sell consistently.
+1. Make Essential and Complete readings sell consistently.
 2. Add testimonials and sample excerpts.
 3. Add email capture and welcome flow.
 4. Add small digital products or mini readings.
@@ -1027,7 +1073,7 @@ Conversion priority:
 2. Ensure checkout is simple on mobile.
 3. Add trust details: delivery time, what is included, refund policy, sample report.
 4. Add testimonials when available.
-5. Test Basic vs Complete emphasis.
+5. Test Essential vs Complete emphasis.
 
 ## 20. Technical Operations
 
@@ -1066,6 +1112,22 @@ NEXT_PUBLIC_BIRTH_DETAILS_FORM_URL=
 
 Do not commit real `.env.local` secrets.
 
+### VPS Availability
+
+The owner has access to a capable Contabo VPS. It currently runs a WhatsApp Evolution instance and can be used if the project needs backend work.
+
+Use Vercel first for the public frontend, simple APIs, checkout redirects, and basic email notifications. Consider the VPS later for:
+
+- PDF generation queues.
+- Email retry logs.
+- Scheduled jobs.
+- A small private admin backend.
+- Persistent lead/order storage.
+- Stripe webhook processing that benefits from durable logs.
+- WhatsApp or CRM integrations.
+
+Do not move the frontend away from Vercel unless there is a clear operational reason.
+
 ## 21. Pending Setup Checklist
 
 Domain:
@@ -1079,22 +1141,25 @@ Email:
 - Done: create `hello@mysticbirthchart.com` mailbox.
 - Done: update `NEXT_PUBLIC_SUPPORT_EMAIL` in Vercel.
 - Done: Hostinger MX, SPF, DKIM, and DMARC records are present in DNS.
-- Pending: manually test sending and receiving from `hello@mysticbirthchart.com`.
+- Done: buyer receives email after purchase and the owner receives the order email, according to the owner.
+- Pending: keep monitoring deliverability and spam placement.
 
 Stripe:
 
-- Create Basic product/price.
-- Create Complete product/price.
-- Add Stripe env vars in Vercel.
-- Test checkout.
+- Done: two products exist and are ready to buy, according to the owner.
+- Done: checkout and post-purchase emails are working, according to the owner.
+- Done: public naming moved from Simple/Basic to Essential Birth Chart Reading in the site copy.
+- Done: Essential repositioned as a $17 automated instant email reading in public copy and post-purchase email logic.
+- Pending: ensure `STRIPE_BASIC_PRICE_ID` points to the live $17 Stripe price.
+- Pending: verify all live purchase events are tracked after GA4 setup.
 
 Analytics:
 
 - Create GA4 property/web stream.
 - Add measurement ID to Vercel.
 - Verify events.
-- Add Search Console token.
-- Submit sitemap.
+- Done: Search Console/indexing handled by the owner.
+- Pending: implement expanded funnel events and UTM capture.
 
 Newsletter:
 

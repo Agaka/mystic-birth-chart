@@ -22,13 +22,14 @@ export function getReadingOffer(tier: ReadingTier) {
         : process.env.STRIPE_COMPLETE_PRICE_ID,
     features: isBasic
       ? [
-          "Core natal chart synthesis",
-          "Sun, Moon, Rising, chart ruler, and key aspects",
-          "Purpose, emotional patterns, love, and direction",
-          "Clear PDF written in practical English",
+          "Generated automatically from your birth date, exact time, and city",
+          "Sun, Moon, Rising, chart ruler, and sect in context",
+          "A first chart synthesis translated into practical English",
+          "Instant delivery by email after payment",
+          "An accessible first step, not a hand-prepared report",
         ]
       : [
-          "Expanded traditional-first natal analysis",
+          "Expanded hand-prepared traditional-first natal analysis",
           "House rulers, dignities, aspects, and chart emphasis",
           "Love, career, money, temperament, and vocation themes",
           "Prioritized integration notes and next-step guidance",

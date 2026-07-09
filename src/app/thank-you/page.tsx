@@ -25,6 +25,7 @@ export default function ThankYouPage() {
   const supportEmail = siteConfig.supportEmail;
   const [status, setStatus] = useState<SendStatus>("loading");
   const [draft, setDraft] = useState<CheckoutDraft | null>(null);
+  const isEssential = draft?.tier === "basic";
 
   useEffect(() => {
     const timer = window.setTimeout(async () => {
@@ -38,7 +39,6 @@ export default function ThankYouPage() {
         const parsed = JSON.parse(stored) as CheckoutDraft;
         setDraft(parsed);
 
-        // Auto-send the birth details email
         trackEvent("birth_details_auto_send", {
           tier: parsed.tier || "unknown",
         });
@@ -60,7 +60,6 @@ export default function ThankYouPage() {
 
         if (res.ok) {
           setStatus("sent");
-          // Clear the draft after successful send
           window.localStorage.removeItem(draftStorageKey);
         } else {
           setStatus("error");
@@ -89,7 +88,9 @@ export default function ThankYouPage() {
             {status === "loading"
               ? "We're sending your birth details now..."
               : status === "sent"
-                ? "Your birth details have been received. Your personalized reading is now in the queue."
+                ? isEssential
+                  ? "Your automated Essential reading has been sent to your email."
+                  : "Your birth details have been received. Your hand-prepared reading is now in the queue."
                 : status === "error"
                   ? "Your payment was successful, but we had trouble sending your details automatically."
                   : "Your payment was successful."}
@@ -102,9 +103,7 @@ export default function ThankYouPage() {
           {status === "loading" && (
             <div className="border border-gold/20 bg-ivory-dark p-8 text-center">
               <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-gold/30 border-t-gold" />
-              <p className="text-ink/60">
-                Sending your birth details...
-              </p>
+              <p className="text-ink/60">Sending your birth details...</p>
             </div>
           )}
 
@@ -112,15 +111,28 @@ export default function ThankYouPage() {
             <div className="space-y-8">
               <div className="border border-gold/20 bg-ivory-dark p-8 text-center">
                 <p className="font-ui text-xs font-semibold uppercase tracking-[0.2em] text-gold-dark">
-                  ✓ Details received
+                  Details received
                 </p>
                 <h2 className="mt-4 font-heading text-3xl font-medium text-aubergine">
-                  Your reading is being prepared.
+                  {isEssential
+                    ? "Your automated reading is on its way."
+                    : "Your reading is being prepared."}
                 </h2>
                 <p className="mt-4 text-ink/60">
-                  We&apos;ll deliver your personalized PDF to{" "}
-                  <strong className="text-ink/80">{draft.email}</strong> within
-                  the delivery window for your reading tier.
+                  {isEssential ? (
+                    <>
+                      We sent the automated Essential Reading to{" "}
+                      <strong className="text-ink/80">{draft.email}</strong>.
+                      It is generated automatically from your birth data, not
+                      hand-prepared.
+                    </>
+                  ) : (
+                    <>
+                      We&apos;ll deliver your hand-prepared PDF to{" "}
+                      <strong className="text-ink/80">{draft.email}</strong>{" "}
+                      within the delivery window for your reading tier.
+                    </>
+                  )}
                 </p>
               </div>
 
@@ -169,8 +181,8 @@ export default function ThankYouPage() {
               </div>
 
               <p className="text-center text-xs text-ink/40">
-                A payment receipt has been sent to your email by Stripe. If you have
-                any questions, contact us at{" "}
+                A payment receipt has been sent to your email by Stripe. If you
+                have any questions, contact us at{" "}
                 <a href={`mailto:${supportEmail}`} className="underline">
                   {supportEmail}
                 </a>
@@ -182,13 +194,13 @@ export default function ThankYouPage() {
           {status === "sent" && !draft && (
             <div className="border border-gold/20 bg-ivory-dark p-8 text-center">
               <p className="font-ui text-xs font-semibold uppercase tracking-[0.2em] text-gold-dark">
-                ✓ Order confirmed
+                Order confirmed
               </p>
               <h2 className="mt-4 font-heading text-3xl font-medium text-aubergine">
-                Your reading is being prepared.
+                Your reading details were received.
               </h2>
               <p className="mt-4 text-ink/60">
-                We&apos;ll deliver your personalized PDF within the delivery window.
+                Please check your email for the next step or delivery message.
               </p>
             </div>
           )}
@@ -196,21 +208,21 @@ export default function ThankYouPage() {
           {status === "no-draft" && (
             <div className="border border-gold/20 bg-ivory-dark p-8 text-center">
               <p className="font-ui text-xs font-semibold uppercase tracking-[0.2em] text-gold-dark">
-                ✓ Payment received
+                Payment received
               </p>
               <h2 className="mt-4 font-heading text-3xl font-medium text-aubergine">
                 Thank you for your purchase.
               </h2>
               <p className="mt-4 text-ink/60">
-                If you haven&apos;t already sent your birth details, please email them
-                to{" "}
+                If you do not receive your delivery email, please send your
+                order email and birth details to{" "}
                 <a
                   href={`mailto:${supportEmail}`}
                   className="font-medium text-gold-dark underline"
                 >
                   {supportEmail}
-                </a>{" "}
-                so we can prepare your reading.
+                </a>
+                .
               </p>
             </div>
           )}
@@ -222,8 +234,8 @@ export default function ThankYouPage() {
                   We couldn&apos;t send your details automatically.
                 </h2>
                 <p className="mt-4 text-ink/60">
-                  Don&apos;t worry — your payment went through. Please send your birth
-                  details directly to:
+                  Don&apos;t worry - your payment went through. Please send your
+                  birth details directly to:
                 </p>
                 <a
                   href={`mailto:${supportEmail}?subject=${encodeURIComponent(

@@ -10,15 +10,16 @@ import { getBasicCheckoutUrl, siteConfig } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Natal Chart Readings",
   description:
-    "Order a written natal chart reading grounded in traditional astrology, practical synthesis, and clear personal guidance. Basic readings start at $29.",
+    "Order an automated Essential birth chart reading for $17, delivered instantly by email, or a hand-prepared Complete natal reading for deeper synthesis.",
 };
 
 const included = [
-  "A written PDF reading prepared from your birth date, exact time, and city",
+  "Essential: an automated email reading generated from your birth date, exact time, and city",
+  "Complete: a hand-prepared PDF reading written with deeper chart judgment",
   "Traditional-first analysis of planets, houses, rulers, and aspects",
   "Clear synthesis for purpose, relationships, career, money, and temperament",
   "A private document you can revisit instead of a disposable horoscope",
-  "Delivery within 48 to 72 hours depending on the reading option",
+  "Delivery instantly by email for Essential, or within 72 hours for Complete",
 ];
 
 const method = [
@@ -27,12 +28,12 @@ const method = [
     body: "The reading begins with your birth data, house placements, planetary condition, aspects, and chart emphasis.",
   },
   {
-    title: "Find the ruling pattern",
-    body: "We look for the chart's hierarchy: angular planets, rulers, Saturn, Venus, the Moon, and repeating themes.",
+    title: "Choose the depth",
+    body: "Essential gives you an automated first synthesis. Complete is the hand-prepared option for a fuller chart hierarchy.",
   },
   {
-    title: "Write the synthesis",
-    body: "The final reading connects the pieces into a coherent narrative, with practical guidance instead of fatalistic claims.",
+    title: "Receive the reading",
+    body: "The Essential reading arrives instantly by email. The Complete reading is prepared by hand and delivered as a PDF.",
   },
 ];
 
@@ -45,7 +46,7 @@ const faqItems = [
   {
     question: "Is this generated automatically?",
     answer:
-      "No generic automated report is sent directly to you. The reading is prepared from your birth data, structured through astrological interpretation, and reviewed for clarity, coherence, and usefulness before delivery.",
+      "The Essential Birth Chart Reading is generated automatically from your birth data and delivered instantly by email. The Complete Natal Reading is not automated; it is prepared by hand in a limited daily queue.",
   },
   {
     question: "What birth information do I need?",
@@ -60,7 +61,7 @@ const faqItems = [
   {
     question: "Which reading should I choose?",
     answer:
-      "Choose Basic if you want an accessible first reading of your core chart pattern. Choose Complete if you want deeper house ruler analysis, more life areas, and a fuller synthesis.",
+      "Choose Essential if you want the most accessible first paid synthesis and instant delivery. Choose Complete if you want deeper house ruler analysis, more life areas, and a hand-prepared interpretation.",
   },
   {
     question: "Does this predict my future?",
@@ -70,7 +71,7 @@ const faqItems = [
   {
     question: "Can I get a refund?",
     answer:
-      "Refunds are available before the reading work begins. Once a personalized reading is prepared or delivered, refunds are generally not offered unless there is a clear fulfillment issue.",
+      "For the automated Essential reading, delivery begins immediately after purchase and birth details, so refunds are generally not offered once it is sent. For Complete, refunds are available before the hand-prepared work begins unless there is a clear fulfillment issue.",
   },
 ];
 
@@ -93,11 +94,12 @@ export default function BirthChartReportPage() {
               Reading options
             </p>
             <h2 className="font-heading text-3xl font-semibold leading-tight text-aubergine md:text-5xl">
-              Start at $29. Go deeper at $97.
+              Start instantly at $17. Go deeper by hand at $97.
             </h2>
             <p className="mt-5 text-lg leading-relaxed text-ink/62">
-              Basic is built for first-time buyers. Complete is for people who
-              want the fuller chart synthesis and are ready for a deeper reading.
+              Essential is the automated entry reading: lower price, instant
+              email delivery, and clear first synthesis. Complete is for people
+              who want the fuller chart architecture interpreted by hand.
             </p>
           </div>
 
@@ -114,12 +116,12 @@ export default function BirthChartReportPage() {
               What you receive
             </p>
             <h2 className="font-heading text-3xl font-semibold leading-tight text-ivory md:text-5xl">
-              A personal reading, not a pile of disconnected meanings.
+              A clear path from instant insight to hand-prepared depth.
             </h2>
             <p className="mt-5 text-lg leading-relaxed text-ivory/58">
-              Many free tools can list your placements. The value here is
-              synthesis: how those placements work together, which themes matter
-              most, and what the chart seems to ask from you.
+              Many free tools can list your placements. Essential gives you the
+              first automated synthesis quickly. Complete adds the human judgment
+              needed for deeper hierarchy, emphasis, and nuance.
             </p>
           </div>
 
@@ -208,9 +210,9 @@ export default function BirthChartReportPage() {
       </section>
 
       <CTASection
-        title="There are only so many charts one person can read well in a day."
-        body={`${siteConfig.capacity}. Choose the reading depth that matches where you are now.`}
-        buttonLabel="Order a Reading"
+        title="Start now, or choose the deeper hand-prepared path."
+        body={`Essential is automated and instant. Complete is prepared by hand, with ${siteConfig.capacity.toLowerCase()}.`}
+        buttonLabel="Get Instant Essential Reading"
         buttonHref={getBasicCheckoutUrl()}
         variant="gradient"
         analyticsLocation="readings_page_final_cta"

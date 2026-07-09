@@ -100,7 +100,8 @@ export default function FreeBirthChartPage() {
               Choose the depth of your personal report.
             </h2>
             <p className="mt-5 text-lg leading-relaxed text-ivory/58">
-              Start with a clear $29 reading, or choose the complete $97
+              Start with a clear $17 automated Essential reading delivered
+              instantly by email, or choose the hand-prepared $97 Complete
               synthesis when you want more detail across love, career, money,
               temperament, and direction.
             </p>
@@ -114,8 +115,8 @@ export default function FreeBirthChartPage() {
 
       <CTASection
         title="A free preview can name the doorway. A reading opens the room."
-        body="Order a written chart interpretation prepared with traditional structure and practical clarity."
-        buttonLabel="Order a Reading"
+        body="Order the instant automated Essential reading, or compare it with the hand-prepared Complete option."
+        buttonLabel="Get Instant Essential Reading"
         buttonHref={getBasicCheckoutUrl()}
         variant="gradient"
         analyticsLocation="free_chart_final_cta"

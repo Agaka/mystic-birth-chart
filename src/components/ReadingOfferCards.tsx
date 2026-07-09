@@ -9,14 +9,14 @@ const offers = [
   {
     id: "basic-reading",
     product: siteConfig.product.basic,
-    badge: "Fast entry offer",
-    cta: "Order Basic Reading",
+    badge: "Instant automated reading",
+    cta: "Get Instant Essential Reading",
     href: getBasicCheckoutUrl(),
     features: [
-      "Core natal chart synthesis",
-      "Sun, Moon, Rising, chart ruler, and key aspects",
-      "Purpose, emotional patterns, love, and direction",
-      "Clear PDF written in practical English",
+      "Generated automatically from your birth date, exact time, and city",
+      "Sun, Moon, Rising, chart ruler, and sect in context",
+      "A first chart synthesis translated into practical English",
+      "Delivered instantly by email, not hand-prepared",
     ],
   },
   {
@@ -27,7 +27,7 @@ const offers = [
     href: getCompleteCheckoutUrl(),
     featured: true,
     features: [
-      "Expanded traditional-first natal analysis",
+      "Expanded hand-prepared traditional-first natal analysis",
       "House rulers, dignities, aspects, and chart emphasis",
       "Love, career, money, temperament, and vocation themes",
       "Prioritized integration notes and next-step guidance",
@@ -128,7 +128,8 @@ export function ReadingOfferCards() {
               offer.featured ? "text-ink/58" : "text-ivory/64"
             }`}
           >
-            {offer.product.delivery}. {siteConfig.capacity}.
+            {offer.product.delivery}.{" "}
+            {offer.featured ? siteConfig.capacity : offer.product.disclosure}
           </p>
         </article>
       ))}

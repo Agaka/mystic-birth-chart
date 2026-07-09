@@ -30,6 +30,7 @@ export function CheckoutForm({
   productName,
   productPrice,
 }: CheckoutFormProps) {
+  const isEssential = tier === "basic";
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const [draft, setDraft] = useState<CheckoutDraft | null>(null);
@@ -174,10 +175,15 @@ export function CheckoutForm({
             id="birthTime"
             name="birthTime"
             type="time"
+            required={isEssential}
             defaultValue={draft?.birthTime || ""}
             className="w-full border border-ink/15 bg-white px-4 py-3 font-body text-ink focus:border-gold focus:outline-none"
           />
-          <p className="mt-1 text-xs text-ink/42">Exact time gives the best house analysis.</p>
+          <p className="mt-1 text-xs text-ink/42">
+            {isEssential
+              ? "Required for the automated Essential reading, because it calculates Rising sign and chart ruler."
+              : "Exact time gives the best house analysis."}
+          </p>
         </div>
       </div>
 
@@ -218,7 +224,7 @@ export function CheckoutForm({
 
       <div>
         <label htmlFor="notes" className="mb-2 block font-ui text-sm font-medium text-ink/70">
-          Anything you want considered
+          {isEssential ? "Optional support note" : "Anything you want considered"}
         </label>
         <textarea
           id="notes"
@@ -226,7 +232,11 @@ export function CheckoutForm({
           rows={4}
           defaultValue={draft?.notes || ""}
           className="w-full resize-y border border-ink/15 bg-white px-4 py-3 font-body text-ink placeholder:text-ink/30 focus:border-gold focus:outline-none"
-          placeholder="Specific questions, context, or topics you want prioritized."
+          placeholder={
+            isEssential
+              ? "City spelling, birth time context, or anything support should know. The Essential reading itself is generated automatically from chart data."
+              : "Specific questions, context, or topics you want prioritized."
+          }
         />
       </div>
 
@@ -271,7 +281,7 @@ export function CheckoutForm({
 
       <p className="text-center text-xs leading-relaxed text-ink/42">
         Your card payment is completed on Stripe. Your birth details are saved in this browser so
-        the confirmation page can prefill the delivery form.
+        the confirmation page can send the delivery details.
       </p>
     </form>
   );

@@ -13,9 +13,9 @@ export function ProductCTA({ compact = false }: ProductCTAProps) {
           The article explains the symbol. Your chart decides how personal it is.
         </p>
         <p className="mt-3 text-sm text-ivory/72">
-          A written natal reading connects the planet, house, ruler, aspects,
-          and repeated themes so the interpretation belongs to your chart, not
-          to a generic placement description.
+          Start with the {siteConfig.product.basic.price} automated Essential
+          Reading for an instant first synthesis, then upgrade later if you want
+          the whole chart prepared by hand.
         </p>
         <div className="mt-5">
           <Button
@@ -24,13 +24,13 @@ export function ProductCTA({ compact = false }: ProductCTAProps) {
             analytics={{
               event: "cta_click",
               params: {
-                cta_label: "Get My Chart Reading",
+                cta_label: "Get Instant Essential Reading",
                 cta_location: "mid_article_cta",
                 offer_tier: "basic",
               },
             }}
           >
-            Get My Chart Reading
+            Get Instant Essential Reading
           </Button>
         </div>
       </div>
@@ -48,7 +48,8 @@ export function ProductCTA({ compact = false }: ProductCTAProps) {
       <p className="mx-auto mt-4 max-w-lg leading-relaxed text-ivory/72">
         A single placement can reveal a clue. A full reading shows how the
         pattern connects across houses, rulers, aspects, purpose, relationships,
-        and timing themes. Basic readings start at {siteConfig.product.basic.price}.
+        and timing themes. Essential automated readings start at{" "}
+        {siteConfig.product.basic.price}.
       </p>
       <div className="mt-8">
         <Button

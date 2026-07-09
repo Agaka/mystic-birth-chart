@@ -36,6 +36,7 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
   }
 
   const offer = getReadingOffer(tier);
+  const isEssential = offer.tier === "basic";
 
   return (
     <>
@@ -47,11 +48,14 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
           <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
             <div>
               <h1 className="font-heading text-4xl font-semibold leading-tight text-ivory md:text-6xl">
-                Secure your place in the reading queue.
+                {isEssential
+                  ? "Receive your automated Essential reading by email."
+                  : "Secure your place in the hand-prepared reading queue."}
               </h1>
               <p className="mt-5 max-w-2xl text-lg leading-relaxed text-ivory/62">
-                Enter the details needed for your written chart reading. The final card payment is
-                handled securely by Stripe.
+                {isEssential
+                  ? "Enter the birth details needed to generate your instant reading. The final card payment is handled securely by Stripe."
+                  : "Enter the details needed for your written chart reading. The final card payment is handled securely by Stripe."}
               </p>
             </div>
             <aside className="border border-gold/24 bg-ink/45 p-6">
@@ -66,6 +70,9 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
               </div>
               <p className="mt-4 text-sm leading-relaxed text-ivory/58">
                 {offer.product.summary}
+              </p>
+              <p className="mt-3 font-ui text-xs uppercase tracking-[0.16em] text-gold/70">
+                {offer.product.disclosure}
               </p>
             </aside>
           </div>
@@ -104,8 +111,9 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
                 Delivery
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-ink/62">
-                {offer.product.delivery}. {siteConfig.capacity}. You receive a written PDF you can
-                save, revisit, and study at your own pace.
+                {isEssential
+                  ? `${offer.product.delivery}. It is generated automatically from your birth data, not hand-prepared. You receive a written email reading you can save and revisit.`
+                  : `${offer.product.delivery}. ${siteConfig.capacity}. You receive a written PDF you can save, revisit, and study at your own pace.`}
               </p>
             </div>
 
@@ -114,9 +122,9 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
                 Refund policy
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-ink/62">
-                Refunds are available before the reading work begins. Once a personalized reading is
-                prepared or delivered, refunds are generally not offered unless there is a clear
-                fulfillment issue.
+                {isEssential
+                  ? "Because the automated Essential reading is generated and delivered immediately, refunds are generally not offered after delivery unless there is a clear fulfillment issue."
+                  : "Refunds are available before the reading work begins. Once a personalized reading is prepared or delivered, refunds are generally not offered unless there is a clear fulfillment issue."}
               </p>
             </div>
           </aside>

@@ -62,7 +62,7 @@ A live session allows conversation, follow-up questions, and real-time dialogue.
 
 For many people, a written report is the better first step because it is affordable and focused. You can study it privately before deciding whether you want a deeper consultation later.
 
-Mystic Birth Chart is built around written reports. You can preview the tone in the [sample report](/sample-report) and compare the [Basic and Complete options](/birth-chart-report).
+Mystic Birth Chart now has two clear entry points. The Essential Reading is an automated $17 email reading for a quick first synthesis after the free preview. The Complete Reading is the hand-prepared option for deeper chart judgment. You can preview the tone in the [sample report](/sample-report) and compare the [Essential and Complete options](/birth-chart-report).
 
 ## The Main Standard
 
