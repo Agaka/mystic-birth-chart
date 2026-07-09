@@ -60,7 +60,7 @@ export const siteConfig = {
     },
     almanac: {
       name: "The Hermetic Almanac",
-      price: "$19 / month",
+      price: "$14 / month",
       priceNote: "Monthly recurring subscription",
       delivery: "Delivered monthly to your inbox",
       format: "Monthly personalized workbook",
