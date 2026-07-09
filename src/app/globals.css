@@ -146,7 +146,7 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--color-aubergine);
 }
 
-.reading-area a {
+.reading-area .article-prose a {
   color: var(--color-gold-dark);
   text-decoration: underline;
   text-decoration-color: rgba(184, 138, 58, 0.65);
@@ -154,7 +154,7 @@ h1, h2, h3, h4, h5, h6 {
   transition: color 0.2s;
 }
 
-.reading-area a:hover {
+.reading-area .article-prose a:hover {
   color: var(--color-aubergine);
 }
 
