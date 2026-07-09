@@ -119,28 +119,29 @@ export function NatalChartSnapshotTool({
   const [birthplaceQuery, setBirthplaceQuery] = useState("");
   const [selectedPlace, setSelectedPlace] = useState<BirthplaceOption | null>(null);
   const [placeResults, setPlaceResults] = useState<BirthplaceOption[]>([]);
-  const [isFindingCity, setIsFindingCity] = useState(false);
-  const [cityMessage, setCityMessage] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const [result, setResult] = useState<NatalSnapshotResult | null>(null);
   const [error, setError] = useState("");
   const resultRef = useRef<HTMLDivElement | null>(null);
+  const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   function choosePlace(place: BirthplaceOption) {
     setSelectedPlace(place);
     setBirthplaceQuery(formatBirthplace(place));
-    setCityMessage(`Using ${formatBirthplace(place)}.`);
+    setShowDropdown(false);
+    setPlaceResults([]);
   }
 
-  async function findBirthplace(): Promise<BirthplaceOption | null> {
-    const query = birthplaceQuery.trim();
-
-    if (query.length < 2) {
-      setCityMessage("");
-      return null;
+  async function searchCities(query: string) {
+    if (query.trim().length < 2) {
+      setPlaceResults([]);
+      setShowDropdown(false);
+      return;
     }
 
-    setIsFindingCity(true);
-    setError("");
+    setIsSearching(true);
 
     try {
       const localMatches = localBirthplaceMatches(query);
@@ -153,35 +154,24 @@ export function NatalChartSnapshotTool({
       }
 
       const places = uniquePlaces([...apiPlaces, ...localMatches]);
-
-      if (places.length === 0) {
-        setPlaceResults([]);
-        setCityMessage("");
-        return null;
-      }
-
       setPlaceResults(places);
-      choosePlace(places[0]);
-      setCityMessage(`Using ${formatBirthplace(places[0])}. Choose another match below if needed.`);
-      return places[0];
+      setShowDropdown(places.length > 0);
     } finally {
-      setIsFindingCity(false);
+      setIsSearching(false);
     }
   }
 
-  async function handleCitySearch() {
-    const place = await findBirthplace();
-    if (!place) {
-      trackEvent("free_chart_city_search", {
-        status: "not_found",
-      });
-      setError("I could not find that city. Try adding the state or country, like Porto Alegre, Brazil.");
-      return;
+  function handleCityInputChange(value: string) {
+    setBirthplaceQuery(value);
+    setSelectedPlace(null);
+
+    if (searchTimeout.current) {
+      clearTimeout(searchTimeout.current);
     }
 
-    trackEvent("free_chart_city_search", {
-      status: "found",
-    });
+    searchTimeout.current = setTimeout(() => {
+      searchCities(value);
+    }, 300);
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -201,10 +191,34 @@ export function NatalChartSnapshotTool({
       return;
     }
 
-    const place = selectedPlace ?? (await findBirthplace());
+    let place = selectedPlace;
 
     if (!place) {
-      setError("Enter your birth city, like Porto Alegre, Brazil, so the chart can find the Rising sign.");
+      // Try to find city if user hasn't selected one
+      const query = birthplaceQuery.trim();
+      if (query.length >= 2) {
+        setIsSearching(true);
+        try {
+          const localMatches = localBirthplaceMatches(query);
+          let apiPlaces: BirthplaceOption[] = [];
+          try {
+            apiPlaces = await fetchBirthplaces(query);
+          } catch {
+            apiPlaces = [];
+          }
+          const places = uniquePlaces([...apiPlaces, ...localMatches]);
+          if (places.length > 0) {
+            place = places[0];
+            choosePlace(place);
+          }
+        } finally {
+          setIsSearching(false);
+        }
+      }
+    }
+
+    if (!place) {
+      setError("Select your birth city from the dropdown so the chart can find the Rising sign.");
       setResult(null);
       return;
     }
@@ -293,34 +307,83 @@ export function NatalChartSnapshotTool({
             >
               Birth city
             </label>
-            <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
-              <input
-                id="birthplace"
-                required
-                type="text"
-                placeholder="Porto Alegre, Brazil"
-                value={birthplaceQuery}
-                onChange={(event) => {
-                  setBirthplaceQuery(event.target.value);
-                  setSelectedPlace(null);
-                  setCityMessage("");
-                }}
-                className="min-h-12 border border-ivory/14 bg-midnight px-4 font-ui text-sm text-ivory outline-none transition-colors placeholder:text-ivory/32 focus:border-gold"
-              />
-              <Button
-                type="button"
-                variant="secondary"
-                size="md"
-                disabled={isFindingCity}
-                onClick={handleCitySearch}
-                className="w-full sm:w-auto"
-              >
-                {isFindingCity ? "Finding..." : "Find City"}
-              </Button>
+            <div className="relative" ref={dropdownRef}>
+              <div className="relative">
+                <input
+                  id="birthplace"
+                  required
+                  type="text"
+                  autoComplete="off"
+                  placeholder="Start typing a city..."
+                  value={birthplaceQuery}
+                  onChange={(event) => handleCityInputChange(event.target.value)}
+                  onFocus={() => {
+                    if (placeResults.length > 0 && !selectedPlace) {
+                      setShowDropdown(true);
+                    }
+                  }}
+                  onBlur={() => {
+                    // Delay hiding to allow click on dropdown items
+                    setTimeout(() => setShowDropdown(false), 200);
+                  }}
+                  className="min-h-12 w-full border border-ivory/14 bg-midnight px-4 pr-10 font-ui text-sm text-ivory outline-none transition-colors placeholder:text-ivory/32 focus:border-gold"
+                />
+                {isSearching && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-ivory/20 border-t-gold" />
+                  </div>
+                )}
+                {selectedPlace && !isSearching && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gold">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                      <path d="M3 8.5L6.5 12L13 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                )}
+              </div>
+
+              {showDropdown && placeResults.length > 0 && (
+                <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-64 overflow-y-auto border border-gold/30 bg-ink shadow-[0_12px_40px_rgba(0,0,0,0.5)]">
+                  {placeResults.map((place, index) => (
+                    <button
+                      key={`${place.id}-${place.timezone}-${index}`}
+                      type="button"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        choosePlace(place);
+                        trackEvent("free_chart_city_search", { status: "found" });
+                      }}
+                      className="flex w-full items-center justify-between border-b border-ivory/8 px-4 py-3 text-left transition-colors last:border-0 hover:bg-gold/12"
+                    >
+                      <div>
+                        <span className="block font-ui text-sm font-semibold text-ivory">
+                          {formatBirthplace(place)}
+                        </span>
+                        <span className="mt-0.5 block font-ui text-xs text-ivory/42">
+                          {place.timezone} · {place.latitude.toFixed(2)}°, {place.longitude.toFixed(2)}°
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
+
+            {selectedPlace && (
+              <div className="flex items-center gap-2 text-xs text-gold/70">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" className="shrink-0">
+                  <path d="M8 1C5.24 1 3 3.24 3 6c0 3.75 5 9 5 9s5-5.25 5-9c0-2.76-2.24-5-5-5z" fill="currentColor"/>
+                  <circle cx="8" cy="6" r="2" fill="#1a1118"/>
+                </svg>
+                <span>
+                  {formatBirthplace(selectedPlace)} · {selectedPlace.timezone} · {selectedPlace.latitude.toFixed(4)}°N, {selectedPlace.longitude.toFixed(4)}°{selectedPlace.longitude >= 0 ? "E" : "W"}
+                </span>
+              </div>
+            )}
+
             <span className="text-xs leading-relaxed text-ivory/42">
-              City, state, or country works best. Birth date and time stay in
-              your browser; only the city text is searched.
+              Start typing and select your city from the list. Latitude and
+              longitude are set automatically.
             </span>
           </div>
 
@@ -330,7 +393,6 @@ export function NatalChartSnapshotTool({
                 key={place.id}
                 type="button"
                 onClick={() => {
-                  setPlaceResults([]);
                   choosePlace(place);
                 }}
                 className="border border-gold/20 px-3 py-2 font-ui text-xs text-ivory/68 transition-colors hover:border-gold/45 hover:text-ivory"
@@ -339,39 +401,6 @@ export function NatalChartSnapshotTool({
               </button>
             ))}
           </div>
-
-          {(cityMessage || selectedPlace) && (
-            <p className="border border-gold/20 bg-gold/8 px-4 py-3 text-sm leading-relaxed text-ivory/68">
-              {cityMessage || (selectedPlace ? `Using ${formatBirthplace(selectedPlace)}.` : "")}
-            </p>
-          )}
-
-          {placeResults.length > 1 && (
-            <div className="grid gap-2">
-              {placeResults.map((place) => {
-                const active = selectedPlace?.id === place.id;
-                return (
-                  <button
-                    key={`${place.id}-${place.timezone}`}
-                    type="button"
-                    onClick={() => choosePlace(place)}
-                    className={`border px-4 py-3 text-left transition-colors ${
-                      active
-                        ? "border-gold bg-gold/12 text-ivory"
-                        : "border-ivory/12 bg-midnight/70 text-ivory/62 hover:border-gold/35 hover:text-ivory"
-                    }`}
-                  >
-                    <span className="block font-ui text-sm font-semibold">
-                      {formatBirthplace(place)}
-                    </span>
-                    <span className="mt-1 block font-ui text-xs text-ivory/42">
-                      {place.timezone}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
         </div>
 
         {error && (
@@ -381,8 +410,8 @@ export function NatalChartSnapshotTool({
         )}
 
         <div className="mt-7">
-          <Button type="submit" size="lg" className="w-full" disabled={isFindingCity}>
-            {isFindingCity ? "Finding City..." : "Begin My Free Reading"}
+          <Button type="submit" size="lg" className="w-full" disabled={isSearching}>
+            {isSearching ? "Loading..." : "Begin My Free Reading"}
           </Button>
         </div>
       </form>
