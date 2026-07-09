@@ -262,10 +262,27 @@ export function CheckoutForm({
         </p>
       )}
 
+      {isEssential && (
+        <div className="mb-2 mt-4 border border-gold/30 bg-aubergine/[0.04] p-5 shadow-[0_12px_30px_rgba(0,0,0,0.03)]">
+          <p className="font-ui text-xs font-semibold uppercase tracking-[0.16em] text-gold-dark/80">
+            Want the hand-prepared version?
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-ink/70">
+            Upgrade to the Complete Reading for $97 — includes full house analysis, aspects, and a hand-written synthesis delivered as PDF.
+          </p>
+          <a
+            href="/checkout/complete"
+            className="mt-3 inline-block font-ui text-xs font-semibold uppercase tracking-[0.12em] text-aubergine underline decoration-gold/50 underline-offset-4 transition-colors hover:text-gold-dark"
+          >
+            Switch to Complete Reading
+          </a>
+        </div>
+      )}
+
       <Button
         type="submit"
         size="lg"
-        className="w-full"
+        className="w-full mt-4"
         disabled={pending}
         analytics={{
           event: "cta_click",
@@ -279,7 +296,22 @@ export function CheckoutForm({
         {pending ? "Preparing Payment..." : "Continue to Secure Payment"}
       </Button>
 
-      <p className="text-center text-xs leading-relaxed text-ink/42">
+      <div className="mt-5 grid gap-3 sm:grid-cols-3">
+        <div className="flex items-center gap-2 text-ink/65">
+          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-gold/25 bg-gold/10 text-[0.65rem]">🔒</span>
+          <span className="text-[0.7rem] font-semibold tracking-wide uppercase font-ui leading-tight">Stripe Secure</span>
+        </div>
+        <div className="flex items-center gap-2 text-ink/65">
+          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-gold/25 bg-gold/10 text-[0.65rem]">✉️</span>
+          <span className="text-[0.7rem] font-semibold tracking-wide uppercase font-ui leading-tight">{isEssential ? "Instant Delivery" : "72h Delivery"}</span>
+        </div>
+        <div className="flex items-center gap-2 text-ink/65">
+          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-gold/25 bg-gold/10 text-[0.65rem]">📄</span>
+          <span className="text-[0.7rem] font-semibold tracking-wide uppercase font-ui leading-tight">Written format</span>
+        </div>
+      </div>
+
+      <p className="mt-5 text-center text-xs leading-relaxed text-ink/42">
         Your card payment is completed on Stripe. Your birth details are saved in this browser so
         the confirmation page can send the delivery details.
       </p>

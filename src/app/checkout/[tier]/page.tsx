@@ -42,6 +42,19 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
     <>
       <section className="wood-panel py-16 md:py-24">
         <div className="mx-auto max-w-5xl px-6">
+          <div className="mb-12 flex items-center justify-start border-b border-gold/15 pb-8 sm:justify-center">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gold text-[10px] font-bold text-ink sm:h-6 sm:w-6 sm:text-xs">1</span>
+              <span className="font-ui text-[10px] font-semibold uppercase tracking-[0.12em] text-gold-light sm:text-xs">Details</span>
+              <span className="mx-1 h-px w-6 bg-gold/30 sm:mx-2 sm:w-10"></span>
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-gold/40 text-[10px] font-bold text-gold/40 sm:h-6 sm:w-6 sm:text-xs">2</span>
+              <span className="font-ui text-[10px] font-semibold uppercase tracking-[0.12em] text-gold/40 sm:text-xs">Payment</span>
+              <span className="mx-1 h-px w-6 bg-gold/15 sm:mx-2 sm:w-10"></span>
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-gold/20 text-[10px] font-bold text-gold/20 sm:h-6 sm:w-6 sm:text-xs">3</span>
+              <span className="font-ui text-[10px] font-semibold uppercase tracking-[0.12em] text-gold/20 sm:text-xs">Reading</span>
+            </div>
+          </div>
+
           <p className="mb-4 font-ui text-xs font-semibold uppercase tracking-[0.22em] text-gold/75">
             Private reading checkout
           </p>

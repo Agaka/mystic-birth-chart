@@ -395,6 +395,36 @@ const essentialValueCards = [
   },
 ] satisfies Array<{ mark: FlowMark; title: string; body: string }>;
 
+function getPersonalizedHiddenCards(result: NatalSnapshotResult) {
+  return [
+    {
+      title: `Where your ${result.sunSign} Sun actually operates`,
+      body: `Your Sun sign is ${result.sunSign}, but the house it occupies changes whether its energy speaks through identity, family, work, relationships, or hidden inner development. The Essential reading maps this.`,
+      personal: true,
+    },
+    {
+      title: `Why your ${result.moonSign} Moon needs what it needs`,
+      body: `Moon in ${result.moonSign} creates specific emotional patterns. The house and aspects reveal where you seek safety, what triggers protection, and how emotional rhythm shapes your daily life.`,
+      personal: true,
+    },
+    {
+      title: `The real story behind ${result.chartRuler} as your chart ruler`,
+      body: `${result.chartRuler} rules your ${result.risingSign} Ascendant, making it the planet that leads the chart. Its sign, house, condition, and connections to other planets tell a story the free preview cannot finish.`,
+      personal: true,
+    },
+    {
+      title: "The aspects and tensions you are living",
+      body: "Major aspects create repeating patterns: internal conflicts, gifts, pressures, and drives that the chart keeps pointing toward. The reading identifies which ones are loudest.",
+      personal: false,
+    },
+    {
+      title: "Love, career, and timing signatures",
+      body: "Relationship patterns, career direction, and current life timing need the whole chart architecture, not a single placement. The reading maps how these themes connect.",
+      personal: false,
+    },
+  ];
+}
+
 const hiddenChartCards = [
   {
     title: "The house where your Sun operates",
@@ -1846,12 +1876,40 @@ function SnapshotResult({
           how they repeat, and where they ask for attention in real life.
         </p>
 
+        <div className="relative z-10 mt-6 grid grid-cols-1 gap-0 overflow-hidden border border-gold/25 bg-white/30 sm:grid-cols-2 lg:grid-cols-3">
+          {getPersonalizedHiddenCards(result).slice(0, 3).map((card) => (
+            <div key={card.title} className="group relative border-b border-r border-gold/15 p-5 transition-all duration-300 hover:bg-gold/8 sm:last:border-r-0">
+              <div className="flex items-start gap-3">
+                <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-gold/40 bg-gold/15 text-gold-dark" aria-hidden="true">
+                  <IconLock className="h-3.5 w-3.5" stroke={2} />
+                </span>
+                <div>
+                  <h5 className="font-heading text-lg font-semibold leading-snug text-aubergine">
+                    {card.title}
+                  </h5>
+                  <p className="mt-2 text-sm leading-relaxed text-ink/55">
+                    {card.body.split('. ')[0]}.
+                  </p>
+                  <p className="mt-2 text-sm leading-relaxed text-ink/30" style={{
+                    background: 'linear-gradient(180deg, rgba(48,27,23,0.35) 0%, rgba(48,27,23,0.05) 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                  }}>
+                    The full interpretation connects this to the house structure, aspects, and repeated themes across your chart...
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
         <div className="relative z-10 mt-7 border border-aubergine/15 bg-white/36 p-5 shadow-[0_16px_42px_rgba(48,27,23,0.08)] md:p-6">
           <p className="font-ui text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-gold-dark/80">
-            Decision point
+            Your chart speaks
           </p>
           <h4 className="mt-2 font-heading text-2xl font-semibold leading-tight text-aubergine md:text-3xl">
-            If this felt even partly accurate, the next step is not a bigger guess.
+            Your {result.sunSign} Sun with a {result.moonSign} Moon and {result.risingSign} Rising creates a pattern that connects to {result.placements.length + 2} other chart testimonies.
           </h4>
           <p className="mt-3 text-base leading-relaxed text-ink/68">
             {essentialBridge}
@@ -1869,7 +1927,7 @@ function SnapshotResult({
                 },
               }}
             >
-              Get the Essential Reading - $17
+              See the Full Pattern — $17
             </Button>
             <p className="text-xs leading-relaxed text-ink/50">
               Automated reading. Delivered instantly by email. No subscription.
@@ -1965,17 +2023,26 @@ function SnapshotResult({
             </p>
 
             <div className="mt-6 grid gap-0 border-y border-ivory/12">
-              {hiddenChartCards.map((card) => (
+              {getPersonalizedHiddenCards(result).map((card) => (
                 <article
                   key={card.title}
                   className="border-b border-ivory/12 py-4 last:border-b-0"
                 >
-                  <h5 className="font-heading text-xl font-semibold text-ivory">
-                    {card.title}
-                  </h5>
-                  <p className="mt-2 text-sm leading-relaxed text-ivory/64">
-                    {card.body}
-                  </p>
+                  <div className="flex items-start gap-3">
+                    {card.personal && (
+                      <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gold/18 text-gold-light">
+                        <IconLock className="h-3 w-3" stroke={2} />
+                      </span>
+                    )}
+                    <div>
+                      <h5 className="font-heading text-xl font-semibold text-ivory">
+                        {card.title}
+                      </h5>
+                      <p className="mt-2 text-sm leading-relaxed text-ivory/64">
+                        {card.body}
+                      </p>
+                    </div>
+                  </div>
                 </article>
               ))}
             </div>

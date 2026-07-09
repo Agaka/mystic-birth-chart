@@ -53,6 +53,15 @@
   50% { opacity: 1; }
 }
 
+@keyframes toast-progress {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+
+.animate-toast-progress {
+  animation: toast-progress 4.5s linear forwards;
+}
+
 @keyframes astro-draw {
   0% {
     stroke-dashoffset: 180;

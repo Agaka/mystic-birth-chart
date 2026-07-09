@@ -3,7 +3,9 @@ import { Cormorant_Garamond, Inter, Lora } from "next/font/google";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
-import { siteConfig } from "@/lib/site";
+import { SocialProofToast } from "@/components/SocialProofToast";
+import { StickyMobileCTA } from "@/components/StickyMobileCTA";
+import { getBasicCheckoutUrl, siteConfig } from "@/lib/site";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -101,6 +103,8 @@ export default function RootLayout({
         <SiteHeader />
         <main className="flex-1">{children}</main>
         <SiteFooter />
+        <SocialProofToast />
+        <StickyMobileCTA href={getBasicCheckoutUrl()} />
       </body>
     </html>
   );
