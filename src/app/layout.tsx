@@ -4,7 +4,6 @@ import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SocialProofToast } from "@/components/SocialProofToast";
-import { StickyMobileCTA } from "@/components/StickyMobileCTA";
 import { getBasicCheckoutUrl, siteConfig } from "@/lib/site";
 import "./globals.css";
 
@@ -104,7 +103,6 @@ export default function RootLayout({
         <main className="flex-1">{children}</main>
         <SiteFooter />
         <SocialProofToast />
-        <StickyMobileCTA href={getBasicCheckoutUrl()} />
       </body>
     </html>
   );
