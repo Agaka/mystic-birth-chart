@@ -33,6 +33,7 @@ import {
 } from "@tabler/icons-react";
 import { Button } from "@/components/Button";
 import { trackEvent } from "@/lib/analytics";
+import { getBasicCheckoutUrl, getCompleteCheckoutUrl, siteConfig } from "@/lib/site";
 import {
   calculateNatalSnapshot,
   cityPresets,
@@ -1818,11 +1819,23 @@ function SnapshotResult({
   onRestart: () => void;
   onBack: () => void;
 }) {
-  const primaryHref = basicHref;
-  const primaryLabel = "Order Essential Reading - $17";
-  const alternativeHref = completeHref;
-  const alternativeLabel = "Compare Complete Reading - $97";
-  const essentialBridge = intentEssentialBridge[rawIntent];
+  let primaryTierKey: "basic" | "love" | "career" | "yearAhead" | "complete" = "complete";
+  let alternativeTierKey: "basic" | "complete" = "basic";
+
+  if (rawIntent === "love") {
+    primaryTierKey = "love";
+  } else if (rawIntent === "career" || rawIntent === "life-direction") {
+    primaryTierKey = "career";
+  } else if (rawIntent === "current-phase") {
+    primaryTierKey = "yearAhead";
+  }
+
+  const primaryProduct = siteConfig.product[primaryTierKey];
+  const alternativeProduct = siteConfig.product[alternativeTierKey];
+
+  const primaryHref = `/checkout/${primaryTierKey === "yearAhead" ? "year-ahead" : primaryTierKey}`;
+  const alternativeHref = `/checkout/${alternativeTierKey}`;
+
   const bigThree = [
     { label: "Sun", sign: result.sunSign },
     { label: "Moon", sign: result.moonSign },
@@ -1921,11 +1934,11 @@ function SnapshotResult({
             Your {result.sunSign} Sun with a {result.moonSign} Moon and {result.risingSign} Rising creates a pattern that connects to {result.placements.length + 2} other chart testimonies.
           </h4>
           <p className="mt-3 text-base leading-relaxed text-ink/68">
-            {essentialBridge}
+            The free preview answers your first question, but the full reading is where the separate symbols become one unified system.
           </p>
           <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
             <Button
-              href={basicHref}
+              href={primaryHref}
               size="md"
               analytics={{
                 event: "reading_offer_click",
@@ -2061,30 +2074,25 @@ function SnapshotResult({
                 Recommended next
               </p>
               <h5 className="mt-2 font-heading text-2xl font-semibold">
-                Essential Birth Chart Reading
+                {primaryProduct.name}
               </h5>
               <p className="mt-3 text-sm leading-relaxed text-ivory/66">
-                Start with the $17 automated reading. It is the instant paid
-                synthesis after the preview, designed to answer the question
-                this page opened: what should you actually pay attention to in
-                your chart?
+                {primaryProduct.summary}
               </p>
               <div className="mt-5 grid gap-3 border-y border-ivory/12 py-4">
-                {essentialValueCards.map((card) => (
-                  <div key={card.title} className="flex gap-3">
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-gold/28 text-gold-light">
-                      <FlowIcon mark={card.mark} className="h-4 w-4" stroke={1.7} />
+                <div className="flex gap-3">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-gold/28 text-gold-light">
+                    <FlowIcon mark="spark" className="h-4 w-4" stroke={1.7} />
+                  </span>
+                  <span>
+                    <span className="block font-heading text-lg font-semibold leading-tight text-ivory">
+                      {primaryProduct.format}
                     </span>
-                    <span>
-                      <span className="block font-heading text-lg font-semibold leading-tight text-ivory">
-                        {card.title}
-                      </span>
-                      <span className="mt-1 block text-xs leading-relaxed text-ivory/58">
-                        {card.body}
-                      </span>
+                    <span className="mt-1 block text-xs leading-relaxed text-ivory/58">
+                      {primaryProduct.priceNote}. {primaryProduct.delivery}.
                     </span>
-                  </div>
-                ))}
+                  </span>
+                </div>
               </div>
               <div className="mt-5 grid gap-3">
                 <Button
@@ -2094,13 +2102,13 @@ function SnapshotResult({
                   analytics={{
                     event: "reading_offer_click",
                     params: {
-                      offer_id: "basic-reading",
+                      offer_id: primaryTierKey,
                       cta_location: "free_chart_quiz_result",
                       selected_intent: rawIntent,
                     },
                   }}
                 >
-                  {primaryLabel}
+                  Order {primaryProduct.name} - {primaryProduct.price}
                 </Button>
                 <Button
                   href={alternativeHref}
@@ -2110,13 +2118,13 @@ function SnapshotResult({
                   analytics={{
                     event: "reading_offer_click",
                     params: {
-                      offer_id: "complete-reading",
+                      offer_id: alternativeTierKey,
                       cta_location: "free_chart_quiz_result_alternative",
                       selected_intent: rawIntent,
                     },
                   }}
                 >
-                  {alternativeLabel}
+                  Compare {alternativeProduct.name} - {alternativeProduct.price}
                 </Button>
               </div>
             </div>

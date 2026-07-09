@@ -18,15 +18,65 @@ export const siteConfig = {
         "An accessible automated first synthesis generated from your birth data, written to go beyond the free preview.",
       disclosure: "Generated automatically, not hand-prepared.",
     },
+    love: {
+      name: "Love & Relationship Pattern",
+      price: "$49",
+      priceNote: "Hand-prepared study",
+      delivery: "Hand-prepared and delivered within 72 hours",
+      format: "Written PDF study",
+      summary:
+        "A focused study of your affective signatures: Venus, the 7th house, and the aspects that describe what you attract, what you need, and where you face friction in partnerships.",
+      disclosure: "Prepared by hand in a limited daily queue.",
+    },
+    career: {
+      name: "Career & Vocation",
+      price: "$49",
+      priceNote: "Hand-prepared study",
+      delivery: "Hand-prepared and delivered within 72 hours",
+      format: "Written PDF study",
+      summary:
+        "A focused reading of your vocational architecture: Midheaven, the 6th and 10th houses, and the rulers that describe your public direction, resources, and sense of purpose.",
+      disclosure: "Prepared by hand in a limited daily queue.",
+    },
+    yearAhead: {
+      name: "12-Month Transit Forecast",
+      price: "$59",
+      priceNote: "Hand-prepared forecast",
+      delivery: "Hand-prepared and delivered within 72 hours",
+      format: "Written PDF forecast",
+      summary:
+        "A practical map of your upcoming year. We look at profections, solar returns, and major transits to identify periods of growth, pressure, and opportunity.",
+      disclosure: "Prepared by hand in a limited daily queue.",
+    },
+    synastry: {
+      name: "Synastry & Compatibility",
+      price: "$79",
+      priceNote: "Dual-chart reading",
+      delivery: "Hand-prepared and delivered within 7 days",
+      format: "Expanded written PDF",
+      summary:
+        "An in-depth study of the interaction between two charts. We examine how your temperaments blend, where your lives intersect, and the inherent strengths and tensions of the dynamic.",
+      disclosure: "Requires birth data for two individuals. Prepared by hand.",
+    },
     complete: {
       name: "Complete Natal Reading",
       price: "$97",
-      priceNote: "Hand-prepared",
+      priceNote: "Hand-prepared analysis",
       delivery: "Hand-prepared and delivered within 72 hours",
-      format: "Expanded hand-prepared PDF report",
+      format: "Comprehensive PDF report",
       summary:
-        "A deeper synthesis of houses, rulers, aspects, timing themes, and practical life direction.",
+        "A profound structural analysis of your entire chart. Love, vocation, and money are viewed not as isolated parts, but as connected themes stemming from your core planetary rulers and aspects.",
       disclosure: "Prepared by hand in a limited daily queue.",
+    },
+    dossier: {
+      name: "Full Chart Dossier",
+      price: "$197",
+      priceNote: "Premium integration",
+      delivery: "Hand-prepared and delivered within 10 days",
+      format: "Premium multi-part PDF dossier",
+      summary:
+        "Our most comprehensive offering. The Dossier integrates the Complete Natal Reading, the deepest thematic studies of Love and Vocation, and a 12-month Transit Forecast into a single, beautifully bound digital volume.",
+      disclosure: "Our highest level of synthesis. Very limited availability.",
     },
   },
   cta: {

@@ -1,137 +1,174 @@
 import { Button } from "@/components/Button";
-import {
-  getBasicCheckoutUrl,
-  getCompleteCheckoutUrl,
-  siteConfig,
-} from "@/lib/site";
+import { getReadingOffer } from "@/lib/orders";
+import { siteConfig } from "@/lib/site";
 
 const offers = [
   {
-    id: "basic-reading",
-    product: siteConfig.product.basic,
-    badge: "Instant automated reading",
-    cta: "Get Instant Essential Reading",
-    href: getBasicCheckoutUrl(),
-    features: [
-      "Generated automatically from your birth date, exact time, and city",
-      "Sun, Moon, Rising, chart ruler, and sect in context",
-      "A first chart synthesis translated into practical English",
-      "Delivered instantly by email, not hand-prepared",
+    category: "Foundational",
+    description: "Start here to map the architecture of your chart.",
+    items: [
+      {
+        id: "basic",
+        offer: getReadingOffer("basic"),
+        featured: false,
+      },
     ],
   },
   {
-    id: "complete-reading",
-    product: siteConfig.product.complete,
-    badge: "Best for depth",
-    cta: "Order Complete Reading",
-    href: getCompleteCheckoutUrl(),
-    featured: true,
-    features: [
-      "Expanded hand-prepared traditional-first natal analysis",
-      "House rulers, dignities, aspects, and chart emphasis",
-      "Love, career, money, temperament, and vocation themes",
-      "Prioritized integration notes and next-step guidance",
+    category: "Focused Studies",
+    description: "Deep, hand-prepared thematic readings.",
+    items: [
+      {
+        id: "love",
+        offer: getReadingOffer("love"),
+        featured: false,
+      },
+      {
+        id: "career",
+        offer: getReadingOffer("career"),
+        featured: false,
+      },
+      {
+        id: "year-ahead",
+        offer: getReadingOffer("year-ahead"),
+        featured: false,
+      },
+    ],
+  },
+  {
+    category: "Deep Syntheses",
+    description: "Our most comprehensive and premium traditional analyses.",
+    items: [
+      {
+        id: "synastry",
+        offer: getReadingOffer("synastry"),
+        featured: true,
+      },
+      {
+        id: "complete",
+        offer: getReadingOffer("complete"),
+        featured: true,
+      },
+      {
+        id: "dossier",
+        offer: getReadingOffer("dossier"),
+        featured: true,
+        premium: true,
+      },
     ],
   },
 ];
 
 export function ReadingOfferCards() {
   return (
-    <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-      {offers.map((offer) => (
-        <article
-          id={offer.id}
-          key={offer.id}
-          className={`relative border p-6 md:p-8 ${
-            offer.featured
-              ? "parchment-surface border-gold/45 text-ink shadow-[0_18px_60px_rgba(0,0,0,0.22)]"
-              : "wood-grain border-gold/30 text-ivory shadow-[0_18px_55px_rgba(0,0,0,0.24)]"
-          }`}
-        >
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <p
-                className={`font-ui text-xs font-semibold uppercase tracking-[0.18em] ${
-                  offer.featured ? "text-aubergine/75" : "text-gold-light"
-                }`}
-              >
-                {offer.badge}
-              </p>
-              <h3 className="mt-3 font-heading text-3xl font-semibold leading-tight">
-                {offer.product.name}
-              </h3>
-            </div>
-            <div className="sm:text-right">
-              <div className="font-ui text-4xl font-bold tracking-tight">
-                {offer.product.price}
-              </div>
-              <div
-                className={`mt-1 font-ui text-xs uppercase tracking-[0.16em] ${
-                  offer.featured ? "text-ink/58" : "text-ivory/72"
-                }`}
-              >
-                {offer.product.priceNote}
-              </div>
-            </div>
+    <div className="flex flex-col gap-12">
+      {offers.map((group) => (
+        <section key={group.category}>
+          <div className="mb-6 border-b border-gold/15 pb-4">
+            <h3 className="font-heading text-2xl font-semibold text-aubergine md:text-3xl">
+              {group.category}
+            </h3>
+            <p className="mt-2 text-sm leading-relaxed text-ink/68">
+              {group.description}
+            </p>
           </div>
 
-          <p
-            className={`mt-5 text-base leading-relaxed ${
-              offer.featured ? "text-ink/72" : "text-ivory/84"
-            }`}
-          >
-            {offer.product.summary}
-          </p>
+          <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+            {group.items.map(({ id, offer, featured, premium }) => (
+              <article
+                id={`offer-${id}`}
+                key={id}
+                className={`relative border p-6 md:p-8 ${
+                  premium
+                    ? "border-gold/60 bg-ink text-ivory shadow-[0_22px_70px_rgba(184,138,58,0.18)]"
+                    : featured
+                    ? "parchment-surface border-gold/45 text-ink shadow-[0_18px_60px_rgba(0,0,0,0.15)]"
+                    : "bg-white/45 border-ink/10 text-ink shadow-sm"
+                }`}
+              >
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <p
+                      className={`font-ui text-[0.65rem] font-semibold uppercase tracking-[0.18em] ${
+                        premium
+                          ? "text-gold"
+                          : featured
+                          ? "text-aubergine/75"
+                          : "text-ink/50"
+                      }`}
+                    >
+                      {offer.product.priceNote}
+                    </p>
+                    <h4 className={`mt-2 font-heading text-2xl font-semibold leading-tight ${premium ? "text-ivory" : "text-aubergine"}`}>
+                      {offer.product.name}
+                    </h4>
+                  </div>
+                  <div className="sm:text-right">
+                    <div className={`font-ui text-3xl font-bold tracking-tight ${premium ? "text-gold-light" : "text-ink"}`}>
+                      {offer.product.price}
+                    </div>
+                  </div>
+                </div>
 
-          <ul className="mt-6 space-y-3">
-            {offer.features.map((feature) => (
-              <li key={feature} className="flex gap-3">
-                <span
-                  className={offer.featured ? "text-aubergine" : "text-gold-light"}
-                  aria-hidden="true"
-                >
-                  +
-                </span>
-                <span
-                  className={`text-sm leading-relaxed ${
-                    offer.featured ? "text-ink/74" : "text-ivory/88"
+                <p
+                  className={`mt-4 text-sm leading-relaxed ${
+                    premium ? "text-ivory/84" : featured ? "text-ink/72" : "text-ink/68"
                   }`}
                 >
-                  {feature}
-                </span>
-              </li>
+                  {offer.product.summary}
+                </p>
+
+                <ul className="mt-5 space-y-2">
+                  {offer.features.map((feature) => (
+                    <li key={feature} className="flex gap-3">
+                      <span
+                        className={premium ? "text-gold-light" : featured ? "text-aubergine" : "text-gold-dark"}
+                        aria-hidden="true"
+                      >
+                        +
+                      </span>
+                      <span
+                        className={`text-sm leading-relaxed ${
+                          premium ? "text-ivory/88" : featured ? "text-ink/74" : "text-ink/68"
+                        }`}
+                      >
+                        {feature}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="mt-6">
+                  <Button
+                    href={offer.checkoutPath}
+                    size="md"
+                    variant={premium || featured ? "primary" : "secondary"}
+                    className="w-full"
+                    analytics={{
+                      event: "reading_offer_click",
+                      params: {
+                        offer_id: id,
+                        offer_name: offer.product.name,
+                        offer_price: offer.product.price,
+                        cta_location: "reading_offer_cards",
+                      },
+                    }}
+                  >
+                    Secure {offer.product.name}
+                  </Button>
+                </div>
+
+                <p
+                  className={`mt-4 text-center font-ui text-[0.65rem] uppercase tracking-[0.08em] ${
+                    premium ? "text-ivory/50" : "text-ink/48"
+                  }`}
+                >
+                  {offer.product.delivery}. {offer.product.disclosure}
+                </p>
+              </article>
             ))}
-          </ul>
-
-          <div className="mt-7">
-            <Button
-              href={offer.href}
-              size="lg"
-              variant="primary"
-              className="w-full"
-              analytics={{
-                event: "reading_offer_click",
-                params: {
-                  offer_id: offer.id,
-                  offer_name: offer.product.name,
-                  offer_price: offer.product.price,
-                  cta_location: "reading_offer_cards",
-                },
-              }}
-            >
-              {offer.cta}
-            </Button>
           </div>
-
-          <p
-            className={`mt-4 text-center font-ui text-xs ${
-              offer.featured ? "text-ink/58" : "text-ivory/64"
-            }`}
-          >
-            {offer.product.delivery}.{" "}
-            {offer.featured ? siteConfig.capacity : offer.product.disclosure}
-          </p>
-        </article>
+        </section>
       ))}
     </div>
   );

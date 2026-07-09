@@ -20,6 +20,7 @@ interface CheckoutDraft {
   birthCity: string;
   focus: string;
   notes: string;
+  partnerData?: string;
   newsletter: string;
 }
 
@@ -31,6 +32,10 @@ export function CheckoutForm({
   productPrice,
 }: CheckoutFormProps) {
   const isEssential = tier === "basic";
+  const isFocused = tier === "love" || tier === "career";
+  const isSynastry = tier === "synastry";
+  const isAutomated = isEssential;
+  
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const [draft, setDraft] = useState<CheckoutDraft | null>(null);
@@ -68,6 +73,7 @@ export function CheckoutForm({
       birthCity: String(formData.get("birthCity") || ""),
       focus: String(formData.get("focus") || "general"),
       notes: String(formData.get("notes") || ""),
+      partnerData: isSynastry ? String(formData.get("partnerData") || "") : undefined,
       newsletter: formData.get("newsletter") ? "yes" : "no",
     };
 
@@ -180,7 +186,7 @@ export function CheckoutForm({
             className="w-full border border-ink/15 bg-white px-4 py-3 font-body text-ink focus:border-gold focus:outline-none"
           />
           <p className="mt-1 text-xs text-ink/42">
-            {isEssential
+            {isAutomated
               ? "Required for the automated Essential reading, because it calculates Rising sign and chart ruler."
               : "Exact time gives the best house analysis."}
           </p>
@@ -224,7 +230,7 @@ export function CheckoutForm({
 
       <div>
         <label htmlFor="notes" className="mb-2 block font-ui text-sm font-medium text-ink/70">
-          {isEssential ? "Optional support note" : "Anything you want considered"}
+          {isAutomated ? "Optional support note" : "Anything you want considered"}
         </label>
         <textarea
           id="notes"
@@ -233,12 +239,29 @@ export function CheckoutForm({
           defaultValue={draft?.notes || ""}
           className="w-full resize-y border border-ink/15 bg-white px-4 py-3 font-body text-ink placeholder:text-ink/30 focus:border-gold focus:outline-none"
           placeholder={
-            isEssential
+            isAutomated
               ? "City spelling, birth time context, or anything support should know. The Essential reading itself is generated automatically from chart data."
               : "Specific questions, context, or topics you want prioritized."
           }
         />
       </div>
+
+      {isSynastry && (
+        <div>
+          <label htmlFor="partnerData" className="mb-2 block font-ui text-sm font-medium text-ink/70 text-aubergine font-bold">
+            Partner's birth details
+          </label>
+          <textarea
+            id="partnerData"
+            name="partnerData"
+            required
+            rows={4}
+            defaultValue={draft?.partnerData || ""}
+            className="w-full resize-y border border-aubergine/15 bg-aubergine/[0.02] px-4 py-3 font-body text-ink placeholder:text-ink/40 focus:border-aubergine focus:outline-none"
+            placeholder="Please provide: First Name, Date of Birth, Exact Time (or unknown), and Birth City/Country."
+          />
+        </div>
+      )}
 
       <label className="flex gap-3 border border-ink/10 bg-white/55 p-4 text-sm leading-relaxed text-ink/62">
         <input
@@ -262,19 +285,21 @@ export function CheckoutForm({
         </p>
       )}
 
-      {isEssential && (
+      {(isEssential || isFocused) && (
         <div className="mb-2 mt-4 border border-gold/30 bg-aubergine/[0.04] p-5 shadow-[0_12px_30px_rgba(0,0,0,0.03)]">
           <p className="font-ui text-xs font-semibold uppercase tracking-[0.16em] text-gold-dark/80">
-            Want the hand-prepared version?
+            Want the full picture?
           </p>
           <p className="mt-2 text-sm leading-relaxed text-ink/70">
-            Upgrade to the Complete Reading for $97 — includes full house analysis, aspects, and a hand-written synthesis delivered as PDF.
+            {isEssential
+              ? "Upgrade to the Complete Reading for $97 — includes full house analysis, aspects, and a hand-written synthesis delivered as PDF."
+              : "A focused study is great, but a Complete Reading ($97) shows how love, career, and money intertwine across your entire chart."}
           </p>
           <a
             href="/checkout/complete"
-            className="mt-3 inline-block font-ui text-xs font-semibold uppercase tracking-[0.12em] text-aubergine underline decoration-gold/50 underline-offset-4 transition-colors hover:text-gold-dark"
+            className="mt-3 inline-block font-ui text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-aubergine underline decoration-gold/50 underline-offset-4 transition-colors hover:text-gold-dark"
           >
-            Switch to Complete Reading
+            Switch to Complete Reading - $97
           </a>
         </div>
       )}
