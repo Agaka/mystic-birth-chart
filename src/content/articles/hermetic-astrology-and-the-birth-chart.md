@@ -57,13 +57,7 @@ This is where decan angels become useful.
 
 An angel connected to a decan should not be treated like a vending machine. It is better understood as a symbolic intelligence through which the practitioner works a specific quality. A decan angel practice might support confidence, joy, intuition, protection, discipline, healing of attention, or steadier spiritual focus, depending on the decan and the tradition used.
 
-## A Practical Boundary
 
-The site should not publish random magical content just because it is interesting.
-
-If a text, ritual, spirit, angel, or practice cannot be connected to astrology, it does not belong here. If it can be connected through planets, decans, signs, houses, planetary hours, electional timing, solar/lunar rhythm, or the natal chart, then it can be part of the Hermetic study.
-
-That includes a topic like the Arbatel. It is not useful here as a random grimoire curiosity. It becomes useful when studied through its planetary structure, its sevenfold pattern, and the way planetary virtues can be approached as disciplined spiritual practice.
 
 ## What This Means for a Reading
 
