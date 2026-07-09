@@ -120,6 +120,7 @@ body {
   background:
     linear-gradient(180deg, rgba(18, 14, 10, 0.98), rgba(9, 7, 5, 1)),
     var(--color-midnight);
+  background-attachment: fixed;
   color: var(--color-ivory);
   line-height: 1.7;
 }
