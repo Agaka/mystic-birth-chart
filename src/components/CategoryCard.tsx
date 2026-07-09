@@ -16,7 +16,7 @@ export function CategoryCard({
   return (
     <Link
       href={`/blog/category/${slug}`}
-      className="wood-grain group relative border border-gold/18 p-7 transition-all duration-300 hover:border-gold/34 hover:shadow-[0_16px_38px_rgba(0,0,0,0.22)]"
+      className="wood-grain block group relative border border-gold/18 p-7 transition-all duration-300 hover:border-gold/34 hover:shadow-[0_16px_38px_rgba(0,0,0,0.22)]"
     >
       <span className="font-ui text-xs font-semibold uppercase tracking-[0.2em] text-gold-light">
         Study {icon}
