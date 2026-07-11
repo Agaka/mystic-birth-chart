@@ -427,7 +427,24 @@ This can change later if the owner decides to use a personal astrologer name.
 
 ## 10. Analytics Status
 
-The site has analytics hooks. Search Console has been handled by the owner. GA4 has not been configured yet.
+GA4 and Search Console are configured for the live site.
+
+GA4 production configuration completed on 2026-07-11:
+
+- Property: `Mystic Birth Chart` (`544188641`)
+- Web stream: `Mystic Birth Chart Website` (`15200693261`)
+- Measurement ID: `G-7NZP3N06DK`
+- Live domain verified loading the GA4 tag: `https://mysticbirthchart.com`
+- Vercel variable `NEXT_PUBLIC_GA_MEASUREMENT_ID` is available to Production and Preview.
+- Reporting country/time zone: Brazil / `(GMT-03:00) Sao Paulo`
+- Reporting currency: USD
+- Event and user-data retention: 14 months
+- Search Console domain property `mysticbirthchart.com` is linked to the web stream.
+- `stripe.com` is excluded from referrals so payment returns do not overwrite attribution.
+- Cross-domain tag configuration includes only `mysticbirthchart.com`, not Vercel preview domains.
+- Email redaction is enabled in the web stream.
+- `purchase` is the only GA4 key event. Unused GA defaults `qualify_lead` and `close_convert_lead` were unmarked.
+- Event-scoped custom dimensions exist for `product_id`, `product_category`, `funnel_step`, `cta_location`, and `experiment_variant`.
 
 Environment variables:
 
@@ -1155,12 +1172,14 @@ Stripe:
 
 Analytics:
 
-- Create GA4 property/web stream.
-- Add measurement ID to Vercel.
-- Verify events.
+- Done: GA4 property and production web stream configured.
+- Done: GA4 measurement ID verified in Vercel and on the live domain.
+- Done: Search Console linked to GA4.
+- Done: GA4 retention, referral exclusion, domain configuration, custom dimensions, reporting currency, reporting time zone, and key-event cleanup configured.
 - Done locally: privacy-safe funnel event instrumentation and an event map are implemented.
 - Done: Search Console/indexing handled by the owner.
 - Done locally: expanded funnel events and session-scoped UTM capture are implemented.
+- Pending: run one real Essential purchase and confirm the complete `begin_checkout` -> `purchase` chain in GA4 after processing delay.
 
 ### 2026-07-11 local optimization state
 
