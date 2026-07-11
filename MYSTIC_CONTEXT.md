@@ -1,6 +1,6 @@
 # Mystic Birth Chart - AI Context and Growth Bible
 
-Last updated: 2026-07-09
+Last updated: 2026-07-11
 
 This file is the long-term memory for Mystic Birth Chart. Any AI, developer, designer, copywriter, or content assistant working on this project should read it before making decisions about copy, design, content, social media, SEO, conversion, or product strategy.
 
@@ -334,7 +334,7 @@ Current important routes:
 
 Current content:
 
-- 44 English blog posts in `src/content/articles`.
+- 47 English blog posts in `src/content/articles`.
 - 7 categories:
   - Chart Basics
   - Moon & Emotions
@@ -1158,8 +1158,22 @@ Analytics:
 - Create GA4 property/web stream.
 - Add measurement ID to Vercel.
 - Verify events.
+- Done locally: privacy-safe funnel event instrumentation and an event map are implemented.
 - Done: Search Console/indexing handled by the owner.
-- Pending: implement expanded funnel events and UTM capture.
+- Done locally: expanded funnel events and session-scoped UTM capture are implemented.
+
+### 2026-07-11 local optimization state
+
+- The primary funnel is Free Chart -> automated Essential ($17) -> individually reviewed Complete ($97).
+- The five-step Free Chart flow is preserved, supports unknown birth time, and carries birth details into checkout with sessionStorage.
+- About and article authorship are faceless and method-led under Mystic Birth Chart Editorial Studio.
+- Fake social-proof notifications were removed completely and must not be restored without a real, consented data source.
+- Commercial landing pages exist for Complete, Love, Career, Year Ahead, and Synastry readings.
+- Dynamic sitemap, robots, RSS, social metadata, canonical URLs, structured data, security headers, and noindex rules are implemented locally.
+- `docs/growth-strategy.md`, `docs/content-intent-map.md`, `docs/analytics-event-map.md`, and newsletter/proof setup notes document the acquisition system.
+- Automated tests cover product truth, analytics privacy, and natal calculations for Porto Alegre, New York, and London.
+- Final local validation passed lint, typecheck, 8 tests, production build, 73 public routes, 78 internal links, and 28 responsive page/viewport combinations.
+- These changes have not been pushed or deployed. Review and approval are required before production release.
 
 Newsletter:
 

@@ -24,9 +24,9 @@ export function ProductCTA({ compact = false }: ProductCTAProps) {
             analytics={{
               event: "cta_click",
               params: {
-                cta_label: "Get Instant Essential Reading",
                 cta_location: "mid_article_cta",
-                offer_tier: "basic",
+                product_id: "basic",
+                product_category: "reading",
               },
             }}
           >
@@ -58,7 +58,6 @@ export function ProductCTA({ compact = false }: ProductCTAProps) {
           analytics={{
             event: "cta_click",
             params: {
-              cta_label: "Compare Reading Options",
               cta_location: "product_cta",
             },
           }}

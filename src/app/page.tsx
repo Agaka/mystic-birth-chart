@@ -3,13 +3,21 @@ import { ArticleCard } from "@/components/ArticleCard";
 import { CategoryCard } from "@/components/CategoryCard";
 import { CTASection } from "@/components/CTASection";
 import { BlogGrid } from "@/components/BlogGrid";
-import { ReadingOfferCards } from "@/components/ReadingOfferCards";
+import { PrimaryReadingComparison } from "@/components/PrimaryReadingComparison";
 import { SampleReportPreview } from "@/components/SampleReportPreview";
 import { Button } from "@/components/Button";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { getAllArticles, getFeaturedArticles } from "@/lib/articles";
 import { categories } from "@/lib/categories";
+import { createPageMetadata } from "@/lib/metadata";
 import { getBasicCheckoutUrl, siteConfig } from "@/lib/site";
+
+export const metadata = createPageMetadata({
+  title: "Traditional Birth Chart Readings",
+  description:
+    "Begin with a free birth chart preview, receive an automated Essential reading for $17, or order an individually prepared Complete natal reading for $97.",
+  path: "/",
+});
 
 const authorityNotes = [
   {
@@ -27,15 +35,15 @@ const authorityNotes = [
 ];
 
 const processSteps = [
-  "Order Essential automated or Complete hand-prepared",
-  "Send birth date, exact time, city, and focus",
+  "Begin with the free preview or choose your reading",
+  "Enter birth date, time, city, and focus before payment",
   "Receive an instant email reading or a hand-prepared PDF",
 ];
 
 const comparisonRows = [
   {
     free: "Sun in Leo",
-    full: "Your Sun in Leo in the 10th house, ruled by Mars in Aries, creates a pattern of visible leadership that the chart repeats through 3 other placements.",
+    full: "A Sun in Leo may speak differently in the 10th house than in the 4th. A reading studies its ruler, aspects, and repeated themes before deciding what that Sun emphasizes.",
   },
   {
     free: "Moon in Cancer",
@@ -60,7 +68,7 @@ export default function HomePage() {
         subheadline="The placements you already know are only the surface. Beneath them is a pattern of rulers, houses, and tensions that explains why your chart actually feels the way it does."
         primaryCta={{ label: "Get Instant Essential Reading", href: getBasicCheckoutUrl() }}
         secondaryCta={{ label: "Try the Free Chart Preview", href: "/free-birth-chart" }}
-        imageSrc="/images/birth-chart-reading-hero.png"
+        imageSrc="/images/birth-chart-reading-hero.webp"
         imageAlt="An antique-style birth chart reading laid across a dark wooden desk with old books and brass tools."
         note={`${siteConfig.product.basic.name} ${siteConfig.product.basic.price}. ${siteConfig.product.complete.name} ${siteConfig.product.complete.price}.`}
         trustItems={[
@@ -126,6 +134,9 @@ export default function HomePage() {
                 asks why the placement matters, where it acts, and what it
                 connects to across the chart.
               </p>
+              <p className="mt-3 font-ui text-xs uppercase tracking-[0.12em] text-ink/48">
+                Illustrative examples only, not excerpts from client readings.
+              </p>
             </div>
           </ScrollReveal>
 
@@ -183,7 +194,6 @@ export default function HomePage() {
                   analytics={{
                     event: "cta_click",
                     params: {
-                      cta_label: "Begin My Free Chart Preview",
                       cta_location: "homepage_free_chart_section",
                     },
                   }}
@@ -231,7 +241,6 @@ export default function HomePage() {
                   analytics={{
                     event: "cta_click",
                     params: {
-                      cta_label: "Get Instant Essential Reading",
                       cta_location: "homepage_narrative_section",
                     },
                   }}
@@ -265,7 +274,7 @@ export default function HomePage() {
           </ScrollReveal>
 
           <div className="mx-auto mt-12 max-w-5xl">
-            <ReadingOfferCards />
+            <PrimaryReadingComparison />
           </div>
         </div>
       </section>
@@ -299,7 +308,7 @@ export default function HomePage() {
             </div>
           </ScrollReveal>
           <ScrollReveal delay={200}>
-            <SampleReportPreview />
+            <SampleReportPreview compact />
           </ScrollReveal>
         </div>
       </section>

@@ -39,7 +39,6 @@ export function CTASection({
             analytics={{
               event: "cta_click",
               params: {
-                cta_label: buttonLabel,
                 cta_location: analyticsLocation,
               },
             }}

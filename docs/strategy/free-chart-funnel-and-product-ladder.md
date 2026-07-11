@@ -1,5 +1,7 @@
 # Mystic Birth Chart - Free Chart Funnel and Product Ladder
 
+> Historical planning note. Some prices, routes, event names, and proposed email/PDF features below were exploratory and are not current product truth. Use `MYSTIC_CONTEXT.md`, `docs/growth-strategy.md`, and `docs/analytics-event-map.md` for current implementation decisions. The current core offers are the automated Essential Reading at $17 and the individually prepared Complete Reading at $97.
+
 Last updated: 2026-07-09
 
 This document records the next strategic direction for Mystic Birth Chart after the initial site, domain, email, Search Console, and Stripe setup. It should be read together with `MYSTIC_CONTEXT.md`.

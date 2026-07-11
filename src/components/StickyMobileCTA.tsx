@@ -42,7 +42,6 @@ export function StickyMobileCTA({
         href={href}
         onClick={() =>
           trackEvent("sticky_cta_clicked", {
-            cta_label: label,
             cta_location: "sticky_mobile_bar",
           })
         }

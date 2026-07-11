@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   title: "Payment Setup Pending",
   robots: {
     index: false,
-    follow: false,
+    follow: true,
   },
 };
 

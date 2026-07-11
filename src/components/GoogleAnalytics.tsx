@@ -14,7 +14,12 @@ function PageViewTracker({ measurementId }: { measurementId: string }) {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const queryString = searchParams.toString();
+    const safeSearchParams = new URLSearchParams();
+    for (const key of ["utm_source", "utm_medium", "utm_campaign"]) {
+      const value = searchParams.get(key);
+      if (value) safeSearchParams.set(key, value);
+    }
+    const queryString = safeSearchParams.toString();
     const pagePath = queryString ? `${pathname}?${queryString}` : pathname;
     trackPageView(measurementId, pagePath, document.title);
   }, [measurementId, pathname, searchParams]);

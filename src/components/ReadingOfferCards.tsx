@@ -1,48 +1,15 @@
 import { Button } from "@/components/Button";
 import { getReadingOffer } from "@/lib/orders";
-import { siteConfig } from "@/lib/site";
 
 const offers = [
   {
-    category: "Foundational",
-    description: "Start here to map the architecture of your chart.",
+    category: "Start with my whole chart",
+    description: "Choose the depth of synthesis before narrowing the question.",
     items: [
       {
         id: "basic",
         offer: getReadingOffer("basic"),
         featured: false,
-      },
-    ],
-  },
-  {
-    category: "Focused Studies",
-    description: "Deep, hand-prepared thematic readings.",
-    items: [
-      {
-        id: "love",
-        offer: getReadingOffer("love"),
-        featured: false,
-      },
-      {
-        id: "career",
-        offer: getReadingOffer("career"),
-        featured: false,
-      },
-      {
-        id: "year-ahead",
-        offer: getReadingOffer("year-ahead"),
-        featured: false,
-      },
-    ],
-  },
-  {
-    category: "Deep Syntheses",
-    description: "Our most comprehensive and premium traditional analyses.",
-    items: [
-      {
-        id: "synastry",
-        offer: getReadingOffer("synastry"),
-        featured: true,
       },
       {
         id: "complete",
@@ -58,8 +25,57 @@ const offers = [
     ],
   },
   {
-    category: "Esoteric Practice",
-    description: "Specialized spiritual mapping and Hermetic invocation.",
+    category: "Love and relationships",
+    description: "Focused natal relationship patterns in your own chart.",
+    items: [
+      {
+        id: "love",
+        offer: getReadingOffer("love"),
+        featured: false,
+      },
+    ],
+  },
+  {
+    category: "Career and vocation",
+    description: "Work, visibility, authority, resources, and public direction.",
+    items: [
+      {
+        id: "career",
+        offer: getReadingOffer("career"),
+        featured: false,
+      },
+    ],
+  },
+  {
+    category: "Current timing",
+    description: "The year ahead and an ongoing rhythm for current transits.",
+    items: [
+      {
+        id: "year-ahead",
+        offer: getReadingOffer("year-ahead"),
+        featured: false,
+      },
+      {
+        id: "almanac",
+        offer: getReadingOffer("almanac"),
+        featured: true,
+      },
+    ],
+  },
+  {
+    category: "Compatibility",
+    description: "A dual-chart study of relationship dynamics.",
+    items: [
+      {
+        id: "synastry",
+        offer: getReadingOffer("synastry"),
+        featured: true,
+      },
+    ],
+  },
+  {
+    category: "Esoteric practice",
+    description: "Specialized chart-led Hermetic and Kabbalistic work.",
     items: [
       {
         id: "kabbalah",
@@ -68,22 +84,11 @@ const offers = [
       },
     ],
   },
-  {
-    category: "Ongoing Guidance",
-    description: "Continuous celestial tracking and timing.",
-    items: [
-      {
-        id: "almanac",
-        offer: getReadingOffer("almanac"),
-        featured: true,
-      },
-    ],
-  },
 ];
 
 export function ReadingOfferCards() {
   return (
-    <div className="flex flex-col gap-12">
+    <div id="focused-readings" className="flex scroll-mt-28 flex-col gap-12">
       {offers.map((group) => (
         <section key={group.category}>
           <div className="mb-6 border-b border-gold/15 pb-4">
@@ -95,7 +100,11 @@ export function ReadingOfferCards() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+          <div
+            className={`grid grid-cols-1 gap-5 ${
+              group.items.length === 3 ? "lg:grid-cols-3" : "lg:grid-cols-2"
+            }`}
+          >
             {group.items.map(({ id, offer, featured, premium }) => (
               <article
                 id={`offer-${id}`}
@@ -167,11 +176,10 @@ export function ReadingOfferCards() {
                     variant={premium || featured ? "primary" : "secondary"}
                     className="w-full"
                     analytics={{
-                      event: "reading_offer_click",
+                      event: "select_item",
                       params: {
-                        offer_id: id,
-                        offer_name: offer.product.name,
-                        offer_price: offer.product.price,
+                        product_id: id,
+                        product_category: "reading",
                         cta_location: "reading_offer_cards",
                       },
                     }}

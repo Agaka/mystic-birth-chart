@@ -5,9 +5,12 @@ import { siteConfig } from "@/lib/site";
 
 export async function POST(request: Request) {
   const secretKey = process.env.STRIPE_SECRET_KEY;
-  // Use the request origin so Stripe redirects back to localhost during dev.
-  const origin = request.headers.get("origin") || "";
-  const siteUrl = origin || process.env.NEXT_PUBLIC_SITE_URL || siteConfig.url;
+  const configuredOrigin = new URL(process.env.NEXT_PUBLIC_SITE_URL || siteConfig.url).origin;
+  const requestOrigin = new URL(request.url).origin;
+  const siteUrl =
+    process.env.NODE_ENV === "development" && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(requestOrigin)
+      ? requestOrigin
+      : configuredOrigin;
   const body = (await request.json().catch(() => ({}))) as {
     tier?: string;
     name?: string;
@@ -16,6 +19,15 @@ export async function POST(request: Request) {
 
   if (!isReadingTier(body.tier)) {
     return NextResponse.json({ message: "Invalid reading tier." }, { status: 400 });
+  }
+
+  const name = String(body.name || "").trim().slice(0, 120);
+  const email = String(body.email || "").trim().toLowerCase().slice(0, 254);
+  if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return NextResponse.json(
+      { message: "Enter a valid name and email before continuing." },
+      { status: 400 },
+    );
   }
 
   const offer = getReadingOffer(body.tier);
@@ -39,7 +51,7 @@ export async function POST(request: Request) {
 
     const checkoutParams: Stripe.Checkout.SessionCreateParams = {
       mode: isSubscription ? "subscription" : "payment",
-      customer_email: body.email,
+      customer_email: email,
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${siteUrl}/thank-you?tier=${offer.tier}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}${offer.checkoutPath}`,
@@ -47,7 +59,7 @@ export async function POST(request: Request) {
       metadata: {
         reading_tier: offer.tier,
         reading_name: offer.product.name,
-        customer_name: body.name || "",
+        customer_name: name,
       },
       ...(isSubscription
         ? {
@@ -59,7 +71,7 @@ export async function POST(request: Request) {
             payment_intent_data: {
               description: `${offer.product.name} - ${siteConfig.name}`,
               statement_descriptor: "MYSTICBIRTHCHART",
-              receipt_email: body.email,
+              receipt_email: email,
             },
           }),
       custom_text: {
@@ -68,7 +80,7 @@ export async function POST(request: Request) {
             ? `Your ${offer.product.name} will be delivered to your inbox every month. You can cancel your subscription at any time. Questions? hello@mysticbirthchart.com`
             : isEssential
             ? `Your ${offer.product.name} is generated automatically and delivered instantly by email after payment. It is not hand-prepared. Questions? hello@mysticbirthchart.com`
-            : `Your ${offer.product.name} is hand-prepared and delivered as a personalized PDF to your email within 72 hours. Questions? hello@mysticbirthchart.com`,
+            : `${offer.product.name}: ${offer.product.delivery}. Format: ${offer.product.format}. ${offer.product.disclosure} Questions? hello@mysticbirthchart.com`,
         },
         after_submit: {
           message: isSubscription
@@ -85,13 +97,12 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ url: session.url });
   } catch (error: unknown) {
-    console.error("Stripe Checkout Error:", error);
+    console.error("Stripe Checkout Error", {
+      type: error instanceof Stripe.errors.StripeError ? error.type : "unknown",
+    });
     return NextResponse.json(
       {
-        message:
-          error instanceof Error
-            ? error.message
-            : "Failed to create checkout session.",
+        message: "Unable to start the secure payment session. Please try again.",
       },
       { status: 500 }
     );

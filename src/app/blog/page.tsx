@@ -4,12 +4,14 @@ import { BlogGrid } from "@/components/BlogGrid";
 import { SidebarCTA } from "@/components/SidebarCTA";
 import { getAllArticles, getFeaturedArticles } from "@/lib/articles";
 import { categories } from "@/lib/categories";
+import { createPageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = createPageMetadata({
   title: "The Astrology Reading Room",
   description:
     "Traditional-first astrology essays on natal charts, houses, rulers, Venus, Saturn, emotional patterns, vocation, and chart synthesis.",
-};
+  path: "/blog",
+});
 
 export default function BlogPage() {
   const allArticles = getAllArticles();

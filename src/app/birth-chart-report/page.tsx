@@ -4,14 +4,18 @@ import { Button } from "@/components/Button";
 import { SampleReportPreview } from "@/components/SampleReportPreview";
 import { FAQ } from "@/components/FAQ";
 import { CTASection } from "@/components/CTASection";
+import { PrimaryReadingComparison } from "@/components/PrimaryReadingComparison";
+import { ReadingNeedSelector } from "@/components/ReadingNeedSelector";
 import { ReadingOfferCards } from "@/components/ReadingOfferCards";
+import { createPageMetadata } from "@/lib/metadata";
 import { getBasicCheckoutUrl, siteConfig } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = createPageMetadata({
   title: "Natal Chart Readings",
   description:
     "Order an automated Essential birth chart reading for $17, delivered instantly by email, or a hand-prepared Complete natal reading for deeper synthesis.",
-};
+  path: "/birth-chart-report",
+});
 
 const included = [
   "Essential: an automated email reading generated from your birth date, exact time, and city",
@@ -41,7 +45,7 @@ const faqItems = [
   {
     question: "Is this a live astrology consultation?",
     answer:
-      "No. This is a written natal chart reading delivered as a PDF. That keeps the price accessible and lets you revisit the interpretation whenever you want.",
+      "No. Essential is an automated written reading delivered instantly by email. Complete is an individually prepared written PDF you can revisit whenever you want.",
   },
   {
     question: "Is this generated automatically?",
@@ -76,8 +80,27 @@ const faqItems = [
 ];
 
 export default function BirthChartReportPage() {
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqItems.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer,
+      },
+    })),
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
       <Hero
         eyebrow="Natal chart reading studio"
         headline="Order a chart reading prepared like an old astrological dossier."
@@ -104,6 +127,22 @@ export default function BirthChartReportPage() {
           </div>
 
           <div className="mx-auto mt-12 max-w-5xl">
+            <PrimaryReadingComparison />
+          </div>
+
+          <div className="mx-auto mt-16 max-w-5xl">
+            <ReadingNeedSelector />
+          </div>
+
+          <div className="mx-auto mt-16 max-w-6xl">
+            <div className="mb-10 max-w-3xl">
+              <p className="font-ui text-xs font-semibold uppercase tracking-[0.2em] text-gold-dark/75">
+                Full catalog
+              </p>
+              <h2 className="mt-3 font-heading text-3xl font-semibold text-aubergine md:text-5xl">
+                Browse every reading by the question it answers.
+              </h2>
+            </div>
             <ReadingOfferCards />
           </div>
         </div>
@@ -180,7 +219,7 @@ export default function BirthChartReportPage() {
               See the tone before you order.
             </h2>
           </div>
-          <SampleReportPreview />
+          <SampleReportPreview compact />
           <div className="mt-8 text-center">
             <Button
               href="/sample-report"
@@ -189,7 +228,6 @@ export default function BirthChartReportPage() {
               analytics={{
                 event: "cta_click",
                 params: {
-                  cta_label: "View Full Sample",
                   cta_location: "readings_page_preview",
                 },
               }}

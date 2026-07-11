@@ -1,5 +1,6 @@
 "use client";
 
+import { IconPlus } from "@tabler/icons-react";
 import { useState } from "react";
 
 interface FAQItem {
@@ -30,29 +31,12 @@ export function FAQ({ items }: FAQProps) {
               {item.question}
             </span>
             <span
-              className={`text-gold/50 transition-transform duration-300 flex-shrink-0 ${
+              className={`shrink-0 text-gold/50 transition-transform duration-300 ${
                 openIndex === index ? "rotate-45" : ""
               }`}
               aria-hidden="true"
             >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <line
-                  x1="10"
-                  y1="4"
-                  x2="10"
-                  y2="16"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                />
-                <line
-                  x1="4"
-                  y1="10"
-                  x2="16"
-                  y2="10"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                />
-              </svg>
+              <IconPlus className="h-5 w-5" stroke={1.6} />
             </span>
           </button>
 
@@ -61,7 +45,7 @@ export function FAQ({ items }: FAQProps) {
               openIndex === index ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
             }`}
           >
-            <div className="px-6 pb-6 text-ivory/55 leading-relaxed text-[0.95rem]">
+            <div className="px-6 pb-6 text-[0.95rem] leading-relaxed text-ivory/65">
               {item.answer}
             </div>
           </div>

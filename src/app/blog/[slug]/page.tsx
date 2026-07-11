@@ -6,6 +6,7 @@ import {
   getArticleBySlug,
   getRelatedArticles,
 } from "@/lib/articles";
+import { socialImage } from "@/lib/metadata";
 import { siteConfig } from "@/lib/site";
 
 interface ArticlePageProps {
@@ -35,15 +36,15 @@ export async function generateMetadata({
       type: "article",
       url: `/blog/${slug}`,
       publishedTime: article.date,
+      modifiedTime: article.updatedDate,
       authors: [article.author],
-      images: [
-        {
-          url: "/images/birth-chart-reading-hero.png",
-          width: 1200,
-          height: 630,
-          alt: article.title,
-        },
-      ],
+      images: [{ ...socialImage, alt: article.title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: article.title,
+      description: article.excerpt,
+      images: [socialImage.url],
     },
   };
 }
@@ -57,7 +58,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   const relatedArticles = getRelatedArticles(slug, article.categorySlug, 3);
 
   const articleUrl = `${siteConfig.url}/blog/${slug}`;
-  const imageUrl = `${siteConfig.url}/images/birth-chart-reading-hero.png`;
+  const imageUrl = `${siteConfig.url}/images/birth-chart-reading-hero.webp`;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -76,7 +77,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       url: siteConfig.url,
     },
     datePublished: article.date,
-    dateModified: article.date,
+    dateModified: article.updatedDate,
     mainEntityOfPage: articleUrl,
     url: articleUrl,
   };
@@ -90,12 +91,15 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         }}
       />
       <ArticleLayout
+        slug={article.slug}
         title={article.title}
         excerpt={article.excerpt}
         category={article.category}
         categorySlug={article.categorySlug}
         readingTime={article.readingTime}
         author={article.author}
+        date={article.date}
+        updatedDate={article.updatedDate}
         content={article.content}
         relatedArticles={relatedArticles}
       />

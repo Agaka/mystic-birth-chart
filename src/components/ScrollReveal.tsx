@@ -24,6 +24,11 @@ export function ScrollReveal({
     const node = ref.current;
     if (!node) return;
 
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (reducedMotion.matches) {
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -52,6 +57,7 @@ export function ScrollReveal({
     <div
       ref={ref}
       className={className}
+      data-scroll-reveal
       style={{
         opacity: visible ? 1 : 0,
         transform: visible ? "none" : transforms[direction],

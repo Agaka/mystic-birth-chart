@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { AnalyticsEvent } from "@/components/AnalyticsEvent";
 import { CheckoutForm } from "@/components/CheckoutForm";
+import { createPageMetadata } from "@/lib/metadata";
 import { getReadingOffer, isReadingTier, readingTiers } from "@/lib/orders";
 import { siteConfig } from "@/lib/site";
 
@@ -22,10 +24,12 @@ export async function generateMetadata({
 
   const offer = getReadingOffer(tier);
 
-  return {
+  return createPageMetadata({
     title: `Checkout - ${offer.product.name}`,
     description: `Order the ${offer.product.name} from ${siteConfig.name}.`,
-  };
+    path: offer.checkoutPath,
+    noIndex: true,
+  });
 }
 
 export default async function CheckoutPage({ params }: CheckoutPageProps) {
@@ -40,6 +44,14 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
 
   return (
     <>
+      <AnalyticsEvent
+        name="view_item"
+        params={{
+          product_id: offer.tier,
+          product_category: "reading",
+          funnel_step: "checkout",
+        }}
+      />
       <section className="wood-panel py-16 md:py-24">
         <div className="mx-auto max-w-5xl px-6">
           <div className="mb-12 flex items-center justify-start border-b border-gold/15 pb-8 sm:justify-center">
@@ -87,6 +99,16 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
               <p className="mt-3 font-ui text-xs uppercase tracking-[0.16em] text-gold/70">
                 {offer.product.disclosure}
               </p>
+              <dl className="mt-5 grid gap-3 border-t border-ivory/12 pt-5 text-sm">
+                <div className="flex justify-between gap-4">
+                  <dt className="text-ivory/45">Format</dt>
+                  <dd className="text-right text-ivory/78">{offer.product.format}</dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-ivory/45">Delivery</dt>
+                  <dd className="text-right text-ivory/78">{offer.product.delivery}</dd>
+                </div>
+              </dl>
             </aside>
           </div>
         </div>
@@ -97,8 +119,8 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
           <div className="border border-ink/10 bg-ivory-dark/70 p-5 shadow-[0_18px_60px_rgba(0,0,0,0.12)] sm:p-8">
             <CheckoutForm
               tier={offer.tier}
-              productName={offer.product.name}
-              productPrice={offer.product.price}
+              productDelivery={offer.product.delivery}
+              productFormat={offer.product.format}
             />
           </div>
 

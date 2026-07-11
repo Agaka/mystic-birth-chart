@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
 import { NatalChartSnapshotTool } from "@/components/NatalChartSnapshotTool";
-import { ReadingOfferCards } from "@/components/ReadingOfferCards";
+import { PrimaryReadingComparison } from "@/components/PrimaryReadingComparison";
 import { CTASection } from "@/components/CTASection";
+import { createPageMetadata } from "@/lib/metadata";
 import { getBasicCheckoutUrl, getCompleteCheckoutUrl } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = createPageMetadata({
   title: "Free Birth Chart Preview",
   description:
     "Begin a free birth chart preview with Sun, Moon, Rising, chart ruler, sect, and a traditional-first interpretation that points toward the full chart.",
-};
+  path: "/free-birth-chart",
+});
 
 const reasons = [
   {
@@ -108,7 +110,7 @@ export default function FreeBirthChartPage() {
           </div>
 
           <div className="mx-auto mt-12 max-w-5xl">
-            <ReadingOfferCards />
+            <PrimaryReadingComparison />
           </div>
         </div>
       </section>

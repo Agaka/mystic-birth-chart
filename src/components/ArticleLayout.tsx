@@ -1,19 +1,32 @@
 import Link from "next/link";
 import { ArticleCard } from "@/components/ArticleCard";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Button } from "@/components/Button";
 import { ProductCTA } from "@/components/ProductCTA";
 import { getBasicCheckoutUrl } from "@/lib/site";
 import type { ArticleMeta } from "@/lib/articles";
 
 interface ArticleLayoutProps {
+  slug: string;
   title: string;
   excerpt: string;
   category: string;
   categorySlug: string;
   readingTime: string;
   author: string;
+  date: string;
+  updatedDate: string;
   content: string;
   relatedArticles: ArticleMeta[];
+}
+
+function formatArticleDate(value: string): string {
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${value}T00:00:00Z`));
 }
 
 function renderMarkdown(content: string): string {
@@ -87,12 +100,15 @@ function readerPromptForCategory(category: string): string {
 }
 
 export function ArticleLayout({
+  slug,
   title,
   excerpt,
   category,
   categorySlug,
   readingTime,
   author,
+  date,
+  updatedDate,
   content,
   relatedArticles,
 }: ArticleLayoutProps) {
@@ -102,9 +118,17 @@ export function ArticleLayout({
     <article>
       <header className="wood-panel py-16 md:py-24">
         <div className="mx-auto max-w-3xl px-6 text-center">
+          <Breadcrumbs
+            items={[
+              { label: "Home", href: "/" },
+              { label: "Blog", href: "/blog" },
+              { label: category, href: `/blog/category/${categorySlug}` },
+              { label: title, href: `/blog/${slug}` },
+            ]}
+          />
           <Link
             href={`/blog/category/${categorySlug}`}
-            className="mb-6 inline-block font-ui text-xs font-semibold uppercase tracking-[0.2em] text-gold/70 transition-colors hover:text-gold"
+            className="mb-6 mt-7 inline-block font-ui text-xs font-semibold uppercase tracking-[0.2em] text-gold/70 transition-colors hover:text-gold"
           >
             {category}
           </Link>
@@ -114,9 +138,18 @@ export function ArticleLayout({
           <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-ivory/55">
             {excerpt}
           </p>
-          <div className="mt-8 flex items-center justify-center gap-4 font-ui text-sm text-ivory/35">
-            <span>{author}</span>
-            <span>/</span>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 font-ui text-sm text-ivory/48">
+            <Link
+              href="/about"
+              className="inline-flex min-h-11 items-center transition-colors hover:text-gold"
+            >
+              {author}
+            </Link>
+            <span aria-hidden="true">/</span>
+            <span>Published <time dateTime={date}>{formatArticleDate(date)}</time></span>
+            <span aria-hidden="true">/</span>
+            <span>Updated <time dateTime={updatedDate}>{formatArticleDate(updatedDate)}</time></span>
+            <span aria-hidden="true">/</span>
             <span>{readingTime}</span>
           </div>
         </div>
@@ -188,9 +221,9 @@ export function ArticleLayout({
                 analytics={{
                   event: "cta_click",
                   params: {
-                    cta_label: "Get Instant Essential Reading",
                     cta_location: "article_final_cta",
-                    offer_tier: "basic",
+                    product_id: "basic",
+                    product_category: "reading",
                   },
                 }}
               >
@@ -198,6 +231,27 @@ export function ArticleLayout({
               </Button>
             </div>
           </div>
+
+          <aside className="mt-12 border border-gold/22 bg-white/35 p-6 text-left" aria-labelledby="editorial-author-title">
+            <p className="font-ui text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-gold-dark/78">
+              Editorial author
+            </p>
+            <h2 id="editorial-author-title" className="mt-2 font-heading text-2xl font-semibold text-aubergine">
+              {author}
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-ink/64">
+              Mystic Birth Chart publishes as a private independent studio. Our
+              articles follow a traditional-first method built around chart
+              structure, interpretive consistency, practical synthesis, and
+              non-fatalistic language.
+            </p>
+            <Link
+              href="/editorial-method"
+              className="mt-4 inline-flex min-h-11 items-center font-ui text-sm font-semibold text-aubergine underline decoration-gold/55 underline-offset-4"
+            >
+              Read the editorial method
+            </Link>
+          </aside>
         </div>
       </div>
 

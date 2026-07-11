@@ -22,9 +22,9 @@ export function SidebarCTA() {
           analytics={{
             event: "cta_click",
             params: {
-              cta_label: `Start at ${siteConfig.product.basic.price}`,
               cta_location: "blog_sidebar",
-              offer_tier: "basic",
+              product_id: "basic",
+              product_category: "reading",
             },
           }}
         >

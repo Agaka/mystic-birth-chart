@@ -3,6 +3,8 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
 import {
   IconBriefcase,
+  IconCheck,
+  IconChevronDown,
   IconChartDots,
   IconCompass,
   IconHeart,
@@ -32,8 +34,15 @@ import {
   IconZodiacVirgo,
 } from "@tabler/icons-react";
 import { Button } from "@/components/Button";
+import { ReadingRoomLetters } from "@/components/ReadingRoomLetters";
 import { trackEvent } from "@/lib/analytics";
-import { getBasicCheckoutUrl, getCompleteCheckoutUrl, siteConfig } from "@/lib/site";
+import {
+  clearChartSession,
+  freeChartSessionKey,
+  writeSessionDraft,
+  type FreeChartSessionDraft,
+} from "@/lib/chartSession";
+import { siteConfig } from "@/lib/site";
 import {
   calculateNatalSnapshot,
   cityPresets,
@@ -262,6 +271,14 @@ const intentOptions = [
 
 type ChartIntent = (typeof intentOptions)[number]["id"];
 
+const primaryIntentOptions = intentOptions.filter((option) =>
+  ["whole-chart", "love", "career", "current-phase"].includes(option.id),
+);
+
+const additionalIntentOptions = intentOptions.filter(
+  (option) => !["whole-chart", "love", "career", "current-phase"].includes(option.id),
+);
+
 const intentIconMap = {
   "whole-chart": IconChartDots,
   love: IconHeart,
@@ -332,8 +349,8 @@ const calculationMessages = [
   },
 ] as const;
 
-const CALCULATION_STEP_MS = 1180;
-const CALCULATION_REVEAL_MS = calculationMessages.length * CALCULATION_STEP_MS + 900;
+const CALCULATION_STEP_MS = 620;
+const CALCULATION_REVEAL_MS = calculationMessages.length * CALCULATION_STEP_MS + 360;
 
 const calculationTrustNotes = [
   {
@@ -353,25 +370,6 @@ const calculationTrustNotes = [
   },
 ] satisfies Array<{ mark: FlowMark; title: string; body: string }>;
 
-const intentEssentialBridge: Record<ChartIntent, string> = {
-  "whole-chart":
-    "You asked for the whole chart, so the next useful step is not more isolated placements. The automated Essential Reading gives a concise first hierarchy: Sun, Moon, Rising, chart ruler, and key aspects.",
-  love:
-    "Love questions become clearer only after the basic chart structure is understood. The automated Essential Reading gives you the first synthesis before you decide whether a deeper relationship reading is worth it.",
-  career:
-    "Career questions need the chart's basic direction first. The automated Essential Reading gives you the foundation before you spend more on a deeper vocation-focused report.",
-  emotions:
-    "Emotional patterns are rarely explained by the Moon alone. The automated Essential Reading connects the Moon to the Rising sign, chart ruler, sect, and the key tensions that shape emotional rhythm.",
-  "life-direction":
-    "Direction appears where the chart repeats itself. The automated Essential Reading is designed to name those first repeated signals without overwhelming you with a full advanced report.",
-  "current-phase":
-    "Timing makes more sense after the natal pattern is clear. The automated Essential Reading gives you the foundation before you decide whether deeper timing work is needed.",
-  "shadow-growth":
-    "Growth work needs clarity before intensity. The automated Essential Reading shows the first places where the chart asks for form, steadiness, courage, and attention.",
-  esoteric:
-    "The next useful step is not more isolated placements, but mapping the specific spiritual intelligences that govern your chart. The Essential Reading provides the exact structure for this work.",
-} satisfies Record<ChartIntent, string>;
-
 const freeVsEssentialRows = [
   {
     free: "Names your Big Three",
@@ -390,24 +388,6 @@ const freeVsEssentialRows = [
     essential: "Adds hierarchy, emphasis, repeating themes, and next-step clarity.",
   },
 ];
-
-const essentialValueCards = [
-  {
-    mark: "sun",
-    title: "Automated",
-    body: "Generated from your birth data and clearly marked as automatic, not hand-prepared.",
-  },
-  {
-    mark: "aspect",
-    title: "Clear first hierarchy",
-    body: "The report gives a structured first synthesis instead of treating every symbol equally.",
-  },
-  {
-    mark: "earth",
-    title: "Instant email",
-    body: "A concise written reading sent to your inbox, with no account or subscription.",
-  },
-] satisfies Array<{ mark: FlowMark; title: string; body: string }>;
 
 function getPersonalizedHiddenCards(result: NatalSnapshotResult) {
   return [
@@ -438,29 +418,6 @@ function getPersonalizedHiddenCards(result: NatalSnapshotResult) {
     },
   ];
 }
-
-const hiddenChartCards = [
-  {
-    title: "The house where your Sun operates",
-    body: "This changes whether the Sun speaks through identity, family, work, relationships, public life, or hidden inner development.",
-  },
-  {
-    title: "Where your Moon seeks protection",
-    body: "The Moon's house and aspects show the places where you look for safety, repetition, comfort, and emotional regulation.",
-  },
-  {
-    title: "The position and condition of your chart ruler",
-    body: "The ruler is not only a planet name. Its sign, house, condition, and aspects show how the chart begins to move.",
-  },
-  {
-    title: "Major aspects and internal tensions",
-    body: "The full reading looks for repeating testimonies instead of treating every placement as equally loud.",
-  },
-  {
-    title: "Love, vocation, and timing signatures",
-    body: "Relationship patterns, career direction, and current timing need the whole chart, not a single isolated placement.",
-  },
-];
 
 const chartPlanetMarkers = [
   { id: "sun", icon: IconSun, left: 50, top: 13, delay: "0s" },
@@ -517,6 +474,25 @@ function uniquePlaces(places: BirthplaceOption[]): BirthplaceOption[] {
 
 function getIntentOption(intent: ChartIntent | null) {
   return intentOptions.find((option) => option.id === intent) ?? intentOptions[0];
+}
+
+function checkoutFocusForIntent(intent: ChartIntent | null): string {
+  switch (intent) {
+    case "love":
+      return "love";
+    case "career":
+    case "life-direction":
+      return "career";
+    case "emotions":
+    case "shadow-growth":
+      return "emotions";
+    case "esoteric":
+      return "spiritual";
+    case "current-phase":
+      return "purpose";
+    default:
+      return "general";
+  }
 }
 
 function stepIndex(step: FlowStep): number {
@@ -610,6 +586,7 @@ export function NatalChartSnapshotTool({
   const [intent, setIntent] = useState<ChartIntent | null>(null);
   const [date, setDate] = useState("");
   const [time, setTime] = useState("12:00");
+  const [timeUnknown, setTimeUnknown] = useState(false);
   const [birthplaceQuery, setBirthplaceQuery] = useState("");
   const [selectedPlace, setSelectedPlace] = useState<BirthplaceOption | null>(null);
   const [placeResults, setPlaceResults] = useState<BirthplaceOption[]>([]);
@@ -619,7 +596,6 @@ export function NatalChartSnapshotTool({
   const [pendingResult, setPendingResult] = useState<NatalSnapshotResult | null>(null);
   const [calculationIndex, setCalculationIndex] = useState(0);
   const [error, setError] = useState("");
-  const [birthStepTracked, setBirthStepTracked] = useState(false);
   const stageRef = useRef<HTMLDivElement | null>(null);
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -642,77 +618,72 @@ export function NatalChartSnapshotTool({
   }
 
   useEffect(() => {
-    trackEvent("chart_entry_viewed", {
-      entry_point: "free_birth_chart_quiz",
+    trackEvent("free_chart_started", {
+      funnel_step: "sun-sign",
     });
   }, []);
 
   useEffect(() => {
     if (activeStep !== "calculating" || !pendingResult) return;
 
-    const interval = window.setInterval(() => {
-      setCalculationIndex((current) => Math.min(current + 1, calculationMessages.length - 1));
-    }, CALCULATION_STEP_MS);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const interval = reducedMotion
+      ? null
+      : window.setInterval(() => {
+          setCalculationIndex((current) => Math.min(current + 1, calculationMessages.length - 1));
+        }, CALCULATION_STEP_MS);
 
     const revealTimer = window.setTimeout(() => {
       setResult(pendingResult);
       setPendingResult(null);
       setActiveStep("result");
-      trackEvent("free_chart_preview_generated", {
-        sun_sign: pendingResult.sunSign,
-        moon_sign: pendingResult.moonSign,
-        rising_sign: pendingResult.risingSign,
-        chart_ruler: pendingResult.chartRuler,
-        sect: pendingResult.sect,
-        selected_zodiac: selectedSign,
-        selected_intent: intent,
-      });
-      trackEvent("chart_preview_viewed", {
-        sun_sign: pendingResult.sunSign,
-        moon_sign: pendingResult.moonSign,
-        rising_sign: pendingResult.risingSign,
-        selected_intent: intent,
-      });
-      trackEvent("locked_section_viewed", {
-        selected_intent: intent,
-        locked_items: hiddenChartCards.length,
+      const sessionDraft: FreeChartSessionDraft = {
+        birthDate: date,
+        birthTime: timeUnknown ? "" : time,
+        birthCity: selectedPlace ? formatBirthplace(selectedPlace) : birthplaceQuery,
+        focus: checkoutFocusForIntent(intent),
+        timeUnknown,
+      };
+      writeSessionDraft(freeChartSessionKey, sessionDraft);
+      trackEvent("free_chart_completed", {
+        funnel_step: "preview",
       });
       scrollStageToTop(80);
-    }, CALCULATION_REVEAL_MS);
+    }, reducedMotion ? 120 : CALCULATION_REVEAL_MS);
 
     return () => {
-      window.clearInterval(interval);
+      if (interval) window.clearInterval(interval);
       window.clearTimeout(revealTimer);
     };
-  }, [activeStep, intent, pendingResult, selectedSign]);
+  }, [activeStep, birthplaceQuery, date, intent, pendingResult, selectedPlace, time, timeUnknown]);
 
   function moveToStep(nextStep: FlowStep, scrollDelay = nextStep === "calculating" ? 180 : 30) {
     setActiveStep(nextStep);
     setError("");
     scrollStageToTop(scrollDelay);
-
-    if (nextStep === "birth" && !birthStepTracked) {
-      setBirthStepTracked(true);
-      trackEvent("birth_data_started", {
-        selected_zodiac: selectedSign,
-        selected_intent: intent,
-      });
-    }
   }
 
   function chooseSign(sign: ZodiacSign) {
     setSelectedSign(sign);
-    trackEvent("zodiac_selected", {
-      selected_zodiac: sign,
+    trackEvent("free_chart_sun_selected", {
+      funnel_step: "sun-sign",
+    });
+    moveToStep("intent");
+  }
+
+  function chooseUnknownSign() {
+    setSelectedSign(null);
+    trackEvent("free_chart_sun_selected", {
+      funnel_step: "sun-sign",
     });
     moveToStep("intent");
   }
 
   function chooseIntent(nextIntent: ChartIntent) {
     setIntent(nextIntent);
-    trackEvent("intent_selected", {
-      selected_zodiac: selectedSign,
-      selected_intent: nextIntent,
+    trackEvent("free_chart_intention_selected", {
+      funnel_step: "intention",
     });
     moveToStep("birth");
   }
@@ -798,12 +769,12 @@ export function NatalChartSnapshotTool({
 
     const validTime = /^([01]\d|2[0-3]):[0-5]\d$/.test(time);
 
-    if (!date || !time) {
-      setError("Enter your birth date and birth time to begin the free chart reading.");
+    if (!date || (!timeUnknown && !time)) {
+      setError("Enter your birth date and birth time, or choose the unknown-time option.");
       return;
     }
 
-    if (!validTime) {
+    if (!timeUnknown && !validTime) {
       setError("Enter birth time in 24-hour HH:MM format, like 14:35.");
       return;
     }
@@ -815,9 +786,10 @@ export function NatalChartSnapshotTool({
       return;
     }
 
+    const calculationTime = timeUnknown ? "12:00" : time;
     const snapshot = calculateNatalSnapshot({
       date,
-      time,
+      time: calculationTime,
       latitude: place.latitude,
       longitude: place.longitude,
       timezone: place.timezone,
@@ -827,14 +799,11 @@ export function NatalChartSnapshotTool({
     setResult(null);
     setCalculationIndex(0);
     setPendingResult(snapshot);
-    trackEvent("birth_data_completed", {
-      selected_zodiac: selectedSign,
-      selected_intent: intent,
-      city_selected: true,
+    trackEvent("free_chart_birth_data_completed", {
+      funnel_step: "birth-data",
     });
-    trackEvent("chart_calculation_started", {
-      selected_zodiac: selectedSign,
-      selected_intent: intent,
+    trackEvent("free_chart_calculation_started", {
+      funnel_step: "calculation",
     });
     setActiveStep("calculating");
     scrollStageToTop(180);
@@ -847,7 +816,15 @@ export function NatalChartSnapshotTool({
     setResult(null);
     setPendingResult(null);
     setCalculationIndex(0);
+    setDate("");
+    setTime("12:00");
+    setTimeUnknown(false);
+    setBirthplaceQuery("");
+    setSelectedPlace(null);
+    setPlaceResults([]);
+    setShowDropdown(false);
     setError("");
+    clearChartSession();
   }
 
   const activeIndex = stepIndex(activeStep);
@@ -862,7 +839,7 @@ export function NatalChartSnapshotTool({
     >
       <AstroBackdrop />
 
-      <div className="relative grid min-h-[720px] grid-cols-1 lg:grid-cols-[minmax(320px,0.34fr)_minmax(0,0.66fr)]">
+      <div className="relative grid min-h-[720px] w-full min-w-0 max-w-full grid-cols-1 lg:grid-cols-[minmax(300px,0.3fr)_minmax(0,0.7fr)]">
         <ExperienceLedger
           activeStep={activeStep}
           activeIndex={activeIndex}
@@ -870,6 +847,7 @@ export function NatalChartSnapshotTool({
           intent={intent}
           date={date}
           time={time}
+          timeUnknown={timeUnknown}
           birthplaceLabel={selectedPlaceLabel}
           canRestart={Boolean(selectedSign || intent || result)}
           onRestart={resetExperience}
@@ -877,9 +855,11 @@ export function NatalChartSnapshotTool({
 
         <div
           data-free-chart-active-panel
-          className="relative flex min-h-[680px] min-w-0 items-stretch overflow-hidden border-t border-gold/16 bg-midnight/72 lg:border-l lg:border-t-0"
+          className="relative flex min-h-[680px] w-full min-w-0 max-w-full items-stretch overflow-hidden border-t border-gold/16 bg-midnight/72 lg:border-l lg:border-t-0"
         >
-          {activeStep === "sign" && <SignStep onSelect={chooseSign} />}
+          {activeStep === "sign" && (
+            <SignStep onSelect={chooseSign} onUnsure={chooseUnknownSign} />
+          )}
 
           {activeStep === "intent" && (
             <IntentStep
@@ -893,6 +873,7 @@ export function NatalChartSnapshotTool({
             <BirthDataStep
               date={date}
               time={time}
+              timeUnknown={timeUnknown}
               birthplaceQuery={birthplaceQuery}
               selectedPlace={selectedPlace}
               placeResults={placeResults}
@@ -904,6 +885,7 @@ export function NatalChartSnapshotTool({
               onSubmit={handleBirthSubmit}
               onDateChange={setDate}
               onTimeChange={setTime}
+              onTimeUnknownChange={setTimeUnknown}
               onCityChange={handleCityInputChange}
               onCityFocus={() => {
                 if (placeResults.length > 0 && !selectedPlace) {
@@ -934,6 +916,7 @@ export function NatalChartSnapshotTool({
               intent={selectedIntent}
               rawIntent={intent ?? "whole-chart"}
               birthplaceLabel={selectedPlaceLabel}
+              timeUnknown={timeUnknown}
               onRestart={resetExperience}
               onBack={() => moveToStep("birth")}
             />
@@ -951,6 +934,7 @@ function ExperienceLedger({
   intent,
   date,
   time,
+  timeUnknown,
   birthplaceLabel,
   canRestart,
   onRestart,
@@ -961,6 +945,7 @@ function ExperienceLedger({
   intent: ChartIntent | null;
   date: string;
   time: string;
+  timeUnknown: boolean;
   birthplaceLabel: string;
   canRestart: boolean;
   onRestart: () => void;
@@ -969,7 +954,7 @@ function ExperienceLedger({
   const progress = ((activeIndex + 1) / flowSteps.length) * 100;
 
   return (
-    <aside className="relative flex min-w-0 flex-col justify-between gap-6 overflow-hidden bg-ink/82 p-6 md:gap-10 md:p-8 lg:min-w-[320px]">
+    <aside className="relative flex min-w-0 max-w-full flex-col justify-between gap-6 overflow-hidden bg-ink/82 p-6 md:gap-10 md:p-8 lg:min-w-[300px]">
       <div className="pointer-events-none absolute -left-28 top-8 h-64 w-64 rounded-full border border-gold/10 opacity-70" />
       <div className="pointer-events-none absolute -bottom-24 right-8 h-56 w-56 rounded-full border border-ivory/5 opacity-70" />
       <div>
@@ -1040,7 +1025,10 @@ function ExperienceLedger({
         <dl className="mt-4 grid gap-3 text-sm">
           <LedgerRow label="Sun sign" value={selectedSign ?? "Not chosen yet"} />
           <LedgerRow label="Intention" value={intent ? intentCopy.shortLabel : "Not chosen yet"} />
-          <LedgerRow label="Birth time" value={date ? `${date} at ${time}` : "Not entered yet"} />
+          <LedgerRow
+            label="Birth time"
+            value={date ? `${date}${timeUnknown ? " / time unknown" : ` at ${time}`}` : "Not entered yet"}
+          />
           <LedgerRow label="Birth city" value={birthplaceLabel || "Not selected yet"} />
         </dl>
         {canRestart && (
@@ -1245,7 +1233,13 @@ function StepShell({
   );
 }
 
-function SignStep({ onSelect }: { onSelect: (sign: ZodiacSign) => void }) {
+function SignStep({
+  onSelect,
+  onUnsure,
+}: {
+  onSelect: (sign: ZodiacSign) => void;
+  onUnsure: () => void;
+}) {
   return (
     <StepShell
       eyebrow="Step I - The visible layer"
@@ -1260,6 +1254,16 @@ function SignStep({ onSelect }: { onSelect: (sign: ZodiacSign) => void }) {
       }
     >
       <ZodiacWheelPicker onSelect={onSelect} />
+
+      <div className="mt-7 flex justify-center">
+        <button
+          type="button"
+          onClick={onUnsure}
+          className="inline-flex min-h-11 items-center border border-gold/28 px-5 py-3 font-ui text-sm font-semibold text-ivory/72 transition-colors hover:border-gold hover:bg-gold/10 hover:text-ivory"
+        >
+          I&apos;m not sure - calculate it for me
+        </button>
+      </div>
 
       <div className="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {zodiacSigns.map((sign) => {
@@ -1307,6 +1311,37 @@ function IntentStep({
   onSelect: (intent: ChartIntent) => void;
 }) {
   const sign = selectedSign ?? "Your Sun sign";
+  const [showMore, setShowMore] = useState(false);
+
+  const renderOption = (option: (typeof intentOptions)[number]) => (
+    <button
+      key={option.id}
+      type="button"
+      aria-label={`Choose ${option.label}`}
+      onClick={() => onSelect(option.id)}
+      className="group relative min-h-36 overflow-hidden rounded-[30px] border border-ivory/12 bg-midnight/72 p-5 text-left transition-all duration-300 hover:-translate-y-1 hover:border-gold/55 hover:bg-gold/10"
+    >
+      <span className="pointer-events-none absolute -right-7 -top-7 flex h-24 w-24 items-center justify-center rounded-full border border-gold/10 text-gold/12 transition-all duration-300 group-hover:scale-110 group-hover:text-gold/22">
+        <IntentIcon intent={option.id} className="h-14 w-14" stroke={1.2} />
+      </span>
+      <span className="relative flex items-start gap-4">
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-gold/28 bg-gold/10 text-gold-light">
+          <IntentIcon intent={option.id} className="h-7 w-7" stroke={1.65} />
+        </span>
+        <span>
+          <span className="font-ui text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-gold/64">
+            {option.eyebrow}
+          </span>
+          <span className="mt-2 block font-heading text-2xl font-semibold text-ivory">
+            {option.label}
+          </span>
+        </span>
+      </span>
+      <span className="relative mt-4 block text-sm leading-relaxed text-ivory/50 group-hover:text-ivory/70">
+        {option.body}
+      </span>
+    </button>
+  );
 
   return (
     <StepShell
@@ -1324,36 +1359,28 @@ function IntentStep({
       }
     >
       <div className="grid gap-3 md:grid-cols-2">
-        {intentOptions.map((option) => (
-          <button
-            key={option.id}
-            type="button"
-            aria-label={`Choose ${option.label}`}
-            onClick={() => onSelect(option.id)}
-            className="group relative min-h-36 overflow-hidden rounded-[30px] border border-ivory/12 bg-midnight/72 p-5 text-left transition-all duration-300 hover:-translate-y-1 hover:border-gold/55 hover:bg-gold/10"
-          >
-            <span className="pointer-events-none absolute -right-7 -top-7 flex h-24 w-24 items-center justify-center rounded-full border border-gold/10 text-gold/12 transition-all duration-300 group-hover:scale-110 group-hover:text-gold/22">
-              <IntentIcon intent={option.id} className="h-14 w-14" stroke={1.2} />
-            </span>
-            <span className="relative flex items-start gap-4">
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-gold/28 bg-gold/10 text-gold-light">
-                <IntentIcon intent={option.id} className="h-7 w-7" stroke={1.65} />
-              </span>
-              <span>
-                <span className="font-ui text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-gold/64">
-                  {option.eyebrow}
-                </span>
-                <span className="mt-2 block font-heading text-2xl font-semibold text-ivory">
-                  {option.label}
-                </span>
-              </span>
-            </span>
-            <span className="relative mt-4 block text-sm leading-relaxed text-ivory/50 group-hover:text-ivory/70">
-              {option.body}
-            </span>
-          </button>
-        ))}
+        {primaryIntentOptions.map(renderOption)}
       </div>
+
+      <button
+        type="button"
+        onClick={() => setShowMore((current) => !current)}
+        aria-expanded={showMore}
+        className="mt-5 inline-flex min-h-11 items-center gap-2 font-ui text-sm font-semibold text-ivory/65 underline decoration-gold/50 underline-offset-4 transition-colors hover:text-ivory"
+      >
+        More options
+        <IconChevronDown
+          aria-hidden="true"
+          className={`h-4 w-4 transition-transform ${showMore ? "rotate-180" : ""}`}
+          stroke={1.8}
+        />
+      </button>
+
+      {showMore && (
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          {additionalIntentOptions.map(renderOption)}
+        </div>
+      )}
     </StepShell>
   );
 }
@@ -1361,6 +1388,7 @@ function IntentStep({
 function BirthDataStep({
   date,
   time,
+  timeUnknown,
   birthplaceQuery,
   selectedPlace,
   placeResults,
@@ -1372,6 +1400,7 @@ function BirthDataStep({
   onSubmit,
   onDateChange,
   onTimeChange,
+  onTimeUnknownChange,
   onCityChange,
   onCityFocus,
   onCityBlur,
@@ -1379,6 +1408,7 @@ function BirthDataStep({
 }: {
   date: string;
   time: string;
+  timeUnknown: boolean;
   birthplaceQuery: string;
   selectedPlace: BirthplaceOption | null;
   placeResults: BirthplaceOption[];
@@ -1390,6 +1420,7 @@ function BirthDataStep({
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onDateChange: (value: string) => void;
   onTimeChange: (value: string) => void;
+  onTimeUnknownChange: (value: boolean) => void;
   onCityChange: (value: string) => void;
   onCityFocus: () => void;
   onCityBlur: () => void;
@@ -1419,7 +1450,11 @@ function BirthDataStep({
         </button>
       }
     >
-      <form onSubmit={onSubmit} className="max-w-3xl border border-gold/22 bg-ink/72 p-5 md:p-7">
+      <form
+        onSubmit={onSubmit}
+        className="max-w-3xl border border-gold/22 bg-ink/72 p-5 md:p-7"
+        aria-describedby={error ? "free-chart-error" : undefined}
+      >
         <div className="grid gap-5 md:grid-cols-2">
           <label className="grid gap-2">
             <span className="font-ui text-xs font-semibold uppercase tracking-[0.16em] text-ivory/62">
@@ -1429,7 +1464,7 @@ function BirthDataStep({
               required
               type="date"
               value={date}
-              onChange={(event) => onDateChange(event.target.value)}
+              onInput={(event) => onDateChange(event.currentTarget.value)}
               className="min-h-12 border border-ivory/14 bg-midnight px-4 font-ui text-sm text-ivory outline-none transition-colors placeholder:text-ivory/32 focus:border-gold"
             />
           </label>
@@ -1439,7 +1474,8 @@ function BirthDataStep({
               Birth time
             </span>
             <input
-              required
+              required={!timeUnknown}
+              disabled={timeUnknown}
               type="text"
               inputMode="numeric"
               pattern="([01]?[0-9]|2[0-3]):[0-5][0-9]"
@@ -1447,15 +1483,27 @@ function BirthDataStep({
               maxLength={5}
               value={time}
               onChange={handleTimeInput}
-              className="min-h-12 border border-ivory/14 bg-midnight px-4 font-ui text-sm text-ivory outline-none transition-colors focus:border-gold"
+              aria-describedby="birth-time-help"
+              className="min-h-12 border border-ivory/14 bg-midnight px-4 font-ui text-sm text-ivory outline-none transition-colors focus:border-gold disabled:cursor-not-allowed disabled:opacity-45"
             />
           </label>
         </div>
 
-        <p className="mt-3 text-xs leading-relaxed text-ivory/42">
-          If you do not know the exact time, use your best estimate. The Rising
-          sign and houses may be less precise.
-        </p>
+        <div id="birth-time-help" className="mt-3 border border-ivory/10 bg-midnight/55 p-4">
+          <label className="flex min-h-11 items-start gap-3 text-sm leading-relaxed text-ivory/68">
+            <input
+              type="checkbox"
+              checked={timeUnknown}
+              onChange={(event) => onTimeUnknownChange(event.target.checked)}
+              className="mt-1 h-4 w-4 accent-gold"
+            />
+            <span>
+              <strong className="font-ui text-ivory">I do not know my exact birth time.</strong>{" "}
+              The preview can still calculate an approximate chart, but Rising sign,
+              houses, chart ruler, and sect may be inaccurate.
+            </span>
+          </label>
+        </div>
 
         <div className="mt-6 grid gap-2">
           <label
@@ -1485,7 +1533,7 @@ function BirthDataStep({
               )}
               {selectedPlace && !isSearching && (
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gold">
-                  <span className="font-ui text-sm">set</span>
+                  <IconCheck aria-hidden="true" className="h-5 w-5" stroke={1.9} />
                 </div>
               )}
             </div>
@@ -1496,11 +1544,8 @@ function BirthDataStep({
                   <button
                     key={`${place.id}-${place.timezone}-${index}`}
                     type="button"
-                    onMouseDown={(event) => {
-                      event.preventDefault();
-                      onChoosePlace(place);
-                      trackEvent("free_chart_city_search", { status: "found" });
-                    }}
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={() => onChoosePlace(place)}
                     className="flex w-full items-center justify-between border-b border-ivory/8 px-4 py-3 text-left transition-colors last:border-0 hover:bg-gold/12"
                   >
                     <div>
@@ -1508,7 +1553,7 @@ function BirthDataStep({
                         {formatBirthplace(place)}
                       </span>
                       <span className="mt-0.5 block font-ui text-xs text-ivory/42">
-                        {place.timezone} / {place.latitude.toFixed(2)}, {place.longitude.toFixed(2)}
+                        {place.timezone}
                       </span>
                     </div>
                   </button>
@@ -1519,7 +1564,7 @@ function BirthDataStep({
 
           {selectedPlace && (
             <p className="text-xs leading-relaxed text-gold/72">
-              {formatBirthplace(selectedPlace)} / {selectedPlace.timezone} / {selectedPlace.latitude.toFixed(4)}, {selectedPlace.longitude.toFixed(4)}
+              Selected: {formatBirthplace(selectedPlace)} / {selectedPlace.timezone}
             </p>
           )}
 
@@ -1544,7 +1589,12 @@ function BirthDataStep({
         </div>
 
         {error && (
-          <p className="mt-5 border border-rose/40 bg-rose/12 px-4 py-3 text-sm text-ivory">
+          <p
+            id="free-chart-error"
+            role="alert"
+            aria-live="assertive"
+            className="mt-5 border border-rose/40 bg-rose/12 px-4 py-3 text-sm text-ivory"
+          >
             {error}
           </p>
         )}
@@ -1671,11 +1721,15 @@ function CalculationStep({
     calculationMessages[calculationIndex] ?? calculationMessages[calculationMessages.length - 1];
 
   return (
-    <div className="relative flex w-full min-w-0 flex-col overflow-hidden p-5 text-center animate-fade-in sm:p-8">
+    <div
+      className="relative flex w-full min-w-0 flex-col items-center overflow-hidden p-5 text-center animate-fade-in sm:p-8 lg:px-10 lg:py-12"
+      aria-live="polite"
+      aria-busy="true"
+    >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(184,138,58,0.14),transparent_34%),linear-gradient(180deg,transparent,rgba(9,7,5,0.32))]" />
 
-      <div className="relative z-10 flex w-full flex-col items-center gap-8 xl:flex-row xl:items-center xl:text-left">
-        <div className="flex w-full justify-center xl:w-5/12 xl:justify-end">
+      <div className="relative z-10 flex w-full max-w-[760px] min-w-0 flex-col items-center">
+        <div className="flex w-full justify-center">
           <AnimatedChartFigure
             progress={progress}
             centerSign={selectedSign}
@@ -1683,25 +1737,25 @@ function CalculationStep({
           />
         </div>
 
-        <div className="mx-auto w-full max-w-xl xl:w-7/12">
+        <div className="mt-7 w-full">
           <p className="font-ui text-xs font-semibold uppercase tracking-[0.24em] text-gold/72">
             {currentMessage.eyebrow}
           </p>
-          <h3 className="mt-3 font-heading text-3xl font-semibold leading-tight text-ivory md:text-4xl 2xl:text-5xl">
+          <h3 className="mx-auto mt-3 max-w-2xl font-heading text-3xl font-semibold leading-tight text-ivory md:text-4xl lg:text-5xl">
             {currentMessage.title}
           </h3>
-          <p className="mt-4 text-sm leading-relaxed text-ivory/66 md:text-base">
+          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-ivory/66 md:text-base">
             {currentMessage.body}
           </p>
 
-          <div className="mt-6 h-1.5 w-full overflow-hidden bg-ivory/10">
+          <div className="mx-auto mt-6 h-1.5 w-full max-w-2xl overflow-hidden bg-ivory/10">
             <div
               className="h-full bg-gold transition-all duration-500"
               style={{ width: `${progress}%` }}
             />
           </div>
 
-          <div className="mt-5 border border-gold/24 bg-ink/58 p-4 shadow-[0_18px_50px_rgba(0,0,0,0.22)] md:p-5">
+          <div className="mx-auto mt-5 max-w-2xl border border-gold/24 bg-ink/58 p-4 text-left shadow-[0_18px_50px_rgba(0,0,0,0.22)] md:p-5">
             <p className="font-ui text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-gold/74">
               Why the Essential Reading matters
             </p>
@@ -1717,7 +1771,7 @@ function CalculationStep({
         </div>
       </div>
 
-      <div className="relative z-10 mt-6 grid gap-3 md:grid-cols-3">
+      <div className="relative z-10 mt-7 grid w-full max-w-[760px] min-w-0 gap-3 md:grid-cols-3">
         {calculationTrustNotes.map((note) => (
           <article
             key={note.title}
@@ -1819,6 +1873,7 @@ function SnapshotResult({
   intent,
   rawIntent,
   birthplaceLabel,
+  timeUnknown,
   onRestart,
   onBack,
 }: {
@@ -1829,27 +1884,16 @@ function SnapshotResult({
   intent: (typeof intentOptions)[number];
   rawIntent: ChartIntent;
   birthplaceLabel: string;
+  timeUnknown: boolean;
   onRestart: () => void;
   onBack: () => void;
 }) {
-  let primaryTierKey: "basic" | "love" | "career" | "yearAhead" | "complete" | "kabbalah" = "complete";
-  let alternativeTierKey: "basic" | "complete" = "basic";
-
-  if (rawIntent === "love") {
-    primaryTierKey = "love";
-  } else if (rawIntent === "career" || rawIntent === "life-direction") {
-    primaryTierKey = "career";
-  } else if (rawIntent === "current-phase") {
-    primaryTierKey = "yearAhead";
-  } else if (rawIntent === "esoteric") {
-    primaryTierKey = "kabbalah";
-  }
-
-  const primaryProduct = siteConfig.product[primaryTierKey];
-  const alternativeProduct = siteConfig.product[alternativeTierKey];
-
-  const primaryHref = `/checkout/${primaryTierKey === "yearAhead" ? "year-ahead" : primaryTierKey}`;
-  const alternativeHref = `/checkout/${alternativeTierKey}`;
+  const primaryTierKey = "basic" as const;
+  const alternativeTierKey = "complete" as const;
+  const primaryProduct = siteConfig.product.basic;
+  const alternativeProduct = siteConfig.product.complete;
+  const primaryHref = basicHref;
+  const alternativeHref = completeHref;
 
   const bigThree = [
     { label: "Sun", sign: result.sunSign },
@@ -1906,6 +1950,14 @@ function SnapshotResult({
           </p>
         )}
 
+        {timeUnknown && (
+          <p className="mt-6 border border-rose/28 bg-rose/8 px-5 py-4 text-sm leading-relaxed text-ink/70">
+            Because the birth time is unknown, this preview uses noon as a neutral
+            estimate. The Sun and most Moon calculations remain useful, but Rising
+            sign, houses, chart ruler, and day/night status must be treated as provisional.
+          </p>
+        )}
+
         <p className="relative z-10 mt-6 text-lg leading-relaxed text-ink/72">{result.summary}</p>
         <p className="relative z-10 mt-4 text-base leading-relaxed text-ink/58">
           This preview identifies the front door of the chart. The complete
@@ -1956,11 +2008,11 @@ function SnapshotResult({
               href={primaryHref}
               size="md"
               analytics={{
-                event: "reading_offer_click",
+                event: "essential_reading_cta",
                 params: {
-                  offer_id: "basic-reading",
+                  product_id: "basic",
+                  product_category: "natal-reading",
                   cta_location: "free_chart_result_decision_point",
-                  selected_intent: rawIntent,
                 },
               }}
             >
@@ -2115,11 +2167,11 @@ function SnapshotResult({
                   size="md"
                   className="w-full"
                   analytics={{
-                    event: "reading_offer_click",
+                    event: "essential_reading_cta",
                     params: {
-                      offer_id: primaryTierKey,
+                      product_id: primaryTierKey,
+                      product_category: "natal-reading",
                       cta_location: "free_chart_quiz_result",
-                      selected_intent: rawIntent,
                     },
                   }}
                 >
@@ -2131,11 +2183,11 @@ function SnapshotResult({
                   size="md"
                   className="w-full"
                   analytics={{
-                    event: "reading_offer_click",
+                    event: "complete_reading_cta",
                     params: {
-                      offer_id: alternativeTierKey,
+                      product_id: alternativeTierKey,
+                      product_category: "natal-reading",
                       cta_location: "free_chart_quiz_result_alternative",
-                      selected_intent: rawIntent,
                     },
                   }}
                 >
@@ -2163,6 +2215,7 @@ function SnapshotResult({
           </div>
         </aside>
       </div>
+      <ReadingRoomLetters location="free_chart_result" />
     </div>
   );
 }

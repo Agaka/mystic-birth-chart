@@ -4,6 +4,7 @@ import { BlogGrid } from "@/components/BlogGrid";
 import { SidebarCTA } from "@/components/SidebarCTA";
 import { getArticlesByCategory } from "@/lib/articles";
 import { categories, getCategoryBySlug } from "@/lib/categories";
+import { createPageMetadata } from "@/lib/metadata";
 
 interface CategoryPageProps {
   params: Promise<{ category: string }>;
@@ -20,10 +21,11 @@ export async function generateMetadata({
   const category = getCategoryBySlug(categorySlug);
   if (!category) return {};
 
-  return {
-    title: `${category.name} | Mystic Birth Chart`,
+  return createPageMetadata({
+    title: category.name,
     description: category.description,
-  };
+    path: `/blog/category/${category.slug}`,
+  });
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {

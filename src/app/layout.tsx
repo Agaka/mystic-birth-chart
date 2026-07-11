@@ -3,8 +3,8 @@ import { Cormorant_Garamond, Inter, Lora } from "next/font/google";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
-import { SocialProofToast } from "@/components/SocialProofToast";
-import { getBasicCheckoutUrl, siteConfig } from "@/lib/site";
+import { socialImage } from "@/lib/metadata";
+import { siteConfig } from "@/lib/site";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -35,8 +35,10 @@ const siteJsonLd = {
       "@type": "Organization",
       "@id": `${siteConfig.url}/#organization`,
       name: siteConfig.name,
+      alternateName: siteConfig.editorialName,
       url: siteConfig.url,
       description: siteConfig.description,
+      email: siteConfig.supportEmail,
     },
     {
       "@type": "WebSite",
@@ -66,11 +68,13 @@ export const metadata: Metadata = {
     siteName: siteConfig.name,
     title: `${siteConfig.name} - ${siteConfig.tagline}`,
     description: siteConfig.description,
+    images: [socialImage],
   },
   twitter: {
     card: "summary_large_image",
     title: `${siteConfig.name} - ${siteConfig.tagline}`,
     description: siteConfig.description,
+    images: [socialImage.url],
   },
   robots: {
     index: true,
@@ -78,6 +82,16 @@ export const metadata: Metadata = {
   },
   verification: {
     google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+    other: process.env.NEXT_PUBLIC_PINTEREST_DOMAIN_VERIFICATION
+      ? {
+          "p:domain_verify": process.env.NEXT_PUBLIC_PINTEREST_DOMAIN_VERIFICATION,
+        }
+      : undefined,
+  },
+  alternates: {
+    types: {
+      "application/rss+xml": `${siteConfig.url}/rss.xml`,
+    },
   },
 };
 
@@ -92,6 +106,9 @@ export default function RootLayout({
       className={`${cormorant.variable} ${lora.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
+        <a className="skip-link" href="#main-content">
+          Skip to main content
+        </a>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -100,9 +117,10 @@ export default function RootLayout({
         />
         <GoogleAnalytics measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
         <SiteHeader />
-        <main className="flex-1">{children}</main>
+        <main id="main-content" className="flex-1" tabIndex={-1}>
+          {children}
+        </main>
         <SiteFooter />
-        <SocialProofToast />
       </body>
     </html>
   );

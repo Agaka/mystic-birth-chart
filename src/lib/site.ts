@@ -4,8 +4,15 @@ export const siteConfig = {
   description:
     "Premium English-language birth chart readings grounded in traditional astrology, practical synthesis, and clear written guidance.",
   url: process.env.NEXT_PUBLIC_SITE_URL || "https://mysticbirthchart.com",
-  author: "Mystic Birth Chart",
+  author: "Mystic Birth Chart Editorial Studio",
+  editorialName: "Mystic Birth Chart Editorial Studio",
   supportEmail: process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "hello@mysticbirthchart.com",
+  newsletterUrl: process.env.NEXT_PUBLIC_NEWSLETTER_SIGNUP_URL || "",
+  social: {
+    instagram: process.env.NEXT_PUBLIC_INSTAGRAM_URL || "",
+    pinterest: process.env.NEXT_PUBLIC_PINTEREST_URL || "",
+    youtube: process.env.NEXT_PUBLIC_YOUTUBE_URL || "",
+  },
   capacity: "5 hand-prepared Complete readings available per day",
   product: {
     basic: {
@@ -75,8 +82,8 @@ export const siteConfig = {
       delivery: "Hand-prepared and delivered within 72 hours",
       format: "Comprehensive PDF report",
       summary:
-        "A profound structural analysis of your entire chart. Love, vocation, and money are viewed not as isolated parts, but as connected themes stemming from your core planetary rulers and aspects.",
-      disclosure: "Prepared by hand in a limited daily queue.",
+        "An individually analyzed traditional-first reading of the full chart, connecting love, vocation, money, temperament, rulers, houses, and aspects into one prioritized synthesis.",
+      disclosure: "Individually prepared and reviewed in a limited daily queue.",
     },
     kabbalah: {
       name: "Hermetic Kabbalah Reading",
@@ -114,9 +121,9 @@ export const siteConfig = {
       { label: "Blog", href: "/blog" },
       { label: "Free Chart", href: "/free-birth-chart" },
       { label: "Readings", href: "/birth-chart-report" },
-      { label: "Planetary Hours", href: "/planetary-hours" },
       { label: "About", href: "/about" },
     ],
+    tools: [{ label: "Planetary Hours", href: "/planetary-hours" }],
     categories: [
       { label: "Chart Basics", href: "/blog/category/chart-basics" },
       { label: "Moon & Emotions", href: "/blog/category/moon-emotions" },
@@ -129,6 +136,8 @@ export const siteConfig = {
     legal: [
       { label: "Privacy Policy", href: "/privacy" },
       { label: "Terms of Service", href: "/terms" },
+      { label: "Refund Policy", href: "/refund-policy" },
+      { label: "Editorial Method", href: "/editorial-method" },
     ],
   },
 } as const;
@@ -143,8 +152,4 @@ export function getBasicCheckoutUrl(): string {
 
 export function getCompleteCheckoutUrl(): string {
   return "/checkout/complete";
-}
-
-export function getFormUrl(): string {
-  return process.env.NEXT_PUBLIC_BIRTH_DETAILS_FORM_URL || "";
 }

@@ -27,7 +27,7 @@ export function ArticleCard({
     >
       <Link
         href={`/blog/category/${categorySlug}`}
-        className="mb-3 inline-block font-ui text-xs font-semibold uppercase tracking-widest text-gold-light transition-colors hover:text-gold"
+        className="mb-3 inline-flex min-h-6 items-center font-ui text-xs font-semibold uppercase tracking-widest text-gold-light transition-colors hover:text-gold"
       >
         {category}
       </Link>

@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { IconSun, IconMoon, IconMapPin, IconCalendarEvent } from "@tabler/icons-react";
 import { BirthplaceOption, fetchBirthplaces, formatBirthplace } from "@/lib/geocoding";
-import { calculatePlanetaryHours, PlanetaryHour, PlanetName } from "@/lib/astronomy";
+import { calculatePlanetaryHours, PlanetName } from "@/lib/astronomy";
 
 const planetSymbols: Record<PlanetName, string> = {
   Saturn: "♄",
@@ -26,9 +26,19 @@ export function PlanetaryHoursTool() {
   const [placeResults, setPlaceResults] = useState<BirthplaceOption[]>([]);
   const [selectedPlace, setSelectedPlace] = useState<BirthplaceOption | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [hours, setHours] = useState<PlanetaryHour[]>([]);
-  
+
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const hours = useMemo(() => {
+    if (!selectedPlace || !date) return [];
+
+    const targetDate = new Date(`${date}T12:00:00`);
+    return calculatePlanetaryHours(
+      targetDate,
+      selectedPlace.latitude,
+      selectedPlace.longitude,
+    );
+  }, [date, selectedPlace]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -44,7 +54,6 @@ export function PlanetaryHoursTool() {
   // Debounced search
   useEffect(() => {
     if (!searchQuery.trim() || selectedPlace?.name === searchQuery) {
-      setPlaceResults([]);
       return;
     }
 
@@ -54,8 +63,8 @@ export function PlanetaryHoursTool() {
         const results = await fetchBirthplaces(searchQuery);
         setPlaceResults(results);
         setShowDropdown(true);
-      } catch (error) {
-        console.error(error);
+      } catch {
+        console.error("Planetary-hours location search failed.");
       } finally {
         setIsSearching(false);
       }
@@ -64,19 +73,10 @@ export function PlanetaryHoursTool() {
     return () => clearTimeout(timer);
   }, [searchQuery, selectedPlace]);
 
-  // Calculate hours when place or date changes
-  useEffect(() => {
-    if (selectedPlace && date) {
-      // Ensure we are using the local date selected by the user
-      const targetDate = new Date(`${date}T12:00:00`); 
-      const calculatedHours = calculatePlanetaryHours(targetDate, selectedPlace.latitude, selectedPlace.longitude);
-      setHours(calculatedHours);
-    }
-  }, [selectedPlace, date]);
-
   function handleSelectPlace(place: BirthplaceOption) {
     setSelectedPlace(place);
     setSearchQuery(place.name);
+    setPlaceResults([]);
     setShowDropdown(false);
   }
 
@@ -131,8 +131,13 @@ export function PlanetaryHoursTool() {
                     placeholder="Search your city..."
                     value={searchQuery}
                     onChange={(e) => {
-                      setSearchQuery(e.target.value);
+                      const nextQuery = e.target.value;
+                      setSearchQuery(nextQuery);
                       if (selectedPlace) setSelectedPlace(null);
+                      if (!nextQuery.trim()) {
+                        setPlaceResults([]);
+                        setShowDropdown(false);
+                      }
                     }}
                     onFocus={() => {
                       if (placeResults.length > 0) setShowDropdown(true);

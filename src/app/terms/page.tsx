@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import { createPageMetadata } from "@/lib/metadata";
 import { siteConfig } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = createPageMetadata({
   title: "Terms of Service",
-  description: "Mystic Birth Chart terms of service.",
-};
+  description: "Terms for automated Essential readings, individually prepared readings, payment, delivery, and personal use.",
+  path: "/terms",
+});
 
 export default function TermsPage() {
   return (
@@ -26,10 +28,12 @@ export default function TermsPage() {
 
           <h2>Products and Services</h2>
           <p>
-            Mystic Birth Chart offers personalized natal chart readings based on
-            birth data supplied by the customer. Readings are delivered as PDF
-            documents and may include optional supporting materials when stated
-            on the product page.
+            Mystic Birth Chart offers written astrology products based on birth
+            data supplied by the customer. The Essential Birth Chart Reading is
+            generated automatically and delivered by email. Individually prepared
+            readings, including the Complete Natal Reading, are delivered in the
+            format and delivery window stated on their product page, generally as
+            written PDF documents.
           </p>
 
           <h2>Disclaimer</h2>
@@ -49,11 +53,12 @@ export default function TermsPage() {
 
           <h2>Ordering and Delivery</h2>
           <p>
-            After completing your purchase, you will be asked to submit your
-            birth date, birth time, birth city/country, and optional focus area.
-            Your personalized reading will be delivered within the delivery
-            window listed for your selected option after complete birth details
-            are received.
+            Birth date, birth time, birth city/country, and an optional focus are
+            requested on the custom checkout before card payment. The card payment
+            itself is completed through Stripe. The Essential reading is generated
+            and emailed after payment is confirmed. Individually prepared products
+            enter the stated preparation queue after payment and complete birth
+            details are received.
           </p>
 
           <h2>Payment</h2>
@@ -64,15 +69,18 @@ export default function TermsPage() {
 
           <h2>Refund Policy</h2>
           <p>
-            Because each reading is personalized and created specifically for
-            your birth data, refunds are generally not offered after the reading
-            has been delivered. If there is a significant issue, such as
-            incorrect birth data being used, contact us and we will work to
-            address it.
+            Because the automated Essential reading is generated and delivered
+            immediately, refunds are generally not offered after delivery unless
+            there is a clear fulfillment issue. Individually prepared readings may
+            be refunded before preparation begins.
           </p>
           <p>
-            If your reading has not yet been prepared, you may request a refund
-            by contacting {siteConfig.supportEmail}.
+            Once an individually prepared reading has begun or been delivered,
+            refunds are generally not offered unless there is a clear fulfillment
+            issue. If incorrect customer data was used, contact{" "}
+            <a href={`mailto:${siteConfig.supportEmail}`}>{siteConfig.supportEmail}</a>{" "}
+            so the studio can review whether a correction is possible. See the
+            separate Refund Policy for the product-specific summary.
           </p>
 
           <h2>Intellectual Property</h2>
@@ -102,8 +110,8 @@ export default function TermsPage() {
 
           <h2>Contact</h2>
           <p>
-            For questions about these terms, contact us at
-            {siteConfig.supportEmail}.
+            For questions about these terms, contact us at{" "}
+            <a href={`mailto:${siteConfig.supportEmail}`}>{siteConfig.supportEmail}</a>.
           </p>
         </div>
       </div>

@@ -3,6 +3,11 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/Button";
 import { trackEvent } from "@/lib/analytics";
+import {
+  checkoutSessionKey,
+  clearChartSession,
+  readSessionDraft,
+} from "@/lib/chartSession";
 import { siteConfig } from "@/lib/site";
 
 interface CheckoutDraft {
@@ -14,10 +19,9 @@ interface CheckoutDraft {
   birthCity?: string;
   focus?: string;
   notes?: string;
-  newsletter?: string;
+  partnerData?: string;
+  newsletter?: boolean;
 }
-
-const draftStorageKey = "mysticBirthChartCheckoutDraft";
 
 type SendStatus = "loading" | "sent" | "error" | "no-draft";
 
@@ -30,23 +34,20 @@ export default function ThankYouPage() {
   useEffect(() => {
     const timer = window.setTimeout(async () => {
       try {
-        const stored = window.localStorage.getItem(draftStorageKey);
-        if (!stored) {
+        const parsed = readSessionDraft<CheckoutDraft>(checkoutSessionKey);
+        const sessionId = new URLSearchParams(window.location.search).get("session_id") || "";
+        if (!parsed || !sessionId) {
           setStatus("no-draft");
           return;
         }
 
-        const parsed = JSON.parse(stored) as CheckoutDraft;
         setDraft(parsed);
-
-        trackEvent("birth_details_auto_send", {
-          tier: parsed.tier || "unknown",
-        });
 
         const res = await fetch("/api/email", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            sessionId,
             tier: parsed.tier || "",
             name: parsed.name || "",
             email: parsed.email || "",
@@ -55,12 +56,23 @@ export default function ThankYouPage() {
             birthCity: parsed.birthCity || "",
             focus: parsed.focus || "",
             notes: parsed.notes || "",
+            partnerData: parsed.partnerData || "",
           }),
         });
 
         if (res.ok) {
+          const payload = (await res.json()) as {
+            productId?: string;
+            value?: number;
+            currency?: string;
+          };
+          trackEvent("purchase", {
+            product_id: payload.productId || parsed.tier || "reading",
+            product_category: "reading",
+            funnel_step: "purchase-confirmed",
+          });
           setStatus("sent");
-          window.localStorage.removeItem(draftStorageKey);
+          clearChartSession();
         } else {
           setStatus("error");
         }
@@ -264,7 +276,6 @@ export default function ThankYouPage() {
                 analytics={{
                   event: "cta_click",
                   params: {
-                    cta_label: "Email Birth Details",
                     cta_location: "thank_you_error_fallback",
                   },
                 }}

@@ -6,8 +6,8 @@ interface HeroProps {
   eyebrow?: string;
   headline: string;
   subheadline: string;
-  primaryCta?: { label: string; href: string };
-  secondaryCta?: { label: string; href: string };
+  primaryCta?: { label: string; href: string; event?: string };
+  secondaryCta?: { label: string; href: string; event?: string };
   imageSrc?: string;
   imageAlt?: string;
   trustItems?: string[];
@@ -64,9 +64,8 @@ export function Hero({
                     href={primaryCta.href}
                     size="lg"
                     analytics={{
-                      event: "cta_click",
+                      event: primaryCta.event || "hero_primary_cta",
                       params: {
-                        cta_label: primaryCta.label,
                         cta_location: "image_hero_primary",
                       },
                     }}
@@ -80,9 +79,8 @@ export function Hero({
                     variant="secondary"
                     size="lg"
                     analytics={{
-                      event: "cta_click",
+                      event: secondaryCta.event || "hero_free_chart_cta",
                       params: {
-                        cta_label: secondaryCta.label,
                         cta_location: "image_hero_secondary",
                       },
                     }}
@@ -161,9 +159,8 @@ export function Hero({
                 href={primaryCta.href}
                 size="lg"
                 analytics={{
-                  event: "cta_click",
+                    event: primaryCta.event || "cta_click",
                   params: {
-                    cta_label: primaryCta.label,
                     cta_location: compact ? "compact_hero_primary" : "hero_primary",
                   },
                 }}
@@ -177,9 +174,8 @@ export function Hero({
                 variant="secondary"
                 size="lg"
                 analytics={{
-                  event: "cta_click",
+                    event: secondaryCta.event || "cta_click",
                   params: {
-                    cta_label: secondaryCta.label,
                     cta_location: compact ? "compact_hero_secondary" : "hero_secondary",
                   },
                 }}

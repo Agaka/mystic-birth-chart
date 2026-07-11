@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import { createPageMetadata } from "@/lib/metadata";
 import { siteConfig } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = createPageMetadata({
   title: "Privacy Policy",
-  description: "Mystic Birth Chart privacy policy.",
-};
+  description: "How Mystic Birth Chart handles birth data, checkout information, analytics, email delivery, and privacy requests.",
+  path: "/privacy",
+});
 
 export default function PrivacyPage() {
   return (
@@ -30,9 +32,14 @@ export default function PrivacyPage() {
           <p>We may collect the following information:</p>
           <ul>
             <li>
-              <strong>Birth details:</strong> name, email, birth date, birth
-              time, and birth city/country, provided by you when ordering a
-              personalized reading
+              <strong>Free Chart details:</strong> birth date, birth time or an
+              unknown-time choice, birth city/country, and selected focus. The
+              Free Chart does not require a name, account, or email
+            </li>
+            <li>
+              <strong>Checkout and order details:</strong> name, email, birth
+              details, selected focus, optional notes, and partner details when
+              a two-chart product requires them
             </li>
             <li>
               <strong>Payment information:</strong> processed through our
@@ -53,6 +60,21 @@ export default function PrivacyPage() {
             <li>Comply with legal obligations</li>
           </ul>
 
+          <h2>Free Chart and Session Storage</h2>
+          <p>
+            The Free Chart does not require an account or email. When you choose
+            to continue to checkout, birth date, time, city, and focus may be
+            kept temporarily in your browser&apos;s session storage so you do not
+            need to enter them again. Session storage is cleared after confirmed
+            fulfillment or when you use Start Over.
+          </p>
+          <p>
+            City-search text is sent to the configured geocoding provider so the
+            browser can resolve coordinates and timezone. After a city is selected,
+            the Free Chart calculation and preview run in the browser. Coordinates
+            and chart results are not included in GA4 events.
+          </p>
+
           <h2>Data Storage and Security</h2>
           <p>
             Your birth details are used for the purpose of preparing your
@@ -63,15 +85,20 @@ export default function PrivacyPage() {
 
           <h2>Cookies</h2>
           <p>
-            Our website may use cookies for analytics and to improve browsing.
+            Our website may use cookies for analytics and service operation. GA4
+            events are designed not to include names, email addresses, birth
+            dates, birth times, birth cities, coordinates, notes, or report text.
             You can control cookies through your browser settings.
           </p>
 
           <h2>Third-Party Services</h2>
           <p>
-            We may use third-party services for payment processing, analytics,
-            forms, and email communication. These providers have their own
-            privacy policies.
+            We use or may configure third-party services for Stripe payment
+            processing, Open-Meteo city lookup, GA4 analytics, newsletter signup,
+            and email delivery. Each provider has its own privacy policy. Birth
+            details are sent to the order-fulfillment endpoint only after a paid
+            order is verified; they are not sent to Stripe as payment metadata or
+            to GA4 as analytics parameters.
           </p>
 
           <h2>Your Rights</h2>
@@ -92,8 +119,8 @@ export default function PrivacyPage() {
 
           <h2>Contact</h2>
           <p>
-            For privacy-related questions or requests, contact us at
-            {siteConfig.supportEmail}.
+            For privacy-related questions or requests, contact us at{" "}
+            <a href={`mailto:${siteConfig.supportEmail}`}>{siteConfig.supportEmail}</a>.
           </p>
         </div>
       </div>

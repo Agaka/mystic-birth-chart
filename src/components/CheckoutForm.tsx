@@ -1,14 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {
+  IconFileText,
+  IconLock,
+  IconMail,
+} from "@tabler/icons-react";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/Button";
 import { trackEvent } from "@/lib/analytics";
+import {
+  checkoutSessionKey,
+  freeChartSessionKey,
+  readSessionDraft,
+  writeSessionDraft,
+  type FreeChartSessionDraft,
+} from "@/lib/chartSession";
 import type { ReadingTier } from "@/lib/orders";
+import { siteConfig } from "@/lib/site";
 
 interface CheckoutFormProps {
   tier: ReadingTier;
-  productName: string;
-  productPrice: string;
+  productDelivery: string;
+  productFormat: string;
 }
 
 interface CheckoutDraft {
@@ -17,19 +31,18 @@ interface CheckoutDraft {
   email: string;
   birthDate: string;
   birthTime: string;
+  timeUnknown: boolean;
   birthCity: string;
   focus: string;
   notes: string;
   partnerData?: string;
-  newsletter: string;
+  newsletter: boolean;
 }
-
-const draftStorageKey = "mysticBirthChartCheckoutDraft";
 
 export function CheckoutForm({
   tier,
-  productName,
-  productPrice,
+  productDelivery,
+  productFormat,
 }: CheckoutFormProps) {
   const isEssential = tier === "basic";
   const isFocused = tier === "love" || tier === "career";
@@ -39,19 +52,37 @@ export function CheckoutForm({
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const [draft, setDraft] = useState<CheckoutDraft | null>(null);
+  const [timeUnknown, setTimeUnknown] = useState(false);
+  const submittingRef = useRef(false);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
       try {
-        const stored = window.localStorage.getItem(draftStorageKey);
-        if (!stored) return;
+        const checkoutDraft = readSessionDraft<CheckoutDraft>(checkoutSessionKey);
+        if (checkoutDraft?.tier === tier) {
+          setTimeUnknown(Boolean(checkoutDraft.timeUnknown || checkoutDraft.birthTime === "unknown"));
+          setDraft(checkoutDraft);
+          return;
+        }
 
-        const parsed = JSON.parse(stored) as CheckoutDraft;
-        if (parsed.tier === tier) {
-          setDraft(parsed);
+        const freeChartDraft = readSessionDraft<FreeChartSessionDraft>(freeChartSessionKey);
+        if (freeChartDraft && (tier === "basic" || tier === "complete")) {
+          setDraft({
+            tier,
+            name: "",
+            email: "",
+            birthDate: freeChartDraft.birthDate,
+            birthTime: freeChartDraft.birthTime,
+            timeUnknown: freeChartDraft.timeUnknown,
+            birthCity: freeChartDraft.birthCity,
+            focus: freeChartDraft.focus,
+            notes: "",
+            newsletter: false,
+          });
+          setTimeUnknown(freeChartDraft.timeUnknown);
         }
       } catch {
-        window.localStorage.removeItem(draftStorageKey);
+        window.sessionStorage.removeItem(checkoutSessionKey);
       }
     }, 0);
 
@@ -60,7 +91,22 @@ export function CheckoutForm({
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (submittingRef.current) return;
+
+    const form = event.currentTarget;
+    if (!form.checkValidity()) {
+      const firstInvalid = form.querySelector<HTMLElement>(":invalid");
+      setError("Check the highlighted fields before continuing to payment.");
+      trackEvent("checkout_validation_error", {
+        product_id: tier,
+        funnel_step: "checkout-details",
+      });
+      firstInvalid?.focus();
+      return;
+    }
+
     setError("");
+    submittingRef.current = true;
     setPending(true);
 
     const formData = new FormData(event.currentTarget);
@@ -69,21 +115,22 @@ export function CheckoutForm({
       name: String(formData.get("name") || ""),
       email: String(formData.get("email") || ""),
       birthDate: String(formData.get("birthDate") || ""),
-      birthTime: String(formData.get("birthTime") || ""),
+      birthTime: timeUnknown ? "unknown" : String(formData.get("birthTime") || ""),
+      timeUnknown,
       birthCity: String(formData.get("birthCity") || ""),
       focus: String(formData.get("focus") || "general"),
       notes: String(formData.get("notes") || ""),
       partnerData: isSynastry ? String(formData.get("partnerData") || "") : undefined,
-      newsletter: formData.get("newsletter") ? "yes" : "no",
+      newsletter: Boolean(formData.get("newsletter")),
     };
 
     try {
-      window.localStorage.setItem(draftStorageKey, JSON.stringify(checkoutDraft));
+      writeSessionDraft(checkoutSessionKey, checkoutDraft);
 
-      trackEvent("checkout_submit_attempt", {
-        offer_tier: tier,
-        offer_name: productName,
-        offer_price: productPrice,
+      trackEvent("begin_checkout", {
+        product_id: tier,
+        product_category: "reading",
+        funnel_step: "checkout-details",
       });
 
       const response = await fetch("/api/checkout", {
@@ -113,6 +160,11 @@ export function CheckoutForm({
         throw new Error("Checkout did not return a destination URL.");
       }
 
+      trackEvent("payment_redirect", {
+        product_id: tier,
+        product_category: "reading",
+        funnel_step: "stripe-payment",
+      });
       window.location.href = destination;
     } catch (checkoutError) {
       setError(
@@ -120,12 +172,24 @@ export function CheckoutForm({
           ? checkoutError.message
           : "Unable to start checkout."
       );
+      trackEvent("checkout_validation_error", {
+        product_id: tier,
+        funnel_step: "checkout-details",
+      });
+      submittingRef.current = false;
       setPending(false);
     }
   }
 
   return (
-    <form key={draft?.tier || "empty"} onSubmit={handleSubmit} className="space-y-6">
+    <form
+      key={draft?.tier || "empty"}
+      onSubmit={handleSubmit}
+      noValidate
+      aria-busy={pending}
+      aria-describedby={error ? "checkout-error" : undefined}
+      className="space-y-6"
+    >
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="name" className="mb-2 block font-ui text-sm font-medium text-ink/70">
@@ -136,6 +200,7 @@ export function CheckoutForm({
             name="name"
             type="text"
             required
+            autoComplete="name"
             defaultValue={draft?.name || ""}
             className="w-full border border-ink/15 bg-white px-4 py-3 font-body text-ink placeholder:text-ink/30 focus:border-gold focus:outline-none"
             placeholder="Your name"
@@ -151,6 +216,7 @@ export function CheckoutForm({
             name="email"
             type="email"
             required
+            autoComplete="email"
             defaultValue={draft?.email || ""}
             className="w-full border border-ink/15 bg-white px-4 py-3 font-body text-ink placeholder:text-ink/30 focus:border-gold focus:outline-none"
             placeholder="your@email.com"
@@ -168,6 +234,7 @@ export function CheckoutForm({
             name="birthDate"
             type="date"
             required
+            autoComplete="bday"
             defaultValue={draft?.birthDate || ""}
             className="w-full border border-ink/15 bg-white px-4 py-3 font-body text-ink focus:border-gold focus:outline-none"
           />
@@ -181,15 +248,28 @@ export function CheckoutForm({
             id="birthTime"
             name="birthTime"
             type="time"
-            required={isEssential}
-            defaultValue={draft?.birthTime || ""}
-            className="w-full border border-ink/15 bg-white px-4 py-3 font-body text-ink focus:border-gold focus:outline-none"
+            required={isEssential && !timeUnknown}
+            disabled={timeUnknown}
+            aria-describedby="checkout-birth-time-help"
+            defaultValue={draft?.birthTime === "unknown" ? "" : draft?.birthTime || ""}
+            className="w-full border border-ink/15 bg-white px-4 py-3 font-body text-ink focus:border-gold focus:outline-none disabled:cursor-not-allowed disabled:bg-ink/5 disabled:text-ink/40"
           />
-          <p className="mt-1 text-xs text-ink/42">
-            {isAutomated
+          <p id="checkout-birth-time-help" className="mt-1 text-xs text-ink/52">
+            {timeUnknown
+              ? "The reading will use a noon estimate. Rising sign, houses, chart ruler, and day/night status will be provisional."
+              : isAutomated
               ? "Required for the automated Essential reading, because it calculates Rising sign and chart ruler."
               : "Exact time gives the best house analysis."}
           </p>
+          <label className="mt-3 flex min-h-11 items-start gap-3 text-sm leading-relaxed text-ink/65">
+            <input
+              type="checkbox"
+              checked={timeUnknown}
+              onChange={(event) => setTimeUnknown(event.target.checked)}
+              className="mt-1 h-4 w-4 accent-gold"
+            />
+            <span>I do not know my exact birth time.</span>
+          </label>
         </div>
       </div>
 
@@ -202,6 +282,7 @@ export function CheckoutForm({
           name="birthCity"
           type="text"
           required
+          autoComplete="address-level2"
           defaultValue={draft?.birthCity || ""}
           className="w-full border border-ink/15 bg-white px-4 py-3 font-body text-ink placeholder:text-ink/30 focus:border-gold focus:outline-none"
           placeholder="Porto Alegre, Brazil"
@@ -249,7 +330,7 @@ export function CheckoutForm({
       {isSynastry && (
         <div>
           <label htmlFor="partnerData" className="mb-2 block font-ui text-sm font-medium text-ink/70 text-aubergine font-bold">
-            Partner's birth details
+            Partner&apos;s birth details
           </label>
           <textarea
             id="partnerData"
@@ -263,15 +344,18 @@ export function CheckoutForm({
         </div>
       )}
 
-      <label className="flex gap-3 border border-ink/10 bg-white/55 p-4 text-sm leading-relaxed text-ink/62">
-        <input
-          type="checkbox"
-          name="newsletter"
-          defaultChecked={draft?.newsletter === "yes"}
-          className="mt-1 h-4 w-4 accent-gold"
-        />
-        Send occasional astrology notes and reading availability updates.
-      </label>
+      {siteConfig.newsletterUrl && (
+        <label className="flex gap-3 border border-ink/10 bg-white/55 p-4 text-sm leading-relaxed text-ink/62">
+          <input
+            type="checkbox"
+            name="newsletter"
+            defaultChecked={draft?.newsletter === true}
+            className="mt-1 h-4 w-4 accent-gold"
+          />
+          Send The Reading Room Letters and occasional reading availability
+          updates. This choice is optional and separate from the purchase.
+        </label>
+      )}
 
       <label className="flex gap-3 border border-ink/10 bg-white/55 p-4 text-sm leading-relaxed text-ink/62">
         <input type="checkbox" required className="mt-1 h-4 w-4 accent-gold" />
@@ -280,7 +364,12 @@ export function CheckoutForm({
       </label>
 
       {error && (
-        <p className="border border-rose/35 bg-rose/10 px-4 py-3 text-sm text-aubergine">
+        <p
+          id="checkout-error"
+          role="alert"
+          aria-live="assertive"
+          className="border border-rose/35 bg-rose/10 px-4 py-3 text-sm text-aubergine"
+        >
           {error}
         </p>
       )}
@@ -295,12 +384,12 @@ export function CheckoutForm({
               ? "Upgrade to the Complete Reading for $97 — includes full house analysis, aspects, and a hand-written synthesis delivered as PDF."
               : "A focused study is great, but a Complete Reading ($97) shows how love, career, and money intertwine across your entire chart."}
           </p>
-          <a
+          <Link
             href="/checkout/complete"
-            className="mt-3 inline-block font-ui text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-aubergine underline decoration-gold/50 underline-offset-4 transition-colors hover:text-gold-dark"
+            className="mt-3 inline-flex min-h-11 items-center font-ui text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-aubergine underline decoration-gold/50 underline-offset-4 transition-colors hover:text-gold-dark"
           >
             Switch to Complete Reading - $97
-          </a>
+          </Link>
         </div>
       )}
 
@@ -312,33 +401,60 @@ export function CheckoutForm({
         analytics={{
           event: "cta_click",
           params: {
-            cta_label: "Continue to Secure Payment",
             cta_location: "custom_checkout",
-            offer_tier: tier,
+            product_id: tier,
           },
         }}
       >
         {pending ? "Preparing Payment..." : "Continue to Secure Payment"}
       </Button>
 
+      <p className="text-center text-xs leading-relaxed text-ink/52">
+        By continuing, you agree to the{" "}
+        <Link href="/terms" className="underline decoration-gold/55 underline-offset-3">
+          Terms
+        </Link>
+        ,{" "}
+        <Link href="/privacy" className="underline decoration-gold/55 underline-offset-3">
+          Privacy Policy
+        </Link>
+        , and{" "}
+        <Link href="/refund-policy" className="underline decoration-gold/55 underline-offset-3">
+          Refund Policy
+        </Link>
+        .
+      </p>
+
       <div className="mt-5 grid gap-3 sm:grid-cols-3">
         <div className="flex items-center gap-2 text-ink/65">
-          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-gold/25 bg-gold/10 text-[0.65rem]">🔒</span>
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-gold/25 bg-gold/10 text-gold-dark">
+            <IconLock aria-hidden="true" className="h-4 w-4" stroke={1.8} />
+          </span>
           <span className="text-[0.7rem] font-semibold tracking-wide uppercase font-ui leading-tight">Stripe Secure</span>
         </div>
         <div className="flex items-center gap-2 text-ink/65">
-          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-gold/25 bg-gold/10 text-[0.65rem]">✉️</span>
-          <span className="text-[0.7rem] font-semibold tracking-wide uppercase font-ui leading-tight">{isEssential ? "Instant Delivery" : "72h Delivery"}</span>
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-gold/25 bg-gold/10 text-gold-dark">
+            <IconMail aria-hidden="true" className="h-4 w-4" stroke={1.8} />
+          </span>
+          <span className="text-[0.7rem] font-semibold tracking-wide uppercase font-ui leading-tight">
+            {isEssential
+              ? "Instant email"
+              : productDelivery.replace("Hand-prepared and delivered ", "Delivery ")}
+          </span>
         </div>
         <div className="flex items-center gap-2 text-ink/65">
-          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-gold/25 bg-gold/10 text-[0.65rem]">📄</span>
-          <span className="text-[0.7rem] font-semibold tracking-wide uppercase font-ui leading-tight">Written format</span>
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-gold/25 bg-gold/10 text-gold-dark">
+            <IconFileText aria-hidden="true" className="h-4 w-4" stroke={1.8} />
+          </span>
+          <span className="text-[0.7rem] font-semibold tracking-wide uppercase font-ui leading-tight">
+            {productFormat}
+          </span>
         </div>
       </div>
 
       <p className="mt-5 text-center text-xs leading-relaxed text-ink/42">
-        Your card payment is completed on Stripe. Your birth details are saved in this browser so
-        the confirmation page can send the delivery details.
+        Your card payment is completed on Stripe. Your birth details are kept only in this browser
+        session so the confirmation page can fulfill the order after payment.
       </p>
     </form>
   );

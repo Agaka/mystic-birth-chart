@@ -420,6 +420,6 @@ export function calculateNatalSnapshot(input: NatalSnapshotInput): NatalSnapshot
     timezone: input.timezone,
     utcOffset,
     calculationNote:
-      "This free chart preview uses a lightweight browser calculation, city-based geocoding, and static interpretations. It is designed to give a real first reading, not a complete report. A paid reading verifies the birth data and interprets the whole chart, including houses, rulers, aspects, condition, angularity, repeated themes, and chart emphasis.",
+      "This free chart preview uses a lightweight browser calculation, city-based geocoding, and static interpretations. It is designed to give a real first reading, not a complete report. The automated Essential reading expands the first synthesis from your submitted birth data; the individually prepared Complete reading adds the deeper judgment of houses, rulers, aspects, condition, angularity, repeated themes, and chart emphasis.",
   };
 }

@@ -1,12 +1,16 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import Stripe from "stripe";
 import {
   calculateNatalSnapshot,
   type NatalSnapshotResult,
 } from "@/lib/natalSnapshot";
 import { siteConfig } from "@/lib/site";
-
-type OrderTier = "basic" | "complete";
+import {
+  getReadingOffer,
+  isReadingTier,
+  type ReadingTier,
+} from "@/lib/orders";
 
 interface BirthplaceMatch {
   label: string;
@@ -29,6 +33,7 @@ interface OpenMeteoGeocodingResponse {
 interface AutomatedReading {
   result: NatalSnapshotResult;
   birthplace: BirthplaceMatch;
+  timeUnknown: boolean;
 }
 
 const focusLabels: Record<string, string> = {
@@ -73,10 +78,6 @@ function escapeHtml(value: unknown): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
-}
-
-function normalizeTier(value: unknown): OrderTier {
-  return value === "complete" ? "complete" : "basic";
 }
 
 function getFocusLabel(focus: string): string {
@@ -176,6 +177,9 @@ async function createAutomatedReading({
     return null;
   }
 
+  const timeUnknown = birthTime === "unknown";
+  const calculationTime = timeUnknown ? "12:00" : birthTime;
+
   const birthplace = await findBirthplace(birthCity);
   if (!birthplace) {
     return null;
@@ -183,9 +187,10 @@ async function createAutomatedReading({
 
   return {
     birthplace,
+    timeUnknown,
     result: calculateNatalSnapshot({
       date: birthDate,
-      time: birthTime,
+      time: calculationTime,
       latitude: birthplace.latitude,
       longitude: birthplace.longitude,
       timezone: birthplace.timezone,
@@ -249,12 +254,20 @@ function automatedReadingEmail({
             ["Name", name],
             ["Email", email],
             ["Birth Date", birthDate],
-            ["Birth Time", birthTime],
+            ["Birth Time", automated.timeUnknown ? "Unknown - noon estimate used" : birthTime],
             ["Birth City", automated.birthplace.label],
             ["Focus", focusLabel],
           ])}
         </table>
       </div>
+
+      ${
+        automated.timeUnknown
+          ? `<div style="background: #fff4df; border: 1px solid #d7bf91; padding: 16px; margin: 20px 0; color: #5b4524; font-size: 14px; line-height: 1.65;">
+              Your exact birth time was marked as unknown, so this automated reading uses noon as a neutral estimate. The Sun and most Moon interpretation remain useful, but the Rising sign, houses, chart ruler, and day/night status are provisional.
+            </div>`
+          : ""
+      }
 
       <div style="background: #f4ead7; border: 1px solid #d7bf91; padding: 22px; margin: 24px 0;">
         <p style="font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: #9b742e; margin: 0 0 10px;">
@@ -317,13 +330,16 @@ function automatedFallbackEmail({
   );
 }
 
-function completeConfirmationEmail({
+function manualConfirmationEmail({
   name,
   email,
   birthDate,
   birthTime,
   birthCity,
   focus,
+  productName,
+  delivery,
+  format,
 }: {
   name: string;
   email: string;
@@ -331,16 +347,19 @@ function completeConfirmationEmail({
   birthTime: string;
   birthCity: string;
   focus: string;
+  productName: string;
+  delivery: string;
+  format: string;
 }): string {
   return emailShell(
-    "Your Complete Reading is confirmed",
+    `Your ${productName} is confirmed`,
     `
       <p style="font-size: 16px; line-height: 1.75; color: #3a2a30; margin: 0 0 18px;">
         Hi ${escapeHtml(name || "there")},
       </p>
 
       <p style="font-size: 16px; line-height: 1.75; color: #3a2a30; margin: 0 0 18px;">
-        Thank you for your order. Your <strong>Complete Natal Reading</strong> is now in the hand-prepared queue and will be delivered to this email address within <strong>72 hours</strong>.
+        Thank you for your order. Your <strong>${escapeHtml(productName)}</strong> is now in the individually prepared queue. ${escapeHtml(delivery)}.
       </p>
 
       <div style="background: #fff; border: 1px solid #e8e0d4; padding: 20px; margin: 24px 0;">
@@ -360,7 +379,7 @@ function completeConfirmationEmail({
       </div>
 
       <p style="font-size: 16px; line-height: 1.75; color: #3a2a30; margin: 0;">
-        Your Complete Reading is prepared by hand as a PDF, not generated automatically. If you have any questions in the meantime, simply reply to this message.
+        This is an individually prepared ${escapeHtml(format)}, not an automated Essential reading. If you have any questions in the meantime, simply reply to this message.
       </p>
     `
   );
@@ -369,15 +388,69 @@ function completeConfirmationEmail({
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const tier = normalizeTier(body.tier);
-    const name = cleanText(body.name);
-    const email = cleanText(body.email);
-    const birthDate = cleanText(body.birthDate);
-    const birthTime = cleanText(body.birthTime);
-    const birthCity = cleanText(body.birthCity);
-    const focus = cleanText(body.focus || "general");
-    const notes = cleanText(body.notes);
+    const tierValue = cleanText(body.tier);
+    const sessionId = cleanText(body.sessionId);
+    const name = cleanText(body.name).slice(0, 120);
+    const email = cleanText(body.email).toLowerCase().slice(0, 254);
+    const birthDate = cleanText(body.birthDate).slice(0, 20);
+    const birthTime = cleanText(body.birthTime).slice(0, 20);
+    const birthCity = cleanText(body.birthCity).slice(0, 180);
+    const focus = cleanText(body.focus || "general").slice(0, 60);
+    const notes = cleanText(body.notes).slice(0, 3000);
+    const partnerData = cleanText(body.partnerData).slice(0, 3000);
     const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "hello@mysticbirthchart.com";
+    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+
+    if (!isReadingTier(tierValue)) {
+      return NextResponse.json({ message: "Invalid reading tier." }, { status: 400 });
+    }
+    const tier: ReadingTier = tierValue;
+    const offer = getReadingOffer(tier);
+
+    if (
+      !sessionId ||
+      !stripeSecretKey ||
+      !name ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
+      !birthDate ||
+      !birthCity ||
+      (tier === "basic" && !birthTime)
+    ) {
+      return NextResponse.json(
+        { message: "The paid order could not be verified with complete delivery details." },
+        { status: 400 },
+      );
+    }
+
+    const stripe = new Stripe(stripeSecretKey);
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    const paymentConfirmed =
+      session.status === "complete" &&
+      (session.payment_status === "paid" || session.payment_status === "no_payment_required");
+    const sessionEmail = cleanText(session.customer_details?.email || session.customer_email).toLowerCase();
+
+    if (
+      !paymentConfirmed ||
+      session.client_reference_id !== tier ||
+      !sessionEmail ||
+      sessionEmail !== email
+    ) {
+      return NextResponse.json({ message: "Payment verification failed." }, { status: 403 });
+    }
+
+    if (session.metadata?.fulfillment_status === "sent") {
+      return NextResponse.json({
+        success: true,
+        alreadyFulfilled: true,
+        productId: tier,
+        value: Number(offer.product.price.replace(/[^0-9.]/g, "")) || 0,
+        currency: "USD",
+      });
+    }
+
+    if (!process.env.SMTP_PASSWORD) {
+      return NextResponse.json({ message: "Email delivery is not configured." }, { status: 503 });
+    }
 
     let automated: AutomatedReading | null = null;
     if (tier === "basic") {
@@ -398,12 +471,14 @@ export async function POST(request: Request) {
       from: `"${siteConfig.name}" <${supportEmail}>`,
       to: supportEmail,
       replyTo: email,
-      subject: `New Birth Chart Reading Order - ${cleanSubject(name || email || "Customer")}`,
+      subject: `New ${cleanSubject(offer.product.name)} Order - ${cleanSubject(name || "Customer")}`,
       text: [
         "New order received:",
         "",
         `Reading tier: ${tier}`,
-        `Delivery mode: ${tier === "basic" ? "Automated instant email" : "Hand-prepared PDF"}`,
+        `Product: ${offer.product.name}`,
+        `Delivery mode: ${offer.product.delivery}`,
+        `Format: ${offer.product.format}`,
         `Automated reading sent: ${automated ? "yes" : tier === "basic" ? "no - location or birth data needs review" : "not applicable"}`,
         automated ? `Matched city: ${automated.birthplace.label}` : "",
         "",
@@ -414,6 +489,7 @@ export async function POST(request: Request) {
         `Birth City: ${birthCity}`,
         `Focus: ${getFocusLabel(focus)}`,
         `Notes: ${notes || "(none)"}`,
+        partnerData ? `Partner details: ${partnerData}` : "",
       ]
         .filter(Boolean)
         .join("\n"),
@@ -445,24 +521,48 @@ export async function POST(request: Request) {
         await transporter.sendMail({
           from: `"${siteConfig.name}" <${supportEmail}>`,
           to: email,
-          subject: "Your Complete Natal Reading is confirmed",
-          html: completeConfirmationEmail({
+          subject: `Your ${offer.product.name} is confirmed`,
+          html: manualConfirmationEmail({
             name,
             email,
             birthDate,
             birthTime,
             birthCity,
             focus,
+            productName: offer.product.name,
+            delivery: offer.product.delivery,
+            format: offer.product.format,
           }),
         });
       }
     }
 
-    return NextResponse.json({ success: true, automated: Boolean(automated) });
+    await stripe.checkout.sessions.update(session.id, {
+      metadata: {
+        ...session.metadata,
+        fulfillment_status: "sent",
+        fulfilled_at: new Date().toISOString(),
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      automated: Boolean(automated),
+      productId: tier,
+      value: Number(offer.product.price.replace(/[^0-9.]/g, "")) || 0,
+      currency: "USD",
+    });
   } catch (error: unknown) {
-    console.error("Email Sending Error:", error);
+    console.error("Order Fulfillment Error", {
+      type:
+        error instanceof Stripe.errors.StripeError
+          ? error.type
+          : error instanceof SyntaxError
+            ? "invalid-json"
+            : "unknown",
+    });
     return NextResponse.json(
-      { message: "Failed to send email." },
+      { message: "The order was paid, but fulfillment could not be completed automatically." },
       { status: 500 }
     );
   }

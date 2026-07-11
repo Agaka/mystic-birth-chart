@@ -55,6 +55,27 @@ export const categories: Category[] = [
       "Decans, planetary spirits, Hermetic Qabalah, and magical practice only where they are rooted in astrology.",
     icon: "VII",
   },
+  {
+    name: "The 12 Houses",
+    slug: "the-12-houses",
+    description:
+      "The terrestrial sectors of life, resources, relationships, and hidden places according to Hellenistic tradition.",
+    icon: "VIII",
+  },
+  {
+    name: "Predictive Astrology",
+    slug: "predictive-astrology",
+    description:
+      "Time lords, profections, transits, and techniques for mapping the timing of fate.",
+    icon: "IX",
+  },
+  {
+    name: "Planetary Magic & Timing",
+    slug: "planetary-magic-timing",
+    description:
+      "Planetary hours, electional astrology, talismans, and practical working with celestial mechanics.",
+    icon: "X",
+  },
 ];
 
 export function getCategoryBySlug(slug: string): Category | undefined {

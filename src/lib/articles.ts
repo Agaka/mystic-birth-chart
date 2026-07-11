@@ -2,6 +2,8 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import readingTime from "reading-time";
+import { categories } from "@/lib/categories";
+import { siteConfig } from "@/lib/site";
 
 const CONTENT_DIR = path.join(process.cwd(), "src/content/articles");
 
@@ -12,6 +14,7 @@ export interface ArticleMeta {
   category: string;
   categorySlug: string;
   date: string;
+  updatedDate: string;
   author: string;
   readingTime: string;
   featured: boolean;
@@ -19,6 +22,28 @@ export interface ArticleMeta {
 
 export interface Article extends ArticleMeta {
   content: string;
+}
+
+function normalizedArticleData(data: Record<string, unknown>) {
+  const rawCategory = String(data.category || "Chart Basics");
+  const matchingCategory = categories.find(
+    (category) =>
+      category.slug === String(data.categorySlug || rawCategory).toLowerCase() ||
+      category.name.toLowerCase() === rawCategory.toLowerCase(),
+  );
+  const date = String(data.date || "2026-07-10");
+
+  return {
+    title: String(data.title || ""),
+    excerpt: String(data.excerpt || data.description || ""),
+    category: matchingCategory?.name || rawCategory,
+    categorySlug:
+      matchingCategory?.slug || String(data.categorySlug || "chart-basics"),
+    date,
+    updatedDate: String(data.updated || data.dateModified || date),
+    author: siteConfig.editorialName,
+    featured: Boolean(data.featured),
+  };
 }
 
 export function getAllArticles(): ArticleMeta[] {
@@ -29,17 +54,12 @@ export function getAllArticles(): ArticleMeta[] {
     const fileContent = fs.readFileSync(filePath, "utf-8");
     const { data, content } = matter(fileContent);
     const stats = readingTime(content);
+    const normalized = normalizedArticleData(data);
 
     return {
       slug: filename.replace(/\.md$/, ""),
-      title: data.title || "",
-      excerpt: data.excerpt || "",
-      category: data.category || "",
-      categorySlug: data.categorySlug || "",
-      date: data.date || "",
-      author: data.author || "Mystic Birth Chart",
+      ...normalized,
       readingTime: stats.text,
-      featured: data.featured || false,
     } as ArticleMeta;
   });
 
@@ -56,17 +76,12 @@ export function getArticleBySlug(slug: string): Article | null {
   const fileContent = fs.readFileSync(filePath, "utf-8");
   const { data, content } = matter(fileContent);
   const stats = readingTime(content);
+  const normalized = normalizedArticleData(data);
 
   return {
     slug,
-    title: data.title || "",
-    excerpt: data.excerpt || "",
-    category: data.category || "",
-    categorySlug: data.categorySlug || "",
-    date: data.date || "",
-    author: data.author || "Mystic Birth Chart",
+    ...normalized,
     readingTime: stats.text,
-    featured: data.featured || false,
     content,
   };
 }
