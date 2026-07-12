@@ -1210,13 +1210,16 @@ Analytics:
 - `docs/newsletter-setup.md` contains the five-email Reading Room welcome automation and twice-weekly editorial cadence.
 - Automated coverage now includes annual profections, all eight Moon-phase boundaries, illumination, and minimum free-reading depth. Current local validation: lint clean, typecheck clean, 12 tests passing, production build passing with 139 generated pages.
 - Deployed: commit `59aae1a` is live on `mysticbirthchart.com`; all new public routes and the PDF endpoint returned HTTP 200 in production.
-- Pending external setup: create/configure the Brevo list and set `BREVO_API_KEY` plus `BREVO_LIST_ID`; then run one controlled end-to-end purchase test and confirm the GA4 purchase event after processing delay.
+- Brevo is configured in production: list `The Reading Room Letters` (`#3`), active automation `The Reading Room Welcome` (`#1`), verified sender `hello@mysticbirthchart.com`, authenticated domain, and sensitive Vercel variables for Production and Preview.
+- A controlled newsletter test succeeded on 2026-07-12: the production Free Chart endpoint returned HTTP 200, created the contact using only name and email, entered the active automation, delivered the first email, and recorded the open in Brevo.
+- Remaining external validation: run one controlled end-to-end purchase test and confirm the GA4 purchase event after processing delay.
 
 Newsletter:
 
 - Chosen integration: Brevo.
-- Done locally: separate consent, contact API integration, and five-email welcome sequence specification.
-- Pending: create the Brevo list and automation, then add production API key and list ID in Vercel.
+- Done: separate consent, contact API integration, list `#3`, sender verification, domain authentication, Vercel environment variables, and active five-email automation `#1`.
+- Welcome timing: 1 minute, then 2, 4, 7, and 10 days after entry.
+- The first production contact and first automated delivery were verified successfully on 2026-07-12.
 
 Social:
 

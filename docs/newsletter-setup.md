@@ -11,20 +11,28 @@ Last updated: 2026-07-12
 - Consenting contacts are added to Brevo only when `BREVO_API_KEY` and `BREVO_LIST_ID` are configured.
 - Only email and the optional cover name are sent to Brevo. Birth data, chart results, focus, and checkout notes stay out of the newsletter provider.
 - The endpoint limits repeated email and download requests to reduce abuse.
+- Production is connected to Brevo list `The Reading Room Letters` (list ID `3`).
+- `BREVO_API_KEY` and `BREVO_LIST_ID=3` are configured as sensitive Vercel variables for Production and Preview.
+- The verified sender is `Mystic Birth Chart <hello@mysticbirthchart.com>`.
+- `mysticbirthchart.com` is authenticated in Brevo through Vercel DNS. Brevo notes that full authentication propagation can take up to 48 hours.
 
 ## Brevo Configuration
 
-1. Create the list `The Reading Room Letters`.
-2. Enable double opt-in if the signup countries or campaign strategy require it.
-3. Add `BREVO_API_KEY` and `BREVO_LIST_ID` to Vercel Production, Preview, and Development as appropriate.
-4. Create the five-email welcome automation below, triggered when a contact joins the list.
-5. Use `hello@mysticbirthchart.com` as sender and verify the domain in Brevo.
-6. Keep unsubscribe and company-address elements in every campaign footer.
-7. Test signup, delivery, mobile layout, unsubscribe, and duplicate-contact behavior with an internal address.
+1. List: `The Reading Room Letters`, ID `3`.
+2. Automation: `The Reading Room Welcome`, ID `1`, active.
+3. Trigger: contact added to list `The Reading Room Letters #3`.
+4. Sender: `Mystic Birth Chart <hello@mysticbirthchart.com>`.
+5. Domain: `mysticbirthchart.com`, authenticated through Vercel DNS.
+6. Vercel: `BREVO_API_KEY` and `BREVO_LIST_ID=3` are set for Production and Preview.
+7. Enable double opt-in later if signup countries, legal advice, or campaign strategy require it.
+8. Keep unsubscribe and a valid company postal address in every campaign footer or account-level footer.
+9. Test mobile layout, unsubscribe, complaint handling, and duplicate-contact behavior before each major campaign change.
+
+Production verification completed on 2026-07-12: `hello@mysticbirthchart.com` was created in list `#3`, entered automation `#1`, received the first email, and Brevo recorded the open. No birth details were stored in Brevo.
 
 ## Welcome Automation
 
-### Email 1: Immediately
+### Email 1: After 1 minute
 
 Subject: `Your chart is not a list of placements`
 
