@@ -142,6 +142,13 @@ export function CheckoutForm({
           tier,
           name: checkoutDraft.name,
           email: checkoutDraft.email,
+          birthDate: checkoutDraft.birthDate,
+          birthTime: checkoutDraft.birthTime,
+          birthCity: checkoutDraft.birthCity,
+          focus: checkoutDraft.focus,
+          notes: checkoutDraft.notes,
+          partnerData: checkoutDraft.partnerData || "",
+          newsletter: checkoutDraft.newsletter,
         }),
       });
 

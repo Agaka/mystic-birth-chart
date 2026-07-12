@@ -34,8 +34,10 @@ import {
   IconZodiacVirgo,
 } from "@tabler/icons-react";
 import { Button } from "@/components/Button";
+import { FreeChartPdfPanel } from "@/components/FreeChartPdfPanel";
 import { ReadingRoomLetters } from "@/components/ReadingRoomLetters";
 import { trackEvent } from "@/lib/analytics";
+import { buildExpandedFreeReading } from "@/lib/freeChartReading";
 import {
   clearChartSession,
   freeChartSessionKey,
@@ -916,6 +918,9 @@ export function NatalChartSnapshotTool({
               intent={selectedIntent}
               rawIntent={intent ?? "whole-chart"}
               birthplaceLabel={selectedPlaceLabel}
+              birthDate={date}
+              birthTime={timeUnknown ? "12:00" : time}
+              birthplace={selectedPlace}
               timeUnknown={timeUnknown}
               onRestart={resetExperience}
               onBack={() => moveToStep("birth")}
@@ -1873,6 +1878,9 @@ function SnapshotResult({
   intent,
   rawIntent,
   birthplaceLabel,
+  birthDate,
+  birthTime,
+  birthplace,
   timeUnknown,
   onRestart,
   onBack,
@@ -1884,6 +1892,9 @@ function SnapshotResult({
   intent: (typeof intentOptions)[number];
   rawIntent: ChartIntent;
   birthplaceLabel: string;
+  birthDate: string;
+  birthTime: string;
+  birthplace: BirthplaceOption | null;
   timeUnknown: boolean;
   onRestart: () => void;
   onBack: () => void;
@@ -1894,6 +1905,7 @@ function SnapshotResult({
   const alternativeProduct = siteConfig.product.complete;
   const primaryHref = basicHref;
   const alternativeHref = completeHref;
+  const expandedReading = buildExpandedFreeReading(result, checkoutFocusForIntent(rawIntent));
 
   const bigThree = [
     { label: "Sun", sign: result.sunSign },
@@ -2068,6 +2080,46 @@ function SnapshotResult({
               </article>
             ))}
           </div>
+
+          <section className="mt-8" aria-labelledby="expanded-reading-title">
+            <p className="font-ui text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-gold-dark/78">
+              The deeper free layer
+            </p>
+            <h4 id="expanded-reading-title" className="mt-2 font-heading text-3xl font-semibold text-aubergine md:text-4xl">
+              Read the relationship among the placements.
+            </h4>
+            <p className="mt-3 max-w-2xl text-base leading-relaxed text-ink/64">
+              These passages move beyond three isolated sign descriptions. They begin the work of synthesis while leaving the full houses, planetary condition, and aspects for the paid readings.
+            </p>
+            <div className="mt-6 grid gap-4">
+              {expandedReading.map((section, index) => (
+                <article key={`${section.eyebrow}-${index}`} className="border border-gold/20 bg-white/38 p-5 md:p-6">
+                  <p className="font-ui text-[0.64rem] font-semibold uppercase tracking-[0.17em] text-gold-dark/78">
+                    Study {String(index + 1).padStart(2, "0")} / {section.eyebrow}
+                  </p>
+                  <h5 className="mt-2 font-heading text-2xl font-semibold text-aubergine">{section.title}</h5>
+                  <p className="mt-3 text-base leading-relaxed text-ink/69">{section.body}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          {birthplace && (
+            <div className="mt-8">
+              <FreeChartPdfPanel
+                payload={{
+                  date: birthDate,
+                  time: birthTime,
+                  timeUnknown,
+                  birthCity: birthplaceLabel,
+                  latitude: birthplace.latitude,
+                  longitude: birthplace.longitude,
+                  timezone: birthplace.timezone,
+                  focus: checkoutFocusForIntent(rawIntent),
+                }}
+              />
+            </div>
+          )}
 
           <div className="mt-8 border-l-2 border-gold bg-gold/10 px-5 py-4">
             <p className="text-sm leading-relaxed text-ink/68">{result.calculationNote}</p>

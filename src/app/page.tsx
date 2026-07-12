@@ -11,6 +11,7 @@ import { getAllArticles, getFeaturedArticles } from "@/lib/articles";
 import { categories } from "@/lib/categories";
 import { createPageMetadata } from "@/lib/metadata";
 import { getBasicCheckoutUrl, siteConfig } from "@/lib/site";
+import { IconCalendarTime, IconClockHour4, IconMoonStars } from "@tabler/icons-react";
 
 export const metadata = createPageMetadata({
   title: "Traditional Birth Chart Readings",
@@ -52,6 +53,27 @@ const comparisonRows = [
   {
     free: "Venus in Scorpio",
     full: "Venus in Scorpio in the 8th house draws love toward intensity and depth. Its square to Mars shows why attraction and conflict keep arriving together.",
+  },
+];
+
+const freeTools = [
+  {
+    title: "Planetary Hours",
+    body: "Find the traditional planetary ruler of the present hour for your location.",
+    href: "/planetary-hours",
+    icon: IconClockHour4,
+  },
+  {
+    title: "Annual Time Lord",
+    body: "Calculate the activated house and planet governing your current birthday year.",
+    href: "/annual-time-lord",
+    icon: IconCalendarTime,
+  },
+  {
+    title: "Natal Moon Phase",
+    body: "Read the solar-lunar phase beneath your Moon sign and its developmental task.",
+    href: "/natal-moon-phase",
+    icon: IconMoonStars,
   },
 ];
 
@@ -207,6 +229,46 @@ export default function HomePage() {
       </section>
 
       {/* Why people order — Narrative Transportation */}
+      <section className="border-y border-gold/15 bg-ink py-16 md:py-20">
+        <div className="mx-auto max-w-7xl px-6">
+          <ScrollReveal>
+            <div className="max-w-3xl">
+              <p className="font-ui text-xs font-semibold uppercase tracking-[0.22em] text-gold/70">
+                Free study instruments
+              </p>
+              <h2 className="mt-4 font-heading text-3xl font-semibold text-ivory md:text-5xl">
+                Return to the chart from more than one doorway.
+              </h2>
+              <p className="mt-5 text-lg leading-relaxed text-ivory/58">
+                Use each instrument on its own, then bring the results together when you want a reading of the whole pattern.
+              </p>
+            </div>
+          </ScrollReveal>
+          <div className="mt-10 grid gap-5 md:grid-cols-3">
+            {freeTools.map((tool, index) => {
+              const ToolIcon = tool.icon;
+              return (
+                <ScrollReveal key={tool.href} delay={index * 100}>
+                  <a
+                    href={tool.href}
+                    className="group block h-full border border-ivory/10 bg-midnight/55 p-6 transition-colors hover:border-gold/40"
+                  >
+                    <ToolIcon className="h-8 w-8 text-gold" stroke={1.35} />
+                    <h3 className="mt-5 font-heading text-2xl font-semibold text-ivory group-hover:text-gold-light">
+                      {tool.title}
+                    </h3>
+                    <p className="mt-3 text-sm leading-relaxed text-ivory/52">{tool.body}</p>
+                    <span className="mt-6 inline-block font-ui text-xs font-semibold uppercase tracking-[0.14em] text-gold/75">
+                      Open the tool
+                    </span>
+                  </a>
+                </ScrollReveal>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       <section className="wood-panel py-16 md:py-24">
         <div className="mx-auto max-w-7xl px-6">
           <div className="mx-auto max-w-3xl">

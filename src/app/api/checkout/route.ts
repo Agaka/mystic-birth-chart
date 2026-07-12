@@ -15,6 +15,13 @@ export async function POST(request: Request) {
     tier?: string;
     name?: string;
     email?: string;
+    birthDate?: string;
+    birthTime?: string;
+    birthCity?: string;
+    focus?: string;
+    notes?: string;
+    partnerData?: string;
+    newsletter?: boolean;
   };
 
   if (!isReadingTier(body.tier)) {
@@ -23,7 +30,13 @@ export async function POST(request: Request) {
 
   const name = String(body.name || "").trim().slice(0, 120);
   const email = String(body.email || "").trim().toLowerCase().slice(0, 254);
-  if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  const birthDate = String(body.birthDate || "").trim().slice(0, 20);
+  const birthTime = String(body.birthTime || "").trim().slice(0, 20);
+  const birthCity = String(body.birthCity || "").trim().slice(0, 180);
+  const focus = String(body.focus || "general").trim().slice(0, 60);
+  const notes = String(body.notes || "").trim().slice(0, 450);
+  const partnerData = String(body.partnerData || "").trim().slice(0, 450);
+  if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !birthDate || !birthCity || (body.tier === "basic" && !birthTime)) {
     return NextResponse.json(
       { message: "Enter a valid name and email before continuing." },
       { status: 400 },
@@ -60,6 +73,14 @@ export async function POST(request: Request) {
         reading_tier: offer.tier,
         reading_name: offer.product.name,
         customer_name: name,
+        birth_date: birthDate,
+        birth_time: birthTime,
+        birth_city: birthCity,
+        reading_focus: focus,
+        customer_notes: notes,
+        partner_data: partnerData,
+        newsletter_opt_in: body.newsletter ? "yes" : "no",
+        fulfillment_status: "pending",
       },
       ...(isSubscription
         ? {
@@ -72,6 +93,13 @@ export async function POST(request: Request) {
               description: `${offer.product.name} - ${siteConfig.name}`,
               statement_descriptor: "MYSTICBIRTHCHART",
               receipt_email: email,
+              metadata: {
+                reading_tier: offer.tier,
+                customer_name: name,
+                birth_date: birthDate,
+                birth_time: birthTime,
+                birth_city: birthCity,
+              },
             },
           }),
       custom_text: {

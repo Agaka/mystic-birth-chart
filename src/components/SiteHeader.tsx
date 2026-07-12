@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { IconArrowLeft, IconClockHour4, IconLock, IconMenu2, IconX } from "@tabler/icons-react";
+import { IconArrowLeft, IconCalendarTime, IconClockHour4, IconLock, IconMenu2, IconMoonStars, IconX } from "@tabler/icons-react";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/Button";
@@ -11,6 +11,11 @@ export function SiteHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
   const isCheckout = pathname.startsWith("/checkout/") || pathname === "/thank-you";
+  const toolIcons = {
+    "/planetary-hours": IconClockHour4,
+    "/annual-time-lord": IconCalendarTime,
+    "/natal-moon-phase": IconMoonStars,
+  } as const;
 
   if (isCheckout) {
     return (
@@ -62,14 +67,10 @@ export function SiteHeader() {
             </Link>
           ))}
           {siteConfig.nav.tools.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="inline-flex min-h-11 items-center gap-2 font-ui text-sm text-gold-light/82 transition-colors hover:text-gold-light"
-            >
-              <IconClockHour4 aria-hidden="true" className="h-4 w-4" stroke={1.7} />
-              {item.label}
-            </Link>
+            (() => {
+              const ToolIcon = toolIcons[item.href];
+              return <Link key={item.href} href={item.href} className="inline-flex min-h-11 items-center gap-2 font-ui text-sm text-gold-light/82 transition-colors hover:text-gold-light"><ToolIcon aria-hidden="true" className="h-4 w-4" stroke={1.7} />{item.label}</Link>;
+            })()
           ))}
           <Button
             href={getCheckoutUrl()}
@@ -119,15 +120,10 @@ export function SiteHeader() {
               </Link>
             ))}
             {siteConfig.nav.tools.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setMobileOpen(false)}
-                className="flex min-h-11 items-center gap-3 border-t border-gold/15 pt-4 font-ui text-base font-semibold text-gold-light transition-colors hover:text-ivory"
-              >
-                <IconClockHour4 aria-hidden="true" className="h-5 w-5" stroke={1.7} />
-                {item.label}
-              </Link>
+              (() => {
+                const ToolIcon = toolIcons[item.href];
+                return <Link key={item.href} href={item.href} onClick={() => setMobileOpen(false)} className="flex min-h-11 items-center gap-3 border-t border-gold/15 pt-4 font-ui text-base font-semibold text-gold-light transition-colors hover:text-ivory"><ToolIcon aria-hidden="true" className="h-5 w-5" stroke={1.7} />{item.label}</Link>;
+              })()
             ))}
             <div className="pt-2">
               <Button

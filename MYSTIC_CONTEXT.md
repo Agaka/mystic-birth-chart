@@ -1195,13 +1195,25 @@ Analytics:
 - `docs/growth-strategy.md`, `docs/content-intent-map.md`, `docs/analytics-event-map.md`, and newsletter/proof setup notes document the acquisition system.
 - Automated tests cover product truth, analytics privacy, and natal calculations for Porto Alegre, New York, and London.
 - Final local validation passed lint, typecheck, 8 tests, production build, 73 public routes, 78 internal links, and 28 responsive page/viewport combinations.
-- These changes have not been pushed or deployed. Review and approval are required before production release.
+
+### 2026-07-12 free-tool and fulfillment expansion
+
+- The Free Chart now includes a denser calculated synthesis, natal Moon phase, chart ruler, sect, intention lens, and practical observation.
+- Users can keep a seven-page personalized PDF with a subtle generated parchment texture and the Mystic Birth Chart mark. Download does not require email; optional email delivery and newsletter consent are separate.
+- New free tools exist at `/annual-time-lord` and `/natal-moon-phase`, joining `/planetary-hours`. All three appear in desktop/mobile navigation, the footer, sitemap, and a homepage study-instruments section.
+- Annual Time Lord uses whole-sign annual profections, traditional rulers, birthday-to-birthday periods, and a twelve-year cycle. It is educational timing rather than deterministic prediction.
+- Natal Moon Phase calculates the solar-lunar angle, illumination, one of eight phases, the Moon sign, and a developmental task from birth date, time, and city.
+- Checkout now preserves fulfillment details in private Stripe Session and PaymentIntent metadata. A signed Stripe webhook can fulfill paid orders independently of the browser return page, with idempotency and retry status.
+- The Free Chart PDF endpoint recalculates charts server-side, uses no-store responses, limits repeated requests, sends through Hostinger SMTP, and can add separately consenting contacts to Brevo using only email and optional name.
+- `docs/newsletter-setup.md` contains the five-email Reading Room welcome automation and twice-weekly editorial cadence.
+- Automated coverage now includes annual profections, all eight Moon-phase boundaries, illumination, and minimum free-reading depth. Current local validation: lint clean, typecheck clean, 12 tests passing, production build passing with 139 generated pages.
+- Pending external setup: add the live Stripe webhook signing secret as `STRIPE_WEBHOOK_SECRET`; create/configure the Brevo list and set `BREVO_API_KEY` plus `BREVO_LIST_ID`; then run one controlled end-to-end purchase test.
 
 Newsletter:
 
-- Choose service, likely Brevo first.
-- Add signup form/integration.
-- Create welcome sequence.
+- Chosen integration: Brevo.
+- Done locally: separate consent, contact API integration, and five-email welcome sequence specification.
+- Pending: create the Brevo list and automation, then add production API key and list ID in Vercel.
 
 Social:
 

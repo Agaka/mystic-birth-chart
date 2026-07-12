@@ -9,6 +9,7 @@ const allowedParamKeys = new Set([
   "funnel_step",
   "experiment_variant",
   "cta_location",
+  "delivery_method",
   "utm_source",
   "utm_medium",
   "utm_campaign",

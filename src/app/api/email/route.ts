@@ -11,6 +11,7 @@ import {
   isReadingTier,
   type ReadingTier,
 } from "@/lib/orders";
+import { subscribeToReadingRoom } from "@/lib/brevo";
 
 interface BirthplaceMatch {
   label: string;
@@ -386,18 +387,20 @@ function manualConfirmationEmail({
 }
 
 export async function POST(request: Request) {
+  let recoveryStripe: Stripe | null = null;
+  let recoverySessionId = "";
   try {
     const body = await request.json();
     const tierValue = cleanText(body.tier);
     const sessionId = cleanText(body.sessionId);
-    const name = cleanText(body.name).slice(0, 120);
+    let name = cleanText(body.name).slice(0, 120);
     const email = cleanText(body.email).toLowerCase().slice(0, 254);
-    const birthDate = cleanText(body.birthDate).slice(0, 20);
-    const birthTime = cleanText(body.birthTime).slice(0, 20);
-    const birthCity = cleanText(body.birthCity).slice(0, 180);
-    const focus = cleanText(body.focus || "general").slice(0, 60);
-    const notes = cleanText(body.notes).slice(0, 3000);
-    const partnerData = cleanText(body.partnerData).slice(0, 3000);
+    let birthDate = cleanText(body.birthDate).slice(0, 20);
+    let birthTime = cleanText(body.birthTime).slice(0, 20);
+    let birthCity = cleanText(body.birthCity).slice(0, 180);
+    let focus = cleanText(body.focus || "general").slice(0, 60);
+    let notes = cleanText(body.notes).slice(0, 3000);
+    let partnerData = cleanText(body.partnerData).slice(0, 3000);
     const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "hello@mysticbirthchart.com";
     const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 
@@ -423,6 +426,8 @@ export async function POST(request: Request) {
     }
 
     const stripe = new Stripe(stripeSecretKey);
+    recoveryStripe = stripe;
+    recoverySessionId = sessionId;
     const session = await stripe.checkout.sessions.retrieve(sessionId);
     const paymentConfirmed =
       session.status === "complete" &&
@@ -438,6 +443,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: "Payment verification failed." }, { status: 403 });
     }
 
+    name = cleanText(session.metadata?.customer_name || name).slice(0, 120);
+    birthDate = cleanText(session.metadata?.birth_date || birthDate).slice(0, 20);
+    birthTime = cleanText(session.metadata?.birth_time || birthTime).slice(0, 20);
+    birthCity = cleanText(session.metadata?.birth_city || birthCity).slice(0, 180);
+    focus = cleanText(session.metadata?.reading_focus || focus || "general").slice(0, 60);
+    notes = cleanText(session.metadata?.customer_notes || notes).slice(0, 3000);
+    partnerData = cleanText(session.metadata?.partner_data || partnerData).slice(0, 3000);
+
     if (session.metadata?.fulfillment_status === "sent") {
       return NextResponse.json({
         success: true,
@@ -448,9 +461,31 @@ export async function POST(request: Request) {
       });
     }
 
+    if (session.metadata?.fulfillment_status === "processing") {
+      const startedAt = Date.parse(session.metadata.fulfillment_started_at || "");
+      const stillActive = Number.isFinite(startedAt) && Date.now() - startedAt < 10 * 60 * 1000;
+      if (stillActive) {
+        return NextResponse.json({
+          success: true,
+          alreadyProcessing: true,
+          productId: tier,
+          value: Number(offer.product.price.replace(/[^0-9.]/g, "")) || 0,
+          currency: "USD",
+        });
+      }
+    }
+
     if (!process.env.SMTP_PASSWORD) {
       return NextResponse.json({ message: "Email delivery is not configured." }, { status: 503 });
     }
+
+    await stripe.checkout.sessions.update(session.id, {
+      metadata: {
+        ...session.metadata,
+        fulfillment_status: "processing",
+        fulfillment_started_at: new Date().toISOString(),
+      },
+    });
 
     let automated: AutomatedReading | null = null;
     if (tier === "basic") {
@@ -537,6 +572,16 @@ export async function POST(request: Request) {
       }
     }
 
+    if (session.metadata?.newsletter_opt_in === "yes") {
+      try {
+        await subscribeToReadingRoom(email, name);
+      } catch (error) {
+        console.error("Paid-order newsletter capture failed", {
+          type: error instanceof Error ? error.name : "unknown",
+        });
+      }
+    }
+
     await stripe.checkout.sessions.update(session.id, {
       metadata: {
         ...session.metadata,
@@ -553,6 +598,20 @@ export async function POST(request: Request) {
       currency: "USD",
     });
   } catch (error: unknown) {
+    if (recoveryStripe && recoverySessionId) {
+      try {
+        const failedSession = await recoveryStripe.checkout.sessions.retrieve(recoverySessionId);
+        await recoveryStripe.checkout.sessions.update(recoverySessionId, {
+          metadata: {
+            ...failedSession.metadata,
+            fulfillment_status: "failed",
+            fulfillment_failed_at: new Date().toISOString(),
+          },
+        });
+      } catch {
+        // Stripe will retry the webhook; logging below remains the final fallback.
+      }
+    }
     console.error("Order Fulfillment Error", {
       type:
         error instanceof Stripe.errors.StripeError

@@ -123,7 +123,11 @@ export const siteConfig = {
       { label: "Readings", href: "/birth-chart-report" },
       { label: "About", href: "/about" },
     ],
-    tools: [{ label: "Planetary Hours", href: "/planetary-hours" }],
+    tools: [
+      { label: "Planetary Hours", href: "/planetary-hours" },
+      { label: "Annual Time Lord", href: "/annual-time-lord" },
+      { label: "Natal Moon Phase", href: "/natal-moon-phase" },
+    ],
     categories: [
       { label: "Chart Basics", href: "/blog/category/chart-basics" },
       { label: "Moon & Emotions", href: "/blog/category/moon-emotions" },

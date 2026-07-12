@@ -34,7 +34,7 @@ export default function PrivacyPage() {
             <li>
               <strong>Free Chart details:</strong> birth date, birth time or an
               unknown-time choice, birth city/country, and selected focus. The
-              Free Chart does not require a name, account, or email
+              browser preview does not require a name, account, or email
             </li>
             <li>
               <strong>Checkout and order details:</strong> name, email, birth
@@ -74,6 +74,13 @@ export default function PrivacyPage() {
             the Free Chart calculation and preview run in the browser. Coordinates
             and chart results are not included in GA4 events.
           </p>
+          <p>
+            If you request the optional PDF, the chart details are sent securely
+            to our server only to calculate and generate that document. You may
+            download it without giving an email address. If you choose email
+            delivery, we use the address only to send the PDF unless you separately
+            select the newsletter checkbox.
+          </p>
 
           <h2>Data Storage and Security</h2>
           <p>
@@ -96,9 +103,9 @@ export default function PrivacyPage() {
             We use or may configure third-party services for Stripe payment
             processing, Open-Meteo city lookup, GA4 analytics, newsletter signup,
             and email delivery. Each provider has its own privacy policy. Birth
-            details are sent to the order-fulfillment endpoint only after a paid
-            order is verified; they are not sent to Stripe as payment metadata or
-            to GA4 as analytics parameters.
+            details required for fulfillment may be attached to the Stripe Checkout
+            Session as private order metadata and are processed only after payment
+            is verified. They are never sent to GA4 as analytics parameters.
           </p>
 
           <h2>Your Rights</h2>

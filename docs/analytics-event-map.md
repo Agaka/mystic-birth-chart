@@ -1,6 +1,6 @@
 # GA4 Event Map
 
-Last updated: 2026-07-10
+Last updated: 2026-07-12
 
 ## Funnel
 
@@ -20,6 +20,11 @@ Last updated: 2026-07-10
 | `free_chart_birth_data_completed` | Valid birth data is submitted | Activation | `page`, `funnel_step` |
 | `free_chart_calculation_started` | Calculation begins | Activation | `page`, `funnel_step` |
 | `free_chart_completed` | Preview is revealed | Value delivered | `page`, `funnel_step` |
+| `free_chart_pdf_started` | PDF download or email delivery is requested | Value extension | `page`, `funnel_step`, `delivery_method` |
+| `free_chart_pdf_completed` | PDF is downloaded or accepted for email delivery | Value delivered | `page`, `funnel_step`, `delivery_method` |
+| `free_chart_pdf_failed` | PDF request fails | Diagnostics | `page`, `funnel_step`, `delivery_method` |
+| `annual_time_lord_calculated` | Annual profection result is revealed | Free-tool engagement | `page`, `funnel_step`, `product_category` |
+| `natal_moon_phase_calculated` | Natal lunar-phase result is revealed | Free-tool engagement | `page`, `funnel_step`, `product_category` |
 | `free_chart_email_offer_viewed` | Optional Reading Room Letters offer renders after the result | Retention offer | `page`, `cta_location` |
 | `free_chart_email_opt_in` | User explicitly opens the configured signup destination | Consent action | `page`, `cta_location` |
 | `sample_report_viewed` | Sample Report page mounts | Commercial investigation | `page`, `funnel_step` |

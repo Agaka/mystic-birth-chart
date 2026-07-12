@@ -3,7 +3,7 @@ import { getAllArticles } from "@/lib/articles";
 import { categories } from "@/lib/categories";
 import { siteConfig } from "@/lib/site";
 
-const STATIC_LAST_MODIFIED = "2026-07-10";
+const STATIC_LAST_MODIFIED = "2026-07-12";
 
 const publicRoutes = [
   "",
@@ -13,6 +13,8 @@ const publicRoutes = [
   "/free-birth-chart",
   "/sample-report",
   "/planetary-hours",
+  "/annual-time-lord",
+  "/natal-moon-phase",
   "/editorial-method",
   "/privacy",
   "/terms",

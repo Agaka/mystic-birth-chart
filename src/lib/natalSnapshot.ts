@@ -48,6 +48,10 @@ export interface NatalSnapshotResult {
   risingSign: ZodiacSign;
   chartRuler: Planet;
   sect: "Day chart" | "Night chart";
+  sunLongitude: number;
+  moonLongitude: number;
+  risingLongitude: number;
+  moonPhase: MoonPhaseResult;
   summary: string;
   placements: PlacementInterpretation[];
   rulerInterpretation: PlacementInterpretation;
@@ -55,6 +59,15 @@ export interface NatalSnapshotResult {
   timezone: string;
   utcOffset: number;
   calculationNote: string;
+}
+
+export interface MoonPhaseResult {
+  name: "New Moon" | "Waxing Crescent" | "First Quarter" | "Waxing Gibbous" | "Full Moon" | "Waning Gibbous" | "Last Quarter" | "Waning Crescent";
+  angle: number;
+  illumination: number;
+  cyclePosition: number;
+  keynote: string;
+  developmentalTask: string;
 }
 
 const DEG_TO_RAD = Math.PI / 180;
@@ -227,7 +240,7 @@ const sectInterpretations: Record<NatalSnapshotResult["sect"], string> = {
     "With the Sun below the horizon, the chart has a nocturnal emphasis: instinct, privacy, memory, emotional weather, and the hidden life often carry more weight than the outer performance suggests. In traditional astrology, sect changes how the planets act, especially Venus, Mars, Saturn, and Jupiter. This preview can identify the broad night-chart condition, but a complete reading would ask which planets become more personal after dark.",
 };
 
-function normalizeDegrees(value: number): number {
+export function normalizeDegrees(value: number): number {
   return ((value % 360) + 360) % 360;
 }
 
@@ -239,8 +252,88 @@ function radToDeg(value: number): number {
   return value * RAD_TO_DEG;
 }
 
-function signFromLongitude(longitude: number): ZodiacSign {
+export function signFromLongitude(longitude: number): ZodiacSign {
   return zodiacSigns[Math.floor(normalizeDegrees(longitude) / 30)] ?? "Aries";
+}
+
+const moonPhaseProfiles: Array<{
+  max: number;
+  name: MoonPhaseResult["name"];
+  keynote: string;
+  developmentalTask: string;
+}> = [
+  {
+    max: 22.5,
+    name: "New Moon",
+    keynote: "Instinct and purpose begin close together, creating a concentrated inner direction that may need time before it can see alternatives.",
+    developmentalTask: "Give the emerging impulse a form without demanding complete certainty from its first appearance.",
+  },
+  {
+    max: 67.5,
+    name: "Waxing Crescent",
+    keynote: "A private intention is learning to survive contact with inherited expectations, doubt, and the first resistance of the world.",
+    developmentalTask: "Protect what is still young while testing which loyalties deserve to shape it.",
+  },
+  {
+    max: 112.5,
+    name: "First Quarter",
+    keynote: "Growth arrives through friction, decision, and the need to act before every inner contradiction has been resolved.",
+    developmentalTask: "Use conflict as information, then choose the action that gives the developing pattern a stronger structure.",
+  },
+  {
+    max: 157.5,
+    name: "Waxing Gibbous",
+    keynote: "The instinct to improve is strong: experience is examined, adjusted, and refined in preparation for fuller expression.",
+    developmentalTask: "Let discernment strengthen the work without turning every unfinished edge into evidence of failure.",
+  },
+  {
+    max: 202.5,
+    name: "Full Moon",
+    keynote: "Purpose and need become visible through polarity, relationship, and the encounter with what appears to stand opposite you.",
+    developmentalTask: "Recognize projection, hold two truths at once, and build a center that does not require either side to disappear.",
+  },
+  {
+    max: 247.5,
+    name: "Waning Gibbous",
+    keynote: "Experience wants to be shared, interpreted, and turned into something useful for people beyond the private self.",
+    developmentalTask: "Offer what has been learned without assuming that one lived truth must become a rule for everyone.",
+  },
+  {
+    max: 292.5,
+    name: "Last Quarter",
+    keynote: "Old forms are questioned from the inside, creating pressure to revise beliefs, roles, and structures that have completed their work.",
+    developmentalTask: "Release the identity built around a former answer while preserving the wisdom it produced.",
+  },
+  {
+    max: 337.5,
+    name: "Waning Crescent",
+    keynote: "The cycle turns toward closure, memory, surrender, and preparation for a beginning that cannot yet be fully named.",
+    developmentalTask: "Make room for silence and completion without mistaking rest for disappearance.",
+  },
+  {
+    max: 360,
+    name: "New Moon",
+    keynote: "Instinct and purpose begin close together, creating a concentrated inner direction that may need time before it can see alternatives.",
+    developmentalTask: "Give the emerging impulse a form without demanding complete certainty from its first appearance.",
+  },
+];
+
+export function calculateMoonPhaseFromLongitudes(
+  sunLongitudeValue: number,
+  moonLongitudeValue: number,
+): MoonPhaseResult {
+  const angle = normalizeDegrees(moonLongitudeValue - sunLongitudeValue);
+  const profile = moonPhaseProfiles.find((item) => angle < item.max) ?? moonPhaseProfiles[0];
+  const illumination = (1 - Math.cos(degToRad(angle))) / 2;
+
+  return {
+    name: profile.name,
+    angle: Number(angle.toFixed(2)),
+    illumination: Number((illumination * 100).toFixed(1)),
+    cyclePosition: Number(((angle / 360) * 100).toFixed(1)),
+    keynote: profile.keynote,
+    developmentalTask: profile.developmentalTask,
+  };
 }
 
 function offsetAtUtcInstant(utcMs: number, timezone: string): number {
@@ -387,6 +480,7 @@ export function calculateNatalSnapshot(input: NatalSnapshotInput): NatalSnapshot
   const risingSign = signFromLongitude(risingLong);
   const chartRuler = traditionalRulers[risingSign];
   const sect = sunAltitude(julianDay, input.latitude, input.longitude, sunLong) >= 0 ? "Day chart" : "Night chart";
+  const moonPhase = calculateMoonPhaseFromLongitudes(sunLong, moonLong);
 
   return {
     sunSign,
@@ -394,6 +488,10 @@ export function calculateNatalSnapshot(input: NatalSnapshotInput): NatalSnapshot
     risingSign,
     chartRuler,
     sect,
+    sunLongitude: Number(sunLong.toFixed(4)),
+    moonLongitude: Number(moonLong.toFixed(4)),
+    risingLongitude: Number(risingLong.toFixed(4)),
+    moonPhase,
     summary: buildSummary(sunSign, moonSign, risingSign),
     placements: [
       {

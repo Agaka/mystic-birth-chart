@@ -43,6 +43,7 @@ next-env.d.ts
 
 # marketing assets (local only)
 /marketing
+/tmp
 
 # codex
 .codex-remote-attachments/
