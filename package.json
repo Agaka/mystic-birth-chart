@@ -9,6 +9,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit --incremental false --pretty false",
     "test": "node --test --experimental-strip-types tests/*.test.ts",
+    "audit:articles": "node scripts/audit-articles.mjs",
     "verify:runtime": "node scripts/verify-runtime.mjs"
   },
   "dependencies": {

@@ -334,8 +334,8 @@ Current important routes:
 
 Current content:
 
-- 47 English blog posts in `src/content/articles`.
-- 7 categories:
+- 87 English blog posts in `src/content/articles`.
+- 10 categories:
   - Chart Basics
   - Moon & Emotions
   - Love & Venus
@@ -343,6 +343,9 @@ Current content:
   - Saturn & Growth
   - Deep Chart Patterns
   - Hermetic Astrology
+  - The 12 Houses
+  - Predictive Astrology
+  - Planetary Magic & Timing
 
 The free tool:
 
