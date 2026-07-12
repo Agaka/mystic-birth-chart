@@ -1170,6 +1170,8 @@ Stripe:
 - Done: checkout and post-purchase emails are working, according to the owner.
 - Done: public naming moved from Simple/Basic to Essential Birth Chart Reading in the site copy.
 - Done: Essential repositioned as a $17 automated instant email reading in public copy and post-purchase email logic.
+- Done: live Stripe webhook `Mystic Birth Chart fulfillment` listens to `checkout.session.completed` and `checkout.session.async_payment_succeeded` at `/api/stripe/webhook`.
+- Done: `STRIPE_WEBHOOK_SECRET` is stored as a sensitive Production and Preview variable in Vercel; the production endpoint reaches signature verification.
 - Pending: ensure `STRIPE_BASIC_PRICE_ID` points to the live $17 Stripe price.
 - Pending: verify all live purchase events are tracked after GA4 setup.
 
@@ -1207,7 +1209,8 @@ Analytics:
 - The Free Chart PDF endpoint recalculates charts server-side, uses no-store responses, limits repeated requests, sends through Hostinger SMTP, and can add separately consenting contacts to Brevo using only email and optional name.
 - `docs/newsletter-setup.md` contains the five-email Reading Room welcome automation and twice-weekly editorial cadence.
 - Automated coverage now includes annual profections, all eight Moon-phase boundaries, illumination, and minimum free-reading depth. Current local validation: lint clean, typecheck clean, 12 tests passing, production build passing with 139 generated pages.
-- Pending external setup: add the live Stripe webhook signing secret as `STRIPE_WEBHOOK_SECRET`; create/configure the Brevo list and set `BREVO_API_KEY` plus `BREVO_LIST_ID`; then run one controlled end-to-end purchase test.
+- Deployed: commit `59aae1a` is live on `mysticbirthchart.com`; all new public routes and the PDF endpoint returned HTTP 200 in production.
+- Pending external setup: create/configure the Brevo list and set `BREVO_API_KEY` plus `BREVO_LIST_ID`; then run one controlled end-to-end purchase test and confirm the GA4 purchase event after processing delay.
 
 Newsletter:
 
