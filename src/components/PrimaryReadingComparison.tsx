@@ -20,10 +20,10 @@ export function PrimaryReadingComparison({
   showFocusedLink?: boolean;
 }) {
   return (
-    <div className="overflow-hidden border border-gold/25 bg-white/30 shadow-[0_18px_55px_rgba(0,0,0,0.12)]">
+    <div className="overflow-hidden border border-gold/35 bg-[#ead9bb] shadow-[0_22px_65px_rgba(0,0,0,0.22)]">
       <div className="grid md:grid-cols-2">
-        <article className="border-b border-gold/20 p-6 md:border-b-0 md:border-r md:p-8">
-          <p className="font-ui text-xs font-semibold uppercase tracking-[0.18em] text-gold-dark/75">
+        <article className="border-b border-gold/30 bg-[linear-gradient(145deg,#f4ead7_0%,#e8d4b2_100%)] p-6 md:border-b-0 md:border-r md:p-8">
+          <p className="font-ui text-xs font-semibold uppercase tracking-[0.18em] text-[#815c20]">
             Automated first synthesis
           </p>
           <h3 className="mt-3 font-heading text-3xl font-semibold text-aubergine">
@@ -32,7 +32,7 @@ export function PrimaryReadingComparison({
           <p className="mt-3 font-ui text-4xl font-bold text-ink">
             {siteConfig.product.basic.price}
           </p>
-          <p className="mt-4 text-sm leading-relaxed text-ink/68">
+          <p className="mt-4 text-sm leading-relaxed text-ink/78">
             {siteConfig.product.basic.summary}
           </p>
           <div className="mt-7">
@@ -52,7 +52,7 @@ export function PrimaryReadingComparison({
               Get Essential Reading - $17
             </Button>
           </div>
-          <p className="mt-4 text-center font-ui text-xs uppercase tracking-[0.1em] text-ink/46">
+          <p className="mt-4 text-center font-ui text-xs uppercase tracking-[0.1em] text-ink/62">
             Automated. Instant email. No subscription.
           </p>
         </article>
@@ -93,23 +93,23 @@ export function PrimaryReadingComparison({
         </article>
       </div>
 
-      <dl className="divide-y divide-gold/15 border-t border-gold/20">
+      <dl className="divide-y divide-[#8b672d]/20 border-t border-[#8b672d]/25 bg-[#efe1c8]">
         {comparisonRows.map(([label, essential, complete]) => (
           <div
             key={label}
-            className="grid gap-2 px-5 py-4 text-sm sm:grid-cols-[0.7fr_1fr_1fr] sm:items-start sm:gap-5 md:px-8"
+            className="grid gap-2 px-5 py-4 text-sm odd:bg-[#f5ead6]/55 sm:grid-cols-[0.7fr_1fr_1fr] sm:items-start sm:gap-5 md:px-8"
           >
-            <dt className="font-ui text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-ink/45">
+            <dt className="font-ui text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[#755827]">
               {label}
             </dt>
-            <dd className="text-ink/68">{essential}</dd>
-            <dd className="font-medium text-aubergine">{complete}</dd>
+            <dd className="text-ink/78">{essential}</dd>
+            <dd className="font-semibold text-aubergine">{complete}</dd>
           </div>
         ))}
       </dl>
 
       {showFocusedLink && (
-        <div className="border-t border-gold/20 px-6 py-5 text-center">
+        <div className="border-t border-[#8b672d]/25 bg-[#e6d0aa] px-6 py-5 text-center">
           <Link
             href="/birth-chart-report#focused-readings"
             className="inline-flex min-h-11 items-center font-ui text-sm font-semibold text-aubergine underline decoration-gold/55 underline-offset-4 transition-colors hover:text-gold-dark"
