@@ -101,8 +101,8 @@ export async function createFreeChartPdf(data: FreeChartPdfData): Promise<Uint8A
   const serifItalic = await doc.embedFont(StandardFonts.TimesRomanItalic);
   const sans = await doc.embedFont(StandardFonts.Helvetica);
   const sansBold = await doc.embedFont(StandardFonts.HelveticaBold);
-  const iconPath = path.join(process.cwd(), "src", "app", "icon.png");
-  const icon = fs.existsSync(iconPath) ? await doc.embedPng(fs.readFileSync(iconPath)) : null;
+  const sealPath = path.join(process.cwd(), "public", "brand", "mystic-astrolabe-seal-transparent.png");
+  const seal = fs.existsSync(sealPath) ? await doc.embedPng(fs.readFileSync(sealPath)) : null;
   const texturePath = path.join(process.cwd(), "public", "images", "textures", "parchment-reading-paper.jpg");
   const texture = fs.existsSync(texturePath) ? await doc.embedJpg(fs.readFileSync(texturePath)) : null;
 
@@ -113,15 +113,19 @@ export async function createFreeChartPdf(data: FreeChartPdfData): Promise<Uint8A
   };
 
   const cover = addPage();
-  if (icon) cover.drawImage(icon, { x: 251, y: 622, width: 110, height: 110 });
-  cover.drawText("MYSTIC BIRTH CHART", { x: 205, y: 590, size: 11, font: sansBold, color: gold });
-  cover.drawText("THE OLD STUDY METHOD", { x: 221, y: 568, size: 8, font: sans, color: muted });
-  let y = drawWrapped(cover, "Your First Birth Chart Reading", serifBold, 34, 86, 500, 440, 38, aubergine);
-  y = drawWrapped(cover, `${data.result.sunSign} Sun / ${data.result.moonSign} Moon / ${data.result.risingSign} Rising`, serifItalic, 18, 86, y - 16, 440, 24, gold);
-  cover.drawLine({ start: { x: 118, y: y - 18 }, end: { x: 494, y: y - 18 }, thickness: 0.7, color: gold });
-  y = drawWrapped(cover, `Prepared for ${data.name || "the chart holder"}`, serif, 16, 86, y - 60, 440, 22, ink);
-  y = drawWrapped(cover, `${data.birthDate} at ${data.birthTime} / ${data.birthCity}`, sans, 9.5, 86, y - 8, 440, 14, muted);
-  drawWrapped(cover, "A substantial free preview of the chart's visible architecture. Useful by itself, intentionally unfinished where houses, full planetary condition, aspects, and prioritized synthesis begin.", serif, 12.5, 105, 178, 402, 19, muted);
+  if (seal) {
+    // The seal is a quiet watermark, not a competing app-icon logo.
+    cover.drawImage(seal, { x: 176, y: 394, width: 260, height: 260, opacity: 0.11 });
+    cover.drawImage(seal, { x: 270, y: 643, width: 72, height: 72, opacity: 0.9 });
+  }
+  cover.drawText("MYSTIC BIRTH CHART", { x: 205, y: 620, size: 11, font: sansBold, color: gold });
+  cover.drawText("THE OLD STUDY METHOD", { x: 231, y: 601, size: 8, font: sans, color: muted });
+  let y = drawWrapped(cover, "Your First Birth Chart Reading", serifBold, 34, 86, 530, 440, 38, aubergine);
+  y = drawWrapped(cover, `${data.result.sunSign} Sun / ${data.result.moonSign} Moon / ${data.result.risingSign} Rising`, serifItalic, 18, 86, y - 18, 440, 24, gold);
+  cover.drawLine({ start: { x: 86, y: y - 20 }, end: { x: 526, y: y - 20 }, thickness: 0.7, color: gold, opacity: 0.75 });
+  y = drawWrapped(cover, `Prepared for ${data.name || "the chart holder"}`, serif, 16, 86, y - 64, 440, 22, ink);
+  y = drawWrapped(cover, `${data.birthDate} at ${data.birthTime} / ${data.birthCity}`, sans, 9.5, 86, y - 10, 440, 14, muted);
+  drawWrapped(cover, "A substantial free preview of the chart's visible architecture. Useful by itself, intentionally unfinished where houses, full planetary condition, aspects, and prioritized synthesis begin.", serif, 12.5, 86, 178, 440, 19, muted);
   cover.drawText("mysticbirthchart.com", { x: 233, y: 72, size: 9, font: sansBold, color: gold });
 
   const overview = addPage();
