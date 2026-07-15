@@ -46,8 +46,8 @@ export default function PrivacyPage() {
               payment provider. We do not store your credit card details
             </li>
             <li>
-              <strong>Usage data:</strong> analytics data about how visitors use
-              the website
+            <strong>Usage data:</strong> analytics data about how visitors use
+              the website when they choose to allow analytics
             </li>
           </ul>
 
@@ -92,8 +92,9 @@ export default function PrivacyPage() {
 
           <h2>Cookies</h2>
           <p>
-            Our website may use cookies for analytics and service operation. GA4
-            events are designed not to include names, email addresses, birth
+            Our website uses only essential storage by default. You may choose to
+            allow anonymous analytics through the privacy notice. GA4 events are
+            designed not to include names, email addresses, birth
             dates, birth times, birth cities, coordinates, notes, or report text.
             You can control cookies through your browser settings.
           </p>

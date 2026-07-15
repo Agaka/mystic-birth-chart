@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Inter, Lora } from "next/font/google";
+import { AnalyticsConsentBanner } from "@/components/AnalyticsConsentBanner";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -116,6 +117,7 @@ export default function RootLayout({
           }}
         />
         <GoogleAnalytics measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
+        <AnalyticsConsentBanner />
         <SiteHeader />
         <main id="main-content" className="flex-1" tabIndex={-1}>
           {children}
