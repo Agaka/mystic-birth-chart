@@ -70,6 +70,9 @@ export default function ThankYouPage() {
             product_id: payload.productId || parsed.tier || "reading",
             product_category: "reading",
             funnel_step: "purchase-confirmed",
+            value: payload.value || undefined,
+            currency: payload.currency || "USD",
+            transaction_id: sessionId,
           });
           setStatus("sent");
           clearChartSession();

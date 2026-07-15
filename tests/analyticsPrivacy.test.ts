@@ -50,3 +50,39 @@ test("analytics drops personal and birth-chart data", () => {
 
   delete (globalThis as { window?: unknown }).window;
 });
+
+test("analytics keeps the standard purchase revenue fields", () => {
+  const calls: unknown[][] = [];
+  const fakeWindow = {
+    location: { pathname: "/thank-you", search: "" },
+    dataLayer: [],
+    gtag: (...args: unknown[]) => calls.push(args),
+    sessionStorage: { getItem: () => null, setItem: () => undefined },
+  };
+
+  Object.defineProperty(globalThis, "window", {
+    configurable: true,
+    value: fakeWindow,
+  });
+
+  trackEvent("purchase", {
+    product_id: "basic",
+    product_category: "reading",
+    value: 17,
+    currency: "USD",
+    transaction_id: "cs_live_example",
+  });
+
+  const [, eventName, params] = calls[0] as [string, string, Record<string, unknown>];
+  assert.equal(eventName, "purchase");
+  assert.deepEqual(params, {
+    page: "/thank-you",
+    product_id: "basic",
+    product_category: "reading",
+    value: 17,
+    currency: "USD",
+    transaction_id: "cs_live_example",
+  });
+
+  delete (globalThis as { window?: unknown }).window;
+});
