@@ -1214,6 +1214,13 @@ Analytics:
 - A controlled newsletter test succeeded on 2026-07-12: the production Free Chart endpoint returned HTTP 200, created the contact using only name and email, entered the active automation, delivered the first email, and recorded the open in Brevo.
 - Remaining external validation: run one controlled end-to-end purchase test and confirm the GA4 purchase event after processing delay.
 
+### 2026-07-15 production payments and email presentation
+
+- Stripe live mode has 10 active catalog products covering the nine website offers, including the monthly Hermetic Almanac. The `$17` Essential, `$97` Complete, focused readings, premium dossier, and subscription price IDs are set as sensitive Vercel variables for both Production and Preview.
+- The live Stripe webhook destination at `https://mysticbirthchart.com/api/stripe/webhook` is active for the two fulfillment events and reports no delivery errors.
+- All five messages in the Brevo `The Reading Room Welcome` automation now use the branded HTML treatment: parchment body, old-study header, transparent astrolabe seal, accessible button CTA, and unsubscribe footer. Do not revert these messages to the plain rich-text editor.
+- GA4 is receiving funnel events, but the first weeks are too small to judge conversion. The historical `social_proof_toast_shown` event inflated event totals before the fake notification UI was removed; do not treat raw event count as engagement until new traffic accumulates.
+
 Newsletter:
 
 - Chosen integration: Brevo.
