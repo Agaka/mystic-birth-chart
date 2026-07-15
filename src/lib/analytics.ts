@@ -1,4 +1,12 @@
-export type AnalyticsValue = string | number | boolean | null | undefined;
+export type AnalyticsItem = {
+  item_id?: string;
+  item_name?: string;
+  item_category?: string;
+  price?: number;
+  quantity?: number;
+};
+
+export type AnalyticsValue = string | number | boolean | null | undefined | AnalyticsItem[];
 
 export type AnalyticsParams = Record<string, AnalyticsValue>;
 
@@ -13,6 +21,7 @@ const allowedParamKeys = new Set([
   "value",
   "currency",
   "transaction_id",
+  "items",
   "utm_source",
   "utm_medium",
   "utm_campaign",
@@ -27,16 +36,39 @@ declare global {
   }
 }
 
-function cleanParams(params: AnalyticsParams): Record<string, string | number | boolean> {
-  return Object.fromEntries(
-    Object.entries(params).filter(
-      ([key, value]) =>
-        allowedParamKeys.has(key) &&
-        value !== undefined &&
-        value !== null &&
-        value !== "",
-    ),
-  ) as Record<string, string | number | boolean>;
+function cleanItems(value: AnalyticsValue): AnalyticsItem[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+
+  const items = value
+    .map(({ item_id, item_name, item_category, price, quantity }) => ({
+      ...(item_id ? { item_id } : {}),
+      ...(item_name ? { item_name } : {}),
+      ...(item_category ? { item_category } : {}),
+      ...(typeof price === "number" ? { price } : {}),
+      ...(typeof quantity === "number" ? { quantity } : {}),
+    }))
+    .filter((item) => item.item_id || item.item_name);
+
+  return items.length > 0 ? items : undefined;
+}
+
+function cleanParams(params: AnalyticsParams): Record<string, string | number | boolean | AnalyticsItem[]> {
+  const cleaned: Record<string, string | number | boolean | AnalyticsItem[]> = {};
+
+  for (const [key, value] of Object.entries(params)) {
+    if (!allowedParamKeys.has(key)) continue;
+
+    if (key === "items") {
+      const items = cleanItems(value);
+      if (items) cleaned[key] = items;
+      continue;
+    }
+
+    if (value === undefined || value === null || value === "" || Array.isArray(value)) continue;
+    cleaned[key] = value;
+  }
+
+  return cleaned;
 }
 
 function getAttribution(): AnalyticsParams {

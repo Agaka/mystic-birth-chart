@@ -71,6 +71,15 @@ test("analytics keeps the standard purchase revenue fields", () => {
     value: 17,
     currency: "USD",
     transaction_id: "cs_live_example",
+    items: [
+      {
+        item_id: "basic",
+        item_category: "reading",
+        price: 17,
+        quantity: 1,
+        customer_email: "private@example.com",
+      },
+    ] as never,
   });
 
   const [, eventName, params] = calls[0] as [string, string, Record<string, unknown>];
@@ -82,6 +91,14 @@ test("analytics keeps the standard purchase revenue fields", () => {
     value: 17,
     currency: "USD",
     transaction_id: "cs_live_example",
+    items: [
+      {
+        item_id: "basic",
+        item_category: "reading",
+        price: 17,
+        quantity: 1,
+      },
+    ],
   });
 
   delete (globalThis as { window?: unknown }).window;

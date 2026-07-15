@@ -1220,7 +1220,7 @@ Analytics:
 - The live Stripe webhook destination at `https://mysticbirthchart.com/api/stripe/webhook` is active for the two fulfillment events and reports no delivery errors.
 - All five messages in the Brevo `The Reading Room Welcome` automation now use the branded HTML treatment: parchment body, old-study header, transparent astrolabe seal, accessible button CTA, and unsubscribe footer. Do not revert these messages to the plain rich-text editor.
 - GA4 is receiving funnel events, but the first weeks are too small to judge conversion. The historical `social_proof_toast_shown` event inflated event totals before the fake notification UI was removed; do not treat raw event count as engagement until new traffic accumulates.
-- The verified `purchase` event now includes safe ecommerce fields (`value`, `currency`, and the Stripe session as `transaction_id`) so GA4 can report USD revenue without receiving customer or birth-chart data.
+- The verified `purchase` event now includes safe ecommerce fields (`value`, `currency`, the Stripe session as `transaction_id`, and a sanitized product item) so GA4 can report USD revenue and product performance without receiving customer or birth-chart data.
 
 Newsletter:
 

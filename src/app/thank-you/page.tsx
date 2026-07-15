@@ -73,6 +73,13 @@ export default function ThankYouPage() {
             value: payload.value || undefined,
             currency: payload.currency || "USD",
             transaction_id: sessionId,
+            items: [
+              {
+                item_id: payload.productId || parsed.tier || "reading",
+                item_category: "reading",
+                ...(payload.value ? { price: payload.value, quantity: 1 } : {}),
+              },
+            ],
           });
           setStatus("sent");
           clearChartSession();
