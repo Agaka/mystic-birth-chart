@@ -99,6 +99,16 @@ export class EssentialStore {
     return row ? asOrder(row) : null;
   }
 
+  findByToken(token: string): StoredEssentialOrder | null {
+    const row = this.db.prepare("SELECT * FROM essential_orders WHERE report_token = ? AND expires_at > ?").get(token, new Date().toISOString()) as Record<string, unknown> | undefined;
+    return row ? asOrder(row) : null;
+  }
+
+  markGenerated(orderId: string, reportPath: string): void {
+    this.db.prepare("UPDATE essential_orders SET status = ?, report_path = ?, updated_at = ? WHERE order_id = ?")
+      .run("generated", reportPath, new Date().toISOString(), orderId);
+  }
+
   markRetryPending(orderId: string, errorCode: string): void {
     this.updateStatus(orderId, "retry_pending", errorCode);
   }
