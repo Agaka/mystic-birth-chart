@@ -47,3 +47,6 @@ next-env.d.ts
 
 # codex
 .codex-remote-attachments/
+
+# isolated agent worktrees
+.worktrees/
