@@ -43,6 +43,28 @@ export default function ThankYouPage() {
 
         setDraft(parsed);
 
+        if (parsed.tier === "basic") {
+          trackEvent("purchase", {
+            product_id: "basic",
+            product_category: "reading",
+            funnel_step: "purchase-confirmed",
+            value: Number(siteConfig.product.basic.price.replace(/[^0-9.]/g, "")) || undefined,
+            currency: "USD",
+            transaction_id: sessionId,
+            items: [
+              {
+                item_id: "basic",
+                item_category: "reading",
+                price: Number(siteConfig.product.basic.price.replace(/[^0-9.]/g, "")) || undefined,
+                quantity: 1,
+              },
+            ],
+          });
+          setStatus("sent");
+          clearChartSession();
+          return;
+        }
+
         const res = await fetch("/api/email", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -146,7 +168,7 @@ export default function ThankYouPage() {
                       We sent the automated Essential Reading to{" "}
                       <strong className="text-ink/80">{draft.email}</strong>.
                       It is generated automatically from your birth data, not
-                      hand-prepared.
+                      hand-prepared. It is being prepared now and will arrive shortly.
                     </>
                   ) : (
                     <>

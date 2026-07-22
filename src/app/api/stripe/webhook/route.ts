@@ -1,6 +1,8 @@
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
 import { POST as fulfillOrder } from "@/app/api/email/route";
+import { dispatchEssentialJob } from "@/lib/essential/dispatch";
+import { buildEssentialJob } from "@/lib/essential/job";
 
 export const runtime = "nodejs";
 
@@ -25,6 +27,14 @@ export async function POST(request: Request) {
   const metadata = session.metadata || {};
   const email = String(session.customer_details?.email || session.customer_email || "").toLowerCase();
   const tier = metadata.reading_tier || session.client_reference_id || "";
+  if (tier === "basic") {
+    try {
+      await dispatchEssentialJob(buildEssentialJob(session, email));
+      return NextResponse.json({ received: true, dispatched: true });
+    } catch {
+      return NextResponse.json({ message: "Essential dispatch failed and Stripe should retry." }, { status: 500 });
+    }
+  }
   const fulfillmentRequest = new Request("http://internal/api/email", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

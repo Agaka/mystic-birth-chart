@@ -443,6 +443,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: "Payment verification failed." }, { status: 403 });
     }
 
+    if (tier === "basic") {
+      return NextResponse.json(
+        { message: "Essential fulfillment is handled by the secure delivery worker." },
+        { status: 409 },
+      );
+    }
+
     name = cleanText(session.metadata?.customer_name || name).slice(0, 120);
     birthDate = cleanText(session.metadata?.birth_date || birthDate).slice(0, 20);
     birthTime = cleanText(session.metadata?.birth_time || birthTime).slice(0, 20);
@@ -487,11 +494,6 @@ export async function POST(request: Request) {
       },
     });
 
-    let automated: AutomatedReading | null = null;
-    if (tier === "basic") {
-      automated = await createAutomatedReading({ birthDate, birthTime, birthCity });
-    }
-
     const transporter = nodemailer.createTransport({
       host: "smtp.hostinger.com",
       port: 465,
@@ -514,8 +516,6 @@ export async function POST(request: Request) {
         `Product: ${offer.product.name}`,
         `Delivery mode: ${offer.product.delivery}`,
         `Format: ${offer.product.format}`,
-        `Automated reading sent: ${automated ? "yes" : tier === "basic" ? "no - location or birth data needs review" : "not applicable"}`,
-        automated ? `Matched city: ${automated.birthplace.label}` : "",
         "",
         `Name: ${name}`,
         `Email: ${email}`,
@@ -531,45 +531,22 @@ export async function POST(request: Request) {
     });
 
     if (email) {
-      if (tier === "basic" && automated) {
-        await transporter.sendMail({
-          from: `"${siteConfig.name}" <${supportEmail}>`,
-          to: email,
-          subject: "Your automated Essential Birth Chart Reading is ready",
-          html: automatedReadingEmail({
-            name,
-            email,
-            birthDate,
-            birthTime,
-            focus,
-            automated,
-          }),
-        });
-      } else if (tier === "basic") {
-        await transporter.sendMail({
-          from: `"${siteConfig.name}" <${supportEmail}>`,
-          to: email,
-          subject: "Action needed for your Essential Birth Chart Reading",
-          html: automatedFallbackEmail({ name, birthCity }),
-        });
-      } else {
-        await transporter.sendMail({
-          from: `"${siteConfig.name}" <${supportEmail}>`,
-          to: email,
-          subject: `Your ${offer.product.name} is confirmed`,
-          html: manualConfirmationEmail({
-            name,
-            email,
-            birthDate,
-            birthTime,
-            birthCity,
-            focus,
-            productName: offer.product.name,
-            delivery: offer.product.delivery,
-            format: offer.product.format,
-          }),
-        });
-      }
+      await transporter.sendMail({
+        from: `"${siteConfig.name}" <${supportEmail}>`,
+        to: email,
+        subject: `Your ${offer.product.name} is confirmed`,
+        html: manualConfirmationEmail({
+          name,
+          email,
+          birthDate,
+          birthTime,
+          birthCity,
+          focus,
+          productName: offer.product.name,
+          delivery: offer.product.delivery,
+          format: offer.product.format,
+        }),
+      });
     }
 
     if (session.metadata?.newsletter_opt_in === "yes") {
@@ -592,7 +569,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      automated: Boolean(automated),
       productId: tier,
       value: Number(offer.product.price.replace(/[^0-9.]/g, "")) || 0,
       currency: "USD",
