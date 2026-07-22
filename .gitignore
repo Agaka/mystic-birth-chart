@@ -3,6 +3,7 @@
 # dependencies
 /node_modules
 /worker/node_modules
+/worker/.env
 /.pnp
 .pnp.*
 .yarn/*

@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import Stripe from "stripe";
-import {
-  calculateNatalSnapshot,
-  type NatalSnapshotResult,
-} from "@/lib/natalSnapshot";
 import { siteConfig } from "@/lib/site";
 import {
   getReadingOffer,
@@ -12,30 +8,6 @@ import {
   type ReadingTier,
 } from "@/lib/orders";
 import { subscribeToReadingRoom } from "@/lib/brevo";
-
-interface BirthplaceMatch {
-  label: string;
-  latitude: number;
-  longitude: number;
-  timezone: string;
-}
-
-interface OpenMeteoGeocodingResponse {
-  results?: Array<{
-    name?: string;
-    admin1?: string;
-    country?: string;
-    latitude?: number;
-    longitude?: number;
-    timezone?: string;
-  }>;
-}
-
-interface AutomatedReading {
-  result: NatalSnapshotResult;
-  birthplace: BirthplaceMatch;
-  timeUnknown: boolean;
-}
 
 const focusLabels: Record<string, string> = {
   general: "General overview",
@@ -45,23 +17,6 @@ const focusLabels: Record<string, string> = {
   money: "Money and self-worth",
   emotions: "Emotional patterns",
   spiritual: "Spiritual direction",
-};
-
-const focusReflections: Record<string, string> = {
-  purpose:
-    "Read this first through repetition. Purpose in a chart is rarely one placement; it is the way the chart keeps returning to the same planet, house, ruler, or pressure until it becomes direction.",
-  love:
-    "Love becomes clearer when Venus, the Moon, the 7th house, and the chart ruler are read together. This automated reading opens the pattern; the deeper question is which relationship testimonies repeat.",
-  career:
-    "Career is not only the 10th house. It can involve the Midheaven, the chart ruler, Saturn, Mars, the 2nd house, and the planet that keeps demanding public form.",
-  money:
-    "Money and self-worth usually speak through Venus, the 2nd house, its ruler, and the habits that decide what you keep, spend, protect, or undervalue.",
-  emotions:
-    "Emotional patterns begin with the Moon, but they become personal through house, sect, aspects, and the way the chart asks you to regulate pressure, memory, and need.",
-  spiritual:
-    "Spiritual direction is strongest when it grows from the natal chart itself: chart ruler, 9th house, Moon, sect, planetary condition, and the symbols that are actually central for you.",
-  general:
-    "For a whole-chart question, begin with hierarchy: Sun, Moon, Rising, chart ruler, sect, and the themes that repeat. The chart becomes useful when the loudest symbols are separated from the background noise.",
 };
 
 function cleanText(value: unknown): string {
@@ -83,10 +38,6 @@ function escapeHtml(value: unknown): string {
 
 function getFocusLabel(focus: string): string {
   return focusLabels[focus] || focusLabels.general;
-}
-
-function getFocusReflection(focus: string): string {
-  return focusReflections[focus] || focusReflections.general;
 }
 
 function detailRows(details: Array<[string, string | undefined]>): string {
@@ -126,209 +77,6 @@ function emailShell(title: string, body: string): string {
       </div>
     </div>
   `;
-}
-
-async function findBirthplace(query: string): Promise<BirthplaceMatch | null> {
-  const params = new URLSearchParams({
-    name: query,
-    count: "1",
-    language: "en",
-    format: "json",
-  });
-
-  const response = await fetch(
-    `https://geocoding-api.open-meteo.com/v1/search?${params.toString()}`,
-    { cache: "no-store" }
-  );
-
-  if (!response.ok) {
-    return null;
-  }
-
-  const data = (await response.json()) as OpenMeteoGeocodingResponse;
-  const place = data.results?.find(
-    (item) =>
-      typeof item.latitude === "number" &&
-      typeof item.longitude === "number" &&
-      Boolean(item.timezone)
-  );
-
-  if (!place || typeof place.latitude !== "number" || typeof place.longitude !== "number" || !place.timezone) {
-    return null;
-  }
-
-  return {
-    label: [place.name, place.admin1, place.country].filter(Boolean).join(", "),
-    latitude: place.latitude,
-    longitude: place.longitude,
-    timezone: place.timezone,
-  };
-}
-
-async function createAutomatedReading({
-  birthDate,
-  birthTime,
-  birthCity,
-}: {
-  birthDate: string;
-  birthTime: string;
-  birthCity: string;
-}): Promise<AutomatedReading | null> {
-  if (!birthDate || !birthTime || !birthCity) {
-    return null;
-  }
-
-  const timeUnknown = birthTime === "unknown";
-  const calculationTime = timeUnknown ? "12:00" : birthTime;
-
-  const birthplace = await findBirthplace(birthCity);
-  if (!birthplace) {
-    return null;
-  }
-
-  return {
-    birthplace,
-    timeUnknown,
-    result: calculateNatalSnapshot({
-      date: birthDate,
-      time: calculationTime,
-      latitude: birthplace.latitude,
-      longitude: birthplace.longitude,
-      timezone: birthplace.timezone,
-    }),
-  };
-}
-
-function automatedReadingEmail({
-  name,
-  email,
-  birthDate,
-  birthTime,
-  focus,
-  automated,
-}: {
-  name: string;
-  email: string;
-  birthDate: string;
-  birthTime: string;
-  focus: string;
-  automated: AutomatedReading;
-}): string {
-  const result = automated.result;
-  const focusLabel = getFocusLabel(focus);
-  const readingSections = [
-    ...result.placements,
-    result.rulerInterpretation,
-    result.sectInterpretation,
-  ]
-    .map(
-      (section) => `
-        <div style="border-top: 1px solid #e0d2bd; padding-top: 18px; margin-top: 18px;">
-          <h3 style="font-size: 22px; line-height: 1.25; color: #301b17; margin: 0 0 10px;">
-            ${escapeHtml(section.title)}
-          </h3>
-          <p style="font-size: 15px; line-height: 1.75; color: #3a2a30; margin: 0;">
-            ${escapeHtml(section.body)}
-          </p>
-        </div>
-      `
-    )
-    .join("");
-
-  return emailShell(
-    "Your Essential Reading is ready",
-    `
-      <p style="font-size: 16px; line-height: 1.75; color: #3a2a30; margin: 0 0 18px;">
-        Hi ${escapeHtml(name || "there")},
-      </p>
-
-      <p style="font-size: 16px; line-height: 1.75; color: #3a2a30; margin: 0 0 18px;">
-        Your <strong>Essential Birth Chart Reading</strong> has been generated automatically from your birth data and is delivered below. This is the instant $17 reading, not a hand-prepared report.
-      </p>
-
-      <div style="background: #fff; border: 1px solid #e8e0d4; padding: 20px; margin: 24px 0;">
-        <p style="font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: #8a7a6a; margin: 0 0 12px;">
-          Birth data used
-        </p>
-        <table style="width: 100%; font-size: 14px; color: #3a2a30; border-collapse: collapse;">
-          ${detailRows([
-            ["Name", name],
-            ["Email", email],
-            ["Birth Date", birthDate],
-            ["Birth Time", automated.timeUnknown ? "Unknown - noon estimate used" : birthTime],
-            ["Birth City", automated.birthplace.label],
-            ["Focus", focusLabel],
-          ])}
-        </table>
-      </div>
-
-      ${
-        automated.timeUnknown
-          ? `<div style="background: #fff4df; border: 1px solid #d7bf91; padding: 16px; margin: 20px 0; color: #5b4524; font-size: 14px; line-height: 1.65;">
-              Your exact birth time was marked as unknown, so this automated reading uses noon as a neutral estimate. The Sun and most Moon interpretation remain useful, but the Rising sign, houses, chart ruler, and day/night status are provisional.
-            </div>`
-          : ""
-      }
-
-      <div style="background: #f4ead7; border: 1px solid #d7bf91; padding: 22px; margin: 24px 0;">
-        <p style="font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: #9b742e; margin: 0 0 10px;">
-          First synthesis
-        </p>
-        <h2 style="font-size: 28px; line-height: 1.2; color: #301b17; margin: 0 0 12px;">
-          ${escapeHtml(result.sunSign)} Sun. ${escapeHtml(result.moonSign)} Moon. ${escapeHtml(result.risingSign)} Rising.
-        </h2>
-        <p style="font-size: 16px; line-height: 1.75; color: #3a2a30; margin: 0;">
-          ${escapeHtml(result.summary)}
-        </p>
-      </div>
-
-      ${readingSections}
-
-      <div style="border-top: 1px solid #e0d2bd; padding-top: 18px; margin-top: 18px;">
-        <h3 style="font-size: 22px; line-height: 1.25; color: #301b17; margin: 0 0 10px;">
-          Your selected focus: ${escapeHtml(focusLabel)}
-        </h3>
-        <p style="font-size: 15px; line-height: 1.75; color: #3a2a30; margin: 0;">
-          ${escapeHtml(getFocusReflection(focus))}
-        </p>
-      </div>
-
-      <div style="background: #140f0b; border: 1px solid #b88a3a; padding: 22px; margin: 28px 0 0;">
-        <p style="font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: #b88a3a; margin: 0 0 10px;">
-          What remains for a hand-prepared reading
-        </p>
-        <p style="font-size: 15px; line-height: 1.75; color: #f4ead7; margin: 0 0 16px;">
-          This automated Essential reading gives the first hierarchy. The Complete Reading is where the chart is weighed by hand: houses, rulers, aspects, dignity, angularity, repeated testimonies, love, career, money, temperament, and practical direction.
-        </p>
-        <a href="${siteConfig.url}/birth-chart-report#readings" style="display: inline-block; background: #b88a3a; color: #140f0b; padding: 12px 18px; text-decoration: none; font-family: Arial, sans-serif; font-size: 13px; font-weight: bold;">
-          Compare the Complete Reading
-        </a>
-      </div>
-    `
-  );
-}
-
-function automatedFallbackEmail({
-  name,
-  birthCity,
-}: {
-  name: string;
-  birthCity: string;
-}): string {
-  return emailShell(
-    "Your Essential order needs one correction",
-    `
-      <p style="font-size: 16px; line-height: 1.75; color: #3a2a30; margin: 0 0 18px;">
-        Hi ${escapeHtml(name || "there")},
-      </p>
-      <p style="font-size: 16px; line-height: 1.75; color: #3a2a30; margin: 0 0 18px;">
-        Your payment was received, but the automated system could not confidently match this birth city: <strong>${escapeHtml(birthCity || "not provided")}</strong>.
-      </p>
-      <p style="font-size: 16px; line-height: 1.75; color: #3a2a30; margin: 0;">
-        Please reply to this email with your birth city and country written clearly. Once the location is confirmed, we can send your automated Essential Reading.
-      </p>
-    `
-  );
 }
 
 function manualConfirmationEmail({

@@ -16,8 +16,33 @@ export async function createEssentialPdf(facts: ChartFacts, report: EssentialRep
   let y = 560; for (const line of wrap(report.title, bold, 31, 440)) { page.drawText(line, { x: 86, y, size: 31, font: bold, color: aubergine }); y -= 38; }
   page.drawText(`${facts.sun} / ${facts.moon} / ${facts.rising}`, { x: 86, y: y - 16, size: 16, font: serif, color: gold });
   page.drawText("Generated automatically from your submitted birth data.", { x: 86, y: 130, size: 10, font: serif, color: ink });
-  const content = doc.addPage([width, height]); content.drawRectangle({ x: 0, y: 0, width, height, color: parchment }); content.drawRectangle({ x: 24, y: 24, width: width - 48, height: height - 48, borderColor: gold, borderWidth: 0.7 });
-  let cy = 730; const blocks = [{ eyebrow: "FIRST SYNTHESIS", title: report.title, body: `${report.opening}\n\n${report.sections.map((item) => `${item.title}. ${item.body}`).join("\n\n")}\n\n${report.focusSection.title}. ${report.focusSection.body}\n\n${report.closing}\n\n${report.scopeNote}` }];
-  for (const block of blocks) { content.drawText(block.eyebrow, { x: margin, y: cy, size: 8, font: sans, color: gold }); cy -= 32; for (const line of wrap(block.title, bold, 24, 500)) { content.drawText(line, { x: margin, y: cy, size: 24, font: bold, color: aubergine }); cy -= 29; } cy -= 12; for (const line of wrap(block.body, serif, 12, 500)) { if (cy < 60) break; content.drawText(line, { x: margin, y: cy, size: 12, font: serif, color: ink }); cy -= 18; } }
+  const sections = [
+    { eyebrow: "FIRST SYNTHESIS", title: report.title, body: report.opening },
+    ...report.sections,
+    report.focusSection,
+    { eyebrow: "CLOSING NOTE", title: "A pattern to keep observing", body: report.closing },
+    { eyebrow: "SCOPE", title: "What this reading covers", body: report.scopeNote },
+  ];
+  let content = doc.addPage([width, height]);
+  let cy = 730;
+  const drawPageFrame = () => {
+    content.drawRectangle({ x: 0, y: 0, width, height, color: parchment });
+    content.drawRectangle({ x: 24, y: 24, width: width - 48, height: height - 48, borderColor: gold, borderWidth: 0.7 });
+    content.drawText("MYSTIC BIRTH CHART / AUTOMATED ESSENTIAL READING", { x: margin, y: 760, size: 7, font: sans, color: gold });
+  };
+  const nextPage = () => { content = doc.addPage([width, height]); cy = 730; drawPageFrame(); };
+  drawPageFrame();
+  for (const section of sections) {
+    const titleLines = wrap(section.title, bold, 22, 500);
+    const bodyLines = wrap(section.body, serif, 12, 500);
+    const required = 24 + titleLines.length * 27 + 16 + bodyLines.length * 18 + 26;
+    if (cy - required < 58) nextPage();
+    content.drawText(section.eyebrow.toUpperCase(), { x: margin, y: cy, size: 8, font: sans, color: gold });
+    cy -= 28;
+    for (const line of titleLines) { content.drawText(line, { x: margin, y: cy, size: 22, font: bold, color: aubergine }); cy -= 27; }
+    cy -= 8;
+    for (const line of bodyLines) { content.drawText(line, { x: margin, y: cy, size: 12, font: serif, color: ink }); cy -= 18; }
+    cy -= 26;
+  }
   return doc.save();
 }

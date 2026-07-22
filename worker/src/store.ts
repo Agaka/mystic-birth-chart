@@ -20,6 +20,11 @@ export interface StoredEssentialOrder extends WorkerEssentialJob {
   expiresAt: string;
 }
 
+export interface EssentialOrderStatus {
+  status: OrderStatus;
+  updatedAt: string;
+}
+
 export type ClaimResult =
   | { kind: "claimed" | "resume"; order: StoredEssentialOrder }
   | { kind: "duplicate"; order: StoredEssentialOrder };
@@ -102,6 +107,11 @@ export class EssentialStore {
   findByToken(token: string): StoredEssentialOrder | null {
     const row = this.db.prepare("SELECT * FROM essential_orders WHERE report_token = ? AND expires_at > ?").get(token, new Date().toISOString()) as Record<string, unknown> | undefined;
     return row ? asOrder(row) : null;
+  }
+
+  getPublicStatus(orderId: string): EssentialOrderStatus | null {
+    const row = this.db.prepare("SELECT status, updated_at FROM essential_orders WHERE order_id = ?").get(orderId) as { status: OrderStatus; updated_at: string } | undefined;
+    return row ? { status: row.status, updatedAt: row.updated_at } : null;
   }
 
   markGenerated(orderId: string, reportPath: string): void {
