@@ -1,18 +1,43 @@
-import OpenAI from "openai";
 import type { ChartFacts } from "./chartFacts.ts";
 
 export interface EssentialSection { eyebrow: string; title: string; body: string; }
 export interface EssentialReport { title: string; opening: string; sections: EssentialSection[]; focusSection: EssentialSection; closing: string; scopeNote: string; }
 
-const schema = { type: "json_schema" as const, name: "essential_report", strict: true, schema: { type: "object", additionalProperties: false, required: ["title", "opening", "sections", "focusSection", "closing", "scopeNote"], properties: { title: { type: "string" }, opening: { type: "string" }, sections: { type: "array", minItems: 4, maxItems: 6, items: { type: "object", additionalProperties: false, required: ["eyebrow", "title", "body"], properties: { eyebrow: { type: "string" }, title: { type: "string" }, body: { type: "string" } } } }, focusSection: { type: "object", additionalProperties: false, required: ["eyebrow", "title", "body"], properties: { eyebrow: { type: "string" }, title: { type: "string" }, body: { type: "string" } } }, closing: { type: "string" }, scopeNote: { type: "string" } } } };
-const rules = "Write clear, warm, traditional-first English astrology. Use only supplied facts. Do not invent placements, houses or aspects. No fatalism, guaranteed predictions, material promises, medical/legal/financial advice, generic filler, or any claim that this is hand-prepared.";
+import { createHmac } from "node:crypto";
+
+type ProxyResponse = { report?: EssentialReport };
+
+function sign(path: string, timestamp: string, body: string, secret: string): string {
+  return createHmac("sha256", secret).update(`POST\n${path}\n${timestamp}\n${body}`).digest("hex");
+}
+
+async function callProxy(operation: "write" | "review", facts: ChartFacts, draft?: EssentialReport): Promise<EssentialReport> {
+  const base = process.env.AI_PROXY_URL;
+  const secret = process.env.ESSENTIAL_WORKER_SHARED_SECRET;
+  if (!base || !secret) throw new Error("ai-proxy-not-configured");
+  const endpoint = new URL("/api/internal/essential-ai", base);
+  const body = JSON.stringify({ operation, facts, ...(draft ? { draft } : {}) });
+  const timestamp = String(Math.floor(Date.now() / 1000));
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-mystic-timestamp": timestamp,
+      "x-mystic-signature": sign(endpoint.pathname, timestamp, body, secret),
+    },
+    body,
+    signal: AbortSignal.timeout(55_000),
+  });
+  if (!response.ok) throw new Error(`ai-proxy-http-${response.status}`);
+  const payload = await response.json() as ProxyResponse;
+  if (!payload.report) throw new Error("ai-proxy-empty-report");
+  return payload.report;
+}
 
 export async function generateReviewedReport(facts: ChartFacts): Promise<EssentialReport> {
-  if (process.env.AI_PROVIDER !== "openai") throw new Error("ai-provider-not-configured");
-  if (!process.env.OPENAI_API_KEY || !process.env.OPENAI_WRITER_MODEL || !process.env.OPENAI_REVIEWER_MODEL) throw new Error("openai-not-configured");
-  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-  const writer = await client.responses.create({ model: process.env.OPENAI_WRITER_MODEL, input: [{ role: "system", content: `${rules} Produce an automated Essential reading in JSON.` }, { role: "user", content: JSON.stringify(facts) }], text: { format: schema } });
-  const draft = writer.output_text;
-  const reviewer = await client.responses.create({ model: process.env.OPENAI_REVIEWER_MODEL, input: [{ role: "system", content: `${rules} Review this draft against these facts. Rewrite it where needed and return only compliant JSON.` }, { role: "user", content: JSON.stringify({ facts, draft }) }], text: { format: schema } });
-  return JSON.parse(reviewer.output_text) as EssentialReport;
+  if (process.env.AI_PROXY_URL) {
+    const draft = await callProxy("write", facts);
+    return callProxy("review", facts, draft);
+  }
+  throw new Error("ai-proxy-not-configured");
 }

@@ -1230,6 +1230,14 @@ Newsletter:
 - Welcome timing: 1 minute, then 2, 4, 7, and 10 days after entry.
 - The first production contact and first automated delivery were verified successfully on 2026-07-12.
 
+### 2026-07-27 automated Essential fulfillment architecture
+
+- Essential `$17` fulfillment is designed for real purchases: the Stripe webhook queues a signed job on the VPS worker, which calculates the chart, requests one AI draft and one AI review, renders the branded PDF, and sends it by SMTP.
+- The AI provider key stays only in Vercel as `OPENAI_API_KEY`; it is never stored on the VPS or exposed to the browser. The worker calls the private Vercel route `/api/internal/essential-ai` using HMAC headers and receives only the structured report result.
+- The worker uses `AI_PROXY_URL=https://mysticbirthchart.com`; Vercel uses `ESSENTIAL_WORKER_URL=https://worker.mysticbirthchart.com`. `ESSENTIAL_WORKER_SHARED_SECRET` protects the Vercel-to-worker and worker-to-AI-proxy calls. `ESSENTIAL_TEST_SECRET` protects the no-payment test route.
+- The VPS worker is deployed at `https://worker.mysticbirthchart.com` behind Caddy and its public `/healthz` endpoint is healthy. Never print or commit any secret values.
+- The test route is intended for a controlled Essential fulfillment test without a Stripe charge. After a production deployment, use it once and confirm the PDF email and worker logs before declaring the purchase path complete.
+
 Social:
 
 - Create Instagram.
