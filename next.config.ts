@@ -17,8 +17,7 @@ const contentSecurityPolicy = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://www.google-analytics.com https://www.googletagmanager.com",
   "font-src 'self' data:",
-  "connect-src 'self' https://api.stripe.com https://checkout.stripe.com https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://geocoding-api.open-meteo.com",
-  "frame-src https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com",
+  "connect-src 'self' https://api.stripe.com https://checkout.stripe.com https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://geocoding-api.open-meteo.com https://www.promotekit.com", "frame-src https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com",
   `form-action 'self' https://checkout.stripe.com${newsletterOrigin ? ` ${newsletterOrigin}` : ""}`,
   "base-uri 'self'",
   "object-src 'none'",
@@ -44,11 +43,11 @@ const nextConfig: NextConfig = {
           ...(isDevelopment
             ? []
             : [
-                {
-                  key: "Strict-Transport-Security",
-                  value: "max-age=63072000; includeSubDomains; preload",
-                },
-              ]),
+              {
+                key: "Strict-Transport-Security",
+                value: "max-age=63072000; includeSubDomains; preload",
+              },
+            ]),
         ],
       },
     ];
