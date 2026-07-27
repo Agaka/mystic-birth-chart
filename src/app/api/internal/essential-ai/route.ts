@@ -214,7 +214,7 @@ export async function POST(request: Request) {
         hasDecimalNotation: /\b\d+\.\d+\s*(?:degrees?|orb)\b/i.test(JSON.stringify(candidate)),
         hasNeutral: /\bneutral\b/i.test(JSON.stringify(candidate)),
         purposeRequirements: ["tenth whole-sign house", "midheaven", tenthRuler.toLowerCase(), value.facts.chart.chartRuler.toLowerCase()].map((phrase) => purpose.includes(phrase)),
-        relationshipRequirements: ["seventh whole-sign house", seventhRuler.toLowerCase(), value.facts.chart.sect.toLowerCase()].map((phrase) => relationships.includes(phrase)),
+        relationshipRequirements: ["seventh whole-sign house", seventhRuler.toLowerCase(), (value.facts as ChartFacts).chart.sect.toLowerCase()].map((phrase) => relationships.includes(phrase)),
         supportedAspectClaims: hasSupportedAspectClaims(JSON.stringify(candidate), value.facts),
       });
       return NextResponse.json({ message: "AI report failed chart validation." }, { status: 502 });
