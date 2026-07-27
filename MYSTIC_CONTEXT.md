@@ -1239,6 +1239,7 @@ Newsletter:
 - Essential PDF email delivery uses the private Vercel route `/api/internal/essential-email`, so the Hostinger SMTP password remains in Vercel and is not copied to the VPS. The worker uses `EMAIL_PROXY_URL=https://mysticbirthchart.com` and sends the signed PDF payload through that route.
 - The test route is intended for a controlled Essential fulfillment test without a Stripe charge. After a production deployment, use it once and confirm the PDF email and worker logs before declaring the purchase path complete.
 - Controlled no-charge fulfillment test succeeded on 2026-07-27: the production test route queued a Porto Alegre chart, the worker completed the AI draft/review and PDF generation, and the order reached `delivered` through the private Vercel email proxy.
+- PDF report responses include an explicit length, attachment filename, byte ranges, and MIME sniff protection so mobile browsers download the Essential report reliably.
 
 Social:
 

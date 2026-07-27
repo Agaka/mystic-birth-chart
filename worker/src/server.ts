@@ -58,7 +58,14 @@ createServer(async (request, response) => {
     if (!order?.reportPath) return response.writeHead(404).end();
     try {
       const file = await readFile(order.reportPath);
-      response.writeHead(200, { "content-type": "application/pdf", "content-disposition": "attachment; filename=essential-birth-chart-reading.pdf", "cache-control": "private, no-store" });
+      response.writeHead(200, {
+        "content-type": "application/pdf",
+        "content-disposition": 'attachment; filename="essential-birth-chart-reading.pdf"',
+        "content-length": String(file.byteLength),
+        "accept-ranges": "bytes",
+        "cache-control": "private, no-store",
+        "x-content-type-options": "nosniff",
+      });
       response.end(file);
     } catch {
       response.writeHead(404).end();
