@@ -38,8 +38,8 @@ const schema = {
       opening: { type: "string" },
       sections: {
         type: "array",
-        minItems: 4,
-        maxItems: 6,
+        minItems: 12,
+        maxItems: 12,
         items: {
           type: "object",
           additionalProperties: false,
@@ -67,7 +67,7 @@ const schema = {
   },
 };
 
-const rules = "Write clear, warm, traditional-first English astrology. Use only supplied facts. Do not invent placements, houses or aspects. No fatalism, guaranteed predictions, material promises, medical/legal/financial advice, generic filler, or any claim that this is hand-prepared.";
+const rules = "Write a dense, warm, traditional-first English astrology reading. Use only supplied facts. Do not invent placements, houses or aspects. No fatalism, guaranteed predictions, material promises, medical/legal/financial advice, generic filler, or any claim that this is hand-prepared. The report must feel like a complete first study within a defined scope, not a teaser: opening 220-280 words, twelve distinct sections of 150-220 words each, focus section 180-260 words, closing 150-200 words, and scope note 120-180 words. The twelve sections must cover, without repeating one another: the chart as a whole; the Sun and purpose; the Moon and emotional continuity; the Ascendant and approach; the chart ruler; sect and temperament; the natal Moon phase; the relationship between Sun, Moon, and Ascendant; the selected life focus; a practical daily observation; a grounded Hermetic interpretation; and an integrated conclusion. Explain how the supplied factors interact, vary the language, use concrete reflective examples, and never pad by repeating the same sentence.";
 
 function validSignature(request: Request, body: string): boolean {
   const secret = process.env.ESSENTIAL_WORKER_SHARED_SECRET || "";
@@ -90,7 +90,15 @@ function isFacts(value: unknown): value is ChartFacts {
 function isReport(value: unknown): value is EssentialReport {
   if (!value || typeof value !== "object") return false;
   const report = value as Record<string, unknown>;
-  return typeof report.title === "string" && typeof report.opening === "string" && Array.isArray(report.sections) && typeof report.focusSection === "object" && typeof report.closing === "string" && typeof report.scopeNote === "string";
+  const opening = typeof report.opening === "string" ? report.opening : "";
+  const sections = Array.isArray(report.sections) ? report.sections : [];
+  const focusSection = report.focusSection && typeof report.focusSection === "object" ? report.focusSection as Record<string, unknown> : null;
+  const sectionBodiesAreRich = sections.every((section) => {
+    if (!section || typeof section !== "object") return false;
+    const item = section as Record<string, unknown>;
+    return typeof item.eyebrow === "string" && typeof item.title === "string" && typeof item.body === "string" && item.body.length >= 650;
+  });
+  return typeof report.title === "string" && opening.length >= 700 && sections.length === 12 && sectionBodiesAreRich && Boolean(focusSection && typeof focusSection.body === "string" && focusSection.body.length >= 700) && typeof report.closing === "string" && report.closing.length >= 450 && typeof report.scopeNote === "string" && report.scopeNote.length >= 300;
 }
 
 async function callOpenAI(input: unknown, model: string): Promise<EssentialReport> {

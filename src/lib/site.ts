@@ -22,7 +22,7 @@ export const siteConfig = {
       delivery: "Delivered instantly by email",
       format: "Automated email reading",
       summary:
-        "An accessible automated first synthesis generated from your birth data, written to go beyond the free preview.",
+        "A dense automated first study in twelve chapters, generated from your birth data and written to go meaningfully beyond the free preview.",
       disclosure: "Generated automatically, not hand-prepared.",
     },
     love: {
