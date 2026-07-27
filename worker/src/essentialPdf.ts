@@ -112,7 +112,7 @@ export async function createEssentialPdf(facts: ChartFacts, report: EssentialRep
     overview.drawText(label, { x: x + 12, y: top - 12, size: 7, font: sansBold, color: gold });
     drawWrapped(overview, value, bold, 12.5, x + 12, top - 31, 204, 15, aubergine);
   });
-  overview.drawText("The pages that follow are twelve distinct chapters, followed by your selected focus and the boundary of this automated report.", { x: margin, y: 78, size: 9, font: sans, color: muted });
+  overview.drawText("The pages that follow are ten distinct chapters, followed by your selected focus and the boundary of this automated report.", { x: margin, y: 78, size: 9, font: sans, color: muted });
 
   chapter(doc, "Plate II / First synthesis", "The chart as a whole", report.opening, null, serif, bold, sans);
   report.sections.forEach((section, index) => chapter(doc, `Plate ${String(index + 3).padStart(2, "0")} / ${section.eyebrow}`, section.title, section.body, null, serif, bold, sans));
