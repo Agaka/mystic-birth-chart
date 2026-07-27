@@ -185,7 +185,8 @@ export async function POST(request: Request) {
     const report = await callOpenAI(input, model);
     if (!isReport(report, value.facts)) return NextResponse.json({ message: "AI report failed chart validation." }, { status: 502 });
     return NextResponse.json({ report });
-  } catch {
+  } catch (error) {
+    console.error("essential-ai-generation-failed", error instanceof Error ? error.message : error);
     return NextResponse.json({ message: "AI generation failed." }, { status: 502 });
   }
 }
