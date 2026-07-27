@@ -199,10 +199,11 @@ export async function POST(request: Request) {
     const report = await callOpenAI(input, model);
     if (!isReport(report, value.facts)) {
       const candidate = report as unknown as Partial<EssentialReport>;
+      const facts = value.facts as ChartFacts;
       const applications = candidate.applications;
       const purpose = applications?.purposeAndWork?.body?.toLowerCase() || "";
       const relationships = applications?.relationshipsAndBoundaries?.body?.toLowerCase() || "";
-      const ascendantIndex = zodiac.indexOf(value.facts.chart.angles.ascendant.sign);
+      const ascendantIndex = zodiac.indexOf(facts.chart.angles.ascendant.sign);
       const tenthRuler = rulers[zodiac[(ascendantIndex + 9) % 12]];
       const seventhRuler = rulers[zodiac[(ascendantIndex + 6) % 12]];
       console.error("essential-ai-chart-validation-failed", {
@@ -210,12 +211,12 @@ export async function POST(request: Request) {
         chartSentenceLength: candidate.chartSentence?.length,
         chartOverviewLength: candidate.chartOverview?.length,
         hasOneSentence: candidate.chartSentence ? oneSentence(candidate.chartSentence) : false,
-        titlesMatch: candidate.dominantSignatures?.every((signature, index) => signature.title === value.facts.chart.dominantSignatures[index]?.title),
+        titlesMatch: candidate.dominantSignatures?.every((signature, index) => signature.title === facts.chart.dominantSignatures[index]?.title),
         hasDecimalNotation: /\b\d+\.\d+\s*(?:degrees?|orb)\b/i.test(JSON.stringify(candidate)),
         hasNeutral: /\bneutral\b/i.test(JSON.stringify(candidate)),
-        purposeRequirements: ["tenth whole-sign house", "midheaven", tenthRuler.toLowerCase(), value.facts.chart.chartRuler.toLowerCase()].map((phrase) => purpose.includes(phrase)),
-        relationshipRequirements: ["seventh whole-sign house", seventhRuler.toLowerCase(), (value.facts as ChartFacts).chart.sect.toLowerCase()].map((phrase) => relationships.includes(phrase)),
-        supportedAspectClaims: hasSupportedAspectClaims(JSON.stringify(candidate), value.facts),
+        purposeRequirements: ["tenth whole-sign house", "midheaven", tenthRuler.toLowerCase(), facts.chart.chartRuler.toLowerCase()].map((phrase) => purpose.includes(phrase)),
+        relationshipRequirements: ["seventh whole-sign house", seventhRuler.toLowerCase(), facts.chart.sect.toLowerCase()].map((phrase) => relationships.includes(phrase)),
+        supportedAspectClaims: hasSupportedAspectClaims(JSON.stringify(candidate), facts),
       });
       return NextResponse.json({ message: "AI report failed chart validation." }, { status: 502 });
     }
