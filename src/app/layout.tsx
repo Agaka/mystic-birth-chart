@@ -110,6 +110,7 @@ export default function RootLayout({
         <a className="skip-link" href="#main-content">
           Skip to main content
         </a>
+        <script async src="https://cdn.promotekit.com/pk.js" data-promotekit="36a5b3dd-ba79-47d0-a3f6-60f19d17c20f"></script>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

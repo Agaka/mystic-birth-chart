@@ -149,6 +149,7 @@ export function CheckoutForm({
           notes: checkoutDraft.notes,
           partnerData: checkoutDraft.partnerData || "",
           newsletter: checkoutDraft.newsletter,
+          promotekitReferral: (window as any).promotekit_referral,
         }),
       });
 

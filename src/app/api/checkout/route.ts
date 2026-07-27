@@ -22,6 +22,7 @@ export async function POST(request: Request) {
     notes?: string;
     partnerData?: string;
     newsletter?: boolean;
+    promotekitReferral?: string;
   };
 
   if (!isReadingTier(body.tier)) {
@@ -36,6 +37,10 @@ export async function POST(request: Request) {
   const focus = String(body.focus || "general").trim().slice(0, 60);
   const notes = String(body.notes || "").trim().slice(0, 450);
   const partnerData = String(body.partnerData || "").trim().slice(0, 450);
+  const promotekitReferral =
+    typeof body.promotekitReferral === "string"
+      ? body.promotekitReferral.trim().slice(0, 500)
+      : "";
   if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !birthDate || !birthCity || (body.tier === "basic" && !birthTime)) {
     return NextResponse.json(
       { message: "Enter a valid name and email before continuing." },
@@ -63,7 +68,7 @@ export async function POST(request: Request) {
     const isSubscription = offer.isSubscription;
 
     const checkoutParams: Stripe.Checkout.SessionCreateParams = {
-      mode: isSubscription ? "subscription" : "payment",
+      mode: "payment",
       customer_email: email,
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${siteUrl}/thank-you?tier=${offer.tier}&session_id={CHECKOUT_SESSION_ID}`,
@@ -81,6 +86,7 @@ export async function POST(request: Request) {
         partner_data: partnerData,
         newsletter_opt_in: body.newsletter ? "yes" : "no",
         fulfillment_status: "pending",
+        ...(promotekitReferral ? { promotekit_referral: promotekitReferral } : {}),
       },
       ...(isSubscription
         ? {
@@ -99,6 +105,7 @@ export async function POST(request: Request) {
                 birth_date: birthDate,
                 birth_time: birthTime,
                 birth_city: birthCity,
+                ...(promotekitReferral ? { promotekit_referral: promotekitReferral } : {}),
               },
             },
           }),
