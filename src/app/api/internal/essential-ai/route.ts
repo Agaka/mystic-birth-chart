@@ -198,7 +198,8 @@ export async function POST(request: Request) {
     if (value.operation === "review" && !hasReportShape(value.draft)) return NextResponse.json({ message: "Invalid draft." }, { status: 400 });
     const report = await callOpenAI(input, model);
     if (!isReport(report, value.facts)) {
-      console.error("essential-ai-chart-validation-failed", { title: report.title, chartSentenceLength: report.chartSentence.length, chartOverviewLength: report.chartOverview.length });
+      const candidate = report as unknown as Partial<EssentialReport>;
+      console.error("essential-ai-chart-validation-failed", { title: candidate.title, chartSentenceLength: candidate.chartSentence?.length, chartOverviewLength: candidate.chartOverview?.length });
       return NextResponse.json({ message: "AI report failed chart validation." }, { status: 502 });
     }
     return NextResponse.json({ report });
