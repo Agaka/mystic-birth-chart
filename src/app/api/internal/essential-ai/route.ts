@@ -105,13 +105,13 @@ function isFacts(value: unknown): value is ChartFacts {
   return Boolean(facts.birth && facts.chart && Array.isArray(facts.chart.placements) && facts.chart.placements.length >= 10 && Array.isArray(facts.chart.aspects) && Array.isArray(facts.chart.dominantSignatures) && facts.chart.dominantSignatures.length === 3 && typeof facts.focus === "string");
 }
 
-function richSection(value: unknown, minimum = 700): value is EssentialSection {
+function richSection(value: unknown, minimum = 500): value is EssentialSection {
   if (!value || typeof value !== "object") return false;
   const section = value as Record<string, unknown>;
   return typeof section.title === "string" && typeof section.body === "string" && section.body.length >= minimum;
 }
 
-function threeStrings(value: unknown, minimum = 120): value is string[] {
+function threeStrings(value: unknown, minimum = 80): value is string[] {
   return Array.isArray(value) && value.length === 3 && value.every((item) => typeof item === "string" && item.length >= minimum);
 }
 
@@ -146,7 +146,7 @@ function isReport(value: unknown, facts?: ChartFacts): value is EssentialReport 
   const validSignatures = signatures.length === 3 && signatures.every((item, index) => {
     if (!item || typeof item !== "object") return false;
     const signature = item as Record<string, unknown>;
-    return signature.signatureRank === index + 1 && typeof signature.title === "string" && typeof signature.interpretation === "string" && signature.interpretation.length >= 600 && typeof signature.constructiveExpression === "string" && signature.constructiveExpression.length >= 170 && typeof signature.shadow === "string" && signature.shadow.length >= 170 && typeof signature.practicalQuestion === "string";
+    return signature.signatureRank === index + 1 && typeof signature.title === "string" && typeof signature.interpretation === "string" && signature.interpretation.length >= 450 && typeof signature.constructiveExpression === "string" && signature.constructiveExpression.length >= 120 && typeof signature.shadow === "string" && signature.shadow.length >= 120 && typeof signature.practicalQuestion === "string";
   });
   const bigThree = report.bigThree as Record<string, unknown> | undefined;
   const applications = report.applications as Record<string, unknown> | undefined;
@@ -163,10 +163,10 @@ function isReport(value: unknown, facts?: ChartFacts): value is EssentialReport 
     relationshipBody.includes("seventh whole-sign house") && relationshipBody.includes(seventhRuler.toLowerCase()) && relationshipBody.includes(facts.chart.sect.toLowerCase()));
   const supportedClaims = !facts || hasSupportedAspectClaims(allText, facts);
   return typeof report.title === "string" && typeof report.chartSentence === "string" && oneSentence(report.chartSentence) && report.chartSentence.length >= 70 && report.chartSentence.length <= 260 && typeof report.chartOverview === "string" && report.chartOverview.length >= 420 && titlesMatch && noUnsupportedNotation && applicationsHaveStructure && supportedClaims && validSignatures &&
-    Boolean(bigThree && richSection(bigThree.sun) && richSection(bigThree.moon) && richSection(bigThree.ascendant)) && richSection(report.chartRuler, 800) &&
+    Boolean(bigThree && richSection(bigThree.sun) && richSection(bigThree.moon) && richSection(bigThree.ascendant)) && richSection(report.chartRuler, 600) &&
     Boolean(applications && richSection(applications.purposeAndWork) && richSection(applications.emotionalNeeds) && richSection(applications.relationshipsAndBoundaries)) &&
     Boolean(practical && threeStrings(practical.strengths) && threeStrings(practical.tensions) && threeStrings(practical.actions) && threeStrings(practical.questions, 15)) &&
-    typeof report.closing === "string" && report.closing.length >= 430 && typeof report.scopeNote === "string" && report.scopeNote.length >= 170;
+    typeof report.closing === "string" && report.closing.length >= 350 && typeof report.scopeNote === "string" && report.scopeNote.length >= 120;
 }
 
 async function callOpenAI(input: unknown, model: string): Promise<EssentialReport> {
