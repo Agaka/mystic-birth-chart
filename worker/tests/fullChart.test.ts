@@ -52,3 +52,9 @@ test("finds tight aspects and ranks chart-specific dominant signatures", () => {
   assert.match(evidence, /Sun.*Mars|Mars.*Sun/);
   assert.match(evidence, /Sun.*Uranus|Saturn.*Uranus/);
 });
+
+test("uses the Sun's observed altitude for sect near the horizon", () => {
+  const chart = calculateFullChart({ ...birth, time: "07:00" });
+
+  assert.equal(chart.sect, "Day chart");
+});

@@ -148,7 +148,9 @@ export function calculateFullChart(input: FullChartInput): FullChart {
   const chartRuler = traditionalRulers[ascendantSign];
   const sun = placements.find((item) => item.body === "Sun")!;
   const moon = placements.find((item) => item.body === "Moon")!;
-  const sunAboveHorizon = ((sun.house >= 7 && sun.house <= 12));
+  const observer = new Astronomy.Observer(input.latitude, input.longitude, 0);
+  const equatorialSun = Astronomy.Equator(Astronomy.Body.Sun, instant.date, observer, true, true);
+  const sunAboveHorizon = Astronomy.Horizon(instant.date, observer, equatorialSun.ra, equatorialSun.dec, "normal").altitude >= 0;
   return {
     utc: instant.date.toISOString(), utcOffset: instant.utcOffset, zodiac: "Tropical", houseSystem: "Whole Sign",
     coordinates: { latitude: input.latitude, longitude: input.longitude },
