@@ -9,6 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "astronomy-engine": "^2.1.19",
     "better-sqlite3": "^12.4.1",
     "nodemailer": "^9.0.3",
     "openai": "^6.48.0",

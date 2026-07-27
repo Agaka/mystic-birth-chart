@@ -1,7 +1,25 @@
 import type { ChartFacts } from "./chartFacts.ts";
 
-export interface EssentialSection { eyebrow: string; title: string; body: string; }
-export interface EssentialReport { title: string; opening: string; sections: EssentialSection[]; focusSection: EssentialSection; closing: string; scopeNote: string; }
+export interface EssentialSection { title: string; body: string; }
+export interface EssentialSignature {
+  signatureRank: number;
+  title: string;
+  interpretation: string;
+  constructiveExpression: string;
+  shadow: string;
+  practicalQuestion: string;
+}
+export interface EssentialReport {
+  title: string;
+  chartSentence: string;
+  dominantSignatures: EssentialSignature[];
+  bigThree: { sun: EssentialSection; moon: EssentialSection; ascendant: EssentialSection };
+  chartRuler: EssentialSection;
+  applications: { purposeAndWork: EssentialSection; emotionalNeeds: EssentialSection; relationshipsAndBoundaries: EssentialSection };
+  practicalDirection: { strengths: string[]; tensions: string[]; actions: string[]; questions: string[] };
+  closing: string;
+  scopeNote: string;
+}
 
 import { createHmac } from "node:crypto";
 

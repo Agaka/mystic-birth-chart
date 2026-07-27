@@ -57,12 +57,14 @@ The primary paid products are an automated entry reading and a hand-prepared com
 - Format: automated email reading
 - Disclosure: must be clearly described as generated automatically, not hand-prepared
 - Scope:
-  - First natal chart synthesis
-  - Sun, Moon, Rising
-  - Chart ruler
-  - Sect/day or night chart
-  - First core themes connected to the selected focus
-  - Clear practical English
+  - Complete calculated natal figure with exact degrees and whole-sign houses
+  - Natal wheel and technical calculation record
+  - Three automatically ranked dominant chart signatures
+  - Sun, Moon, Rising, chart ruler, sect, dignity, angularity, and key aspects in context
+  - Purpose/work, emotional needs, and relationships/boundaries applications
+  - Strengths, tensions, practical actions, and reflection questions
+  - Focused 17-page PDF in clear practical English
+  - The narrow promise is complete in itself: understand the three patterns that most strongly organize the chart
 
 Important naming rule:
 

@@ -1,11 +1,15 @@
-import { calculateNatalSnapshot } from "../../src/lib/natalSnapshot.ts";
+import { calculateFullChart, type FullChart } from "./fullChart.ts";
 import type { WorkerEssentialJob } from "./store.ts";
 
 interface Place { label: string; latitude: number; longitude: number; timezone: string; }
 
 export interface ChartFacts {
-  sun: string; moon: string; rising: string; chartRuler: string;
-  sect: "Day chart" | "Night chart"; moonPhase: string; focus: string; calculationLimit: string;
+  birth: {
+    date: string; time: string; location: string; timezone: string; utcOffset: number;
+    latitude: number; longitude: number;
+  };
+  chart: FullChart;
+  focus: string;
 }
 
 async function locate(city: string): Promise<Place> {
@@ -19,6 +23,10 @@ async function locate(city: string): Promise<Place> {
 
 export async function buildChartFacts(job: WorkerEssentialJob): Promise<ChartFacts> {
   const place = await locate(job.birth.city);
-  const snapshot = calculateNatalSnapshot({ date: job.birth.date, time: job.birth.time, latitude: place.latitude, longitude: place.longitude, timezone: place.timezone });
-  return { sun: `${snapshot.sunSign} Sun`, moon: `${snapshot.moonSign} Moon`, rising: `${snapshot.risingSign} Rising`, chartRuler: snapshot.chartRuler, sect: snapshot.sect, moonPhase: snapshot.moonPhase.name, focus: job.focus, calculationLimit: "This automated Essential reading interprets Sun, Moon, Rising, chart ruler, sect, Moon phase, and the selected focus. It does not claim a complete house, aspect, dignity, or predictive judgment." };
+  const chart = calculateFullChart({ date: job.birth.date, time: job.birth.time, latitude: place.latitude, longitude: place.longitude, timezone: place.timezone });
+  return {
+    birth: { date: job.birth.date, time: job.birth.time, location: place.label, timezone: place.timezone, utcOffset: chart.utcOffset, latitude: place.latitude, longitude: place.longitude },
+    chart,
+    focus: job.focus,
+  };
 }
