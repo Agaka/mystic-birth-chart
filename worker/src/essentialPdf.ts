@@ -172,9 +172,11 @@ export async function createEssentialPdf(facts: ChartFacts, report: EssentialRep
 
   const dataPage = addPage(doc, texture, fonts);
   y = pageTitle(dataPage, "Plate 02 / Calculation record", "The chart used for this reading", fonts);
+  const utcInstant = new Date(facts.chart.utc).toISOString().replace("T", " at ").slice(0, 19) + " UTC";
   const rows = [
     ["Birth date and time", `${facts.birth.date} at ${facts.birth.time}`], ["Birthplace", facts.birth.location],
     ["Time zone", `${facts.birth.timezone} (UTC${facts.birth.utcOffset >= 0 ? "+" : ""}${facts.birth.utcOffset})`],
+    ["Converted instant", utcInstant],
     ["Coordinates", `${facts.birth.latitude.toFixed(4)}, ${facts.birth.longitude.toFixed(4)}`],
     ["Framework", `${facts.chart.zodiac} zodiac / ${facts.chart.houseSystem} houses`],
     ["Ascendant", `${formatDegree(facts.chart.angles.ascendant.degree)} ${facts.chart.angles.ascendant.sign}`],
@@ -182,14 +184,18 @@ export async function createEssentialPdf(facts: ChartFacts, report: EssentialRep
     ["Sect and lunar phase", `${facts.chart.sect} / ${facts.chart.moonPhase.name} (${facts.chart.moonPhase.angle.toFixed(1)} deg)`],
   ];
   rows.forEach(([label, value], index) => {
-    const rowY = y - index * 48;
+    const rowY = y - index * 43;
     dataPage.drawText(label.toUpperCase(), { x: MARGIN, y: rowY, size: 7, font: fonts.sansBold, color: gold });
     drawWrapped(dataPage, value, fonts.bold, 11.5, MARGIN + 150, rowY, WIDTH - MARGIN * 2 - 150, 14, aubergine);
     dataPage.drawLine({ start: { x: MARGIN, y: rowY - 15 }, end: { x: WIDTH - MARGIN, y: rowY - 15 }, thickness: 0.45, color: parchmentDark });
   });
   dataPage.drawRectangle({ x: MARGIN, y: 91, width: WIDTH - MARGIN * 2, height: 98, color: deep });
   dataPage.drawText("BEFORE YOU READ", { x: MARGIN + 18, y: 166, size: 7, font: fonts.sansBold, color: parchmentDark });
-  drawWrapped(dataPage, "Birth time controls the Ascendant, houses, chart ruler, and angularity. Keep this page with the report and verify the recorded time against the most reliable source available.", fonts.serif, 10.5, MARGIN + 18, 143, WIDTH - MARGIN * 2 - 36, 15, parchment);
+  const ascendantDegree = facts.chart.angles.ascendant.degree;
+  const cuspWarning = ascendantDegree < 2 || ascendantDegree > 28
+    ? " The Ascendant is close to a sign boundary, so even a small time correction may change the rising sign."
+    : "";
+  drawWrapped(dataPage, `Birth time controls the Ascendant, houses, chart ruler, and angularity. Keep this page with the report and verify the recorded time against the most reliable source available.${cuspWarning}`, fonts.serif, 10.5, MARGIN + 18, 143, WIDTH - MARGIN * 2 - 36, 15, parchment);
 
   const wheelPage = addPage(doc, texture, fonts);
   pageTitle(wheelPage, "Plate 03 / Natal figure", "Your calculated chart", fonts);
