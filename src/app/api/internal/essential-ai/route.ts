@@ -2,7 +2,7 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 type EssentialSection = { title: string; body: string };
 type EssentialSignature = { signatureRank: number; title: string; interpretation: string; constructiveExpression: string; shadow: string; practicalQuestion: string };

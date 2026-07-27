@@ -44,7 +44,7 @@ async function callProxy(operation: "write" | "review", facts: ChartFacts, draft
       "x-mystic-signature": sign(endpoint.pathname, timestamp, body, secret),
     },
     body,
-      signal: AbortSignal.timeout(58_000),
+    signal: AbortSignal.timeout(280_000),
   });
   if (!response.ok) throw new Error(`ai-proxy-http-${response.status}`);
   const payload = await response.json() as ProxyResponse;
