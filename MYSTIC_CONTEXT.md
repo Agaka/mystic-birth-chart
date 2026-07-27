@@ -1240,6 +1240,7 @@ Newsletter:
 - The test route is intended for a controlled Essential fulfillment test without a Stripe charge. After a production deployment, use it once and confirm the PDF email and worker logs before declaring the purchase path complete.
 - Controlled no-charge fulfillment test succeeded on 2026-07-27: the production test route queued a Porto Alegre chart, the worker completed the AI draft/review and PDF generation, and the order reached `delivered` through the private Vercel email proxy.
 - PDF report responses include an explicit length, attachment filename, byte ranges, and MIME sniff protection so mobile browsers download the Essential report reliably.
+- Essential report links first open a branded HTML landing page; its visible `Download your PDF` button points to the dedicated `/reports/:token/download` endpoint. This avoids relying on a mobile browser's broken inline PDF viewer.
 
 Social:
 

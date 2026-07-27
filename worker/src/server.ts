@@ -27,6 +27,16 @@ function json(response: ServerResponse, status: number, value: unknown): void {
   response.end(JSON.stringify(value));
 }
 
+function escapeHtml(value: string): string {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
+function reportLandingPage(response: ServerResponse, token: string): void {
+  const downloadPath = `/reports/${encodeURIComponent(token)}/download`;
+  response.writeHead(200, { "content-type": "text/html; charset=utf-8", "cache-control": "private, no-store", "x-content-type-options": "nosniff" });
+  response.end(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Your Essential Reading is ready | Mystic Birth Chart</title><style>body{margin:0;background:#140f0b;color:#f4ead7;font-family:Georgia,serif;min-height:100vh;display:grid;place-items:center;padding:24px;box-sizing:border-box}.panel{width:min(620px,100%);box-sizing:border-box;background:#f7efdf;color:#301b17;border:1px solid #b88a3a;padding:44px 32px;text-align:center}.seal{width:82px;height:82px;object-fit:contain;margin-bottom:20px}.eyebrow{font:700 11px Arial,sans-serif;letter-spacing:2px;color:#9b742e}.title{font-size:36px;line-height:1.15;font-weight:500;margin:12px 0 18px}.copy{font-size:17px;line-height:1.7;margin:0 auto 28px;max-width:480px}.button{display:inline-block;background:#b88a3a;color:#140f0b;padding:15px 24px;text-decoration:none;font:700 14px Arial,sans-serif}.note{font:13px Arial,sans-serif;line-height:1.6;color:#624d42;margin:24px auto 0;max-width:460px}</style></head><body><main class="panel"><img class="seal" src="https://mysticbirthchart.com/brand/mystic-astrolabe-seal-transparent.png" alt="Mystic Birth Chart astrolabe seal"><div class="eyebrow">AUTOMATED FIRST SYNTHESIS</div><h1 class="title">Your Essential Reading is ready.</h1><p class="copy">Your personalized PDF has been prepared from the birth details you submitted.</p><a class="button" href="${escapeHtml(downloadPath)}" download>Download your PDF</a><p class="note">This is an automated Essential reading, delivered instantly by email. The PDF download opens separately so it can be saved to your device.</p></main></body></html>`);
+}
+
 createServer(async (request, response) => {
   const path = new URL(request.url || "/", "http://worker").pathname;
   if (request.method === "GET" && path === "/healthz") return json(response, 200, { ok: true });
@@ -54,8 +64,12 @@ createServer(async (request, response) => {
   }
 
   if (request.method === "GET" && path.startsWith("/reports/")) {
-    const order = store.findByToken(path.slice("/reports/".length));
+    const rawToken = path.slice("/reports/".length);
+    const isDownload = rawToken.endsWith("/download");
+    const token = isDownload ? rawToken.slice(0, -"/download".length) : rawToken;
+    const order = store.findByToken(decodeURIComponent(token));
     if (!order?.reportPath) return response.writeHead(404).end();
+    if (!isDownload) return reportLandingPage(response, token);
     try {
       const file = await readFile(order.reportPath);
       response.writeHead(200, {
