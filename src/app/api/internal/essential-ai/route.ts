@@ -7,7 +7,7 @@ export const maxDuration = 300;
 type EssentialSection = { title: string; body: string };
 type EssentialSignature = { signatureRank: number; title: string; interpretation: string; constructiveExpression: string; shadow: string; practicalQuestion: string };
 type EssentialReport = {
-  title: string; chartSentence: string; dominantSignatures: EssentialSignature[];
+  title: string; chartSentence: string; chartOverview: string; dominantSignatures: EssentialSignature[];
   bigThree: { sun: EssentialSection; moon: EssentialSection; ascendant: EssentialSection };
   chartRuler: EssentialSection;
   applications: { purposeAndWork: EssentialSection; emotionalNeeds: EssentialSection; relationshipsAndBoundaries: EssentialSection };
@@ -20,9 +20,9 @@ type ChartFacts = {
   chart: {
     zodiac: string; houseSystem: string; chartRuler: string; sect: string;
     angles: { ascendant: { longitude: number; sign: string; degree: number }; midheaven: { longitude: number; sign: string; degree: number } };
-    placements: Array<{ body: string; longitude: number; sign: string; degree: number; house: number; dignity: string }>;
+    placements: Array<{ body: string; longitude: number; sign: string; degree: number; house: number; dignity: string; dignities?: string[] }>;
     aspects: Array<{ body1: string; body2: string; type: string; orb: number }>;
-    dominantSignatures: Array<{ rank: number; title: string; evidence: string; score: number }>;
+    dominantSignatures: Array<{ rank: number; title: string; evidence: string; supportingModernEvidence?: string[]; score: number }>;
     moonPhase: { name: string; angle: number; illumination: number };
   };
   focus: string;
@@ -39,9 +39,9 @@ const schema = {
   strict: true,
   schema: {
     type: "object", additionalProperties: false,
-    required: ["title", "chartSentence", "dominantSignatures", "bigThree", "chartRuler", "applications", "practicalDirection", "closing", "scopeNote"],
+    required: ["title", "chartSentence", "chartOverview", "dominantSignatures", "bigThree", "chartRuler", "applications", "practicalDirection", "closing", "scopeNote"],
     properties: {
-      title: { type: "string" }, chartSentence: { type: "string" },
+      title: { type: "string" }, chartSentence: { type: "string" }, chartOverview: { type: "string" },
       dominantSignatures: {
         type: "array", minItems: 3, maxItems: 3,
         items: {
@@ -76,13 +76,17 @@ const schema = {
   },
 };
 
-const rules = `Write a premium automated Essential Birth Chart Reading in warm, precise English. It must be complete within one narrow promise: identify and interpret the three calculated patterns that most strongly organize this chart. Use only the supplied calculated chart. Never invent a degree, house, aspect, dignity, biography, event, or prediction.
+const rules = `Write a premium automated Essential Birth Chart Reading in warm, precise English. It must be complete within one narrow promise: identify and interpret the three calculated patterns that most strongly organize this chart. Use only the calculated chart JSON. Never invent a degree, house, aspect, dignity, ruler, biography, event, or prediction.
 
-Use traditional astrology as the technical foundation: whole-sign houses, sign rulers, chart ruler, angularity, sect, essential dignity, and repeated testimony. Modern planets may be discussed only when they form one of the three supplied dominant signatures, and must be framed as a secondary modern layer. Treat the supplied technical data as authoritative. Never call the chart factors "supplied factors", never say data "was not supplied", and never expose software limitations.
+Traditional-first hierarchy is mandatory. Treat the ranked dominant signatures as authoritative: they already prioritize chart ruler and its condition, sect light, angles and angular planets, relevant house rulers, essential dignity or debility, close traditional aspects, dispositors, and repeated testimony. Uranus, Neptune, and Pluto are secondary modern layers only. Discuss one only when it appears in supportingModernEvidence for the same signature, never as a standalone dominant signature and never ahead of stronger traditional testimony.
 
-The report must feel personal because every claim is tied to named evidence, not because it guesses private facts. Translate technique into recognizable life patterns, constructive expression, possible imbalance, and practical reflection. Avoid Barnum language, filler, repeated summaries, fatalism, guaranteed outcomes, therapy diagnosis, or medical/legal/financial advice. Do not market another product inside the interpretation. Mention automation only once in the final scope note.
+Use whole-sign houses and traditional rulers. State every degree and orb as 25°28′ Leo or 0°46′ orb, never as decimal degrees. Use every dignity listed in dignities; Mercury in Virgo must be called both domicile and exaltation. Say "no major essential dignity" instead of "neutral". Do not expose software limitations or call chart facts supplied factors.
 
-Length and structure: chartSentence 100-140 words. Three dominant signatures in rank order; each interpretation 180-230 words, constructiveExpression 55-80 words, shadow 55-80 words, plus one precise question. Big Three sections 220-280 words each and must include exact degree, whole-sign house, dignity where relevant, ruler, and major aspects from the facts. Chart ruler 260-330 words describing its actual sign, house, dignity, sect relationship, and aspects. Three application sections 230-290 words each, grounded in repeated chart testimony rather than one placement. Practical strengths, tensions, and actions: exactly three items per list, 45-70 words each; questions: exactly three. Closing 140-190 words. Scope note 55-85 words and state only that the reading was generated immediately from the calculated natal chart as a focused interpretation of its principal patterns.`;
+The chartSentence must be exactly one memorable sentence, 18-38 words. chartOverview is the longer 95-125 word explanation beneath it. The three signature titles must exactly match the calculated dominant signature titles. Each signature interpretation gives the complete technical evidence once; later chapters must become concrete and experiential rather than repeat the same degrees and orbs.
+
+Purpose and work must begin with the tenth whole-sign house, Midheaven, ruler of the tenth, planets in the tenth, and their relationship with the chart ruler before practical conclusions. Relationships and boundaries must begin with the seventh whole-sign house, its traditional ruler, and that ruler's sign, house, dignity, sect condition, and main aspects before integrating Venus, Moon, and repeated testimony.
+
+Avoid Barnum language, filler, fatalism, guaranteed outcomes, therapy diagnosis, and medical/legal/financial advice. Mention automation only once in the final scope note. Keep the scope note short, clear, and natural. Length: each signature interpretation 180-230 words, constructiveExpression 55-80, shadow 55-80; Big Three 220-280; chart ruler 260-330; applications 230-290; three practical strengths, tensions, and actions 45-70 words each; closing 140-190; scope note 40-65 words.`;
 
 function validSignature(request: Request, body: string): boolean {
   const secret = process.env.ESSENTIAL_WORKER_SHARED_SECRET || "";
@@ -111,7 +115,17 @@ function threeStrings(value: unknown, minimum = 120): value is string[] {
   return Array.isArray(value) && value.length === 3 && value.every((item) => typeof item === "string" && item.length >= minimum);
 }
 
-function isReport(value: unknown): value is EssentialReport {
+const rulers: Record<string, string> = { Aries: "Mars", Taurus: "Venus", Gemini: "Mercury", Cancer: "Moon", Leo: "Sun", Virgo: "Mercury", Libra: "Venus", Scorpio: "Mars", Sagittarius: "Jupiter", Capricorn: "Saturn", Aquarius: "Saturn", Pisces: "Jupiter" };
+const zodiac = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+function houseSign(facts: ChartFacts, house: number): string { const asc = zodiac.indexOf(facts.chart.angles.ascendant.sign); return zodiac[(asc + house - 1) % 12]; }
+function oneSentence(value: string): boolean { return value.trim().split(/[.!?]+(?:\s|$)/).filter(Boolean).length === 1; }
+function hasSupportedAspectClaims(text: string, facts: ChartFacts): boolean {
+  const words: Record<string, string> = { conjunct: "conjunction", conjunction: "conjunction", sextile: "sextile", sextiles: "sextile", square: "square", squares: "square", trine: "trine", trines: "trine", opposite: "opposition", opposes: "opposition", opposition: "opposition" };
+  const pattern = /\b(?:the )?(Sun|Moon|Mercury|Venus|Mars|Jupiter|Saturn|Uranus|Neptune|Pluto)\s+(conjunct|conjunction|sextile|sextiles|square|squares|trine|trines|opposite|opposes|opposition)\s+(?:the )?(Sun|Moon|Mercury|Venus|Mars|Jupiter|Saturn|Uranus|Neptune|Pluto|Ascendant|Midheaven)\b/gi;
+  return [...text.matchAll(pattern)].every((match) => facts.chart.aspects.some((aspect) => aspect.type === words[match[2].toLowerCase()] && [aspect.body1, aspect.body2].includes(match[1]) && [aspect.body1, aspect.body2].includes(match[3])));
+}
+
+function isReport(value: unknown, facts?: ChartFacts): value is EssentialReport {
   if (!value || typeof value !== "object") return false;
   const report = value as Record<string, unknown>;
   const signatures = Array.isArray(report.dominantSignatures) ? report.dominantSignatures : [];
@@ -123,7 +137,18 @@ function isReport(value: unknown): value is EssentialReport {
   const bigThree = report.bigThree as Record<string, unknown> | undefined;
   const applications = report.applications as Record<string, unknown> | undefined;
   const practical = report.practicalDirection as Record<string, unknown> | undefined;
-  return typeof report.title === "string" && typeof report.chartSentence === "string" && report.chartSentence.length >= 330 && validSignatures &&
+  const titlesMatch = !facts || signatures.every((item, index) => item && typeof item === "object" && (item as Record<string, unknown>).title === facts.chart.dominantSignatures[index]?.title);
+  const allText = JSON.stringify(report);
+  const noUnsupportedNotation = !/\b\d+\.\d+\s*(?:degrees?|orb)\b/i.test(allText) && !/\bneutral\b/i.test(allText);
+  const tenthRuler = rulers[houseSign(facts || { chart: { angles: { ascendant: { sign: "Aries" } } } } as ChartFacts, 10)];
+  const seventhRuler = rulers[houseSign(facts || { chart: { angles: { ascendant: { sign: "Aries" } } } } as ChartFacts, 7)];
+  const purposeBody = String((applications?.purposeAndWork as Record<string, unknown> | undefined)?.body || "").toLowerCase();
+  const relationshipBody = String((applications?.relationshipsAndBoundaries as Record<string, unknown> | undefined)?.body || "").toLowerCase();
+  const applicationsHaveStructure = !facts || (typeof applications?.purposeAndWork === "object" && typeof applications?.relationshipsAndBoundaries === "object" &&
+    purposeBody.includes("tenth whole-sign house") && purposeBody.includes("midheaven") && purposeBody.includes(tenthRuler.toLowerCase()) && purposeBody.includes(facts.chart.chartRuler.toLowerCase()) &&
+    relationshipBody.includes("seventh whole-sign house") && relationshipBody.includes(seventhRuler.toLowerCase()) && relationshipBody.includes(facts.chart.sect.toLowerCase()));
+  const supportedClaims = !facts || hasSupportedAspectClaims(allText, facts);
+  return typeof report.title === "string" && typeof report.chartSentence === "string" && oneSentence(report.chartSentence) && report.chartSentence.length >= 70 && report.chartSentence.length <= 260 && typeof report.chartOverview === "string" && report.chartOverview.length >= 420 && titlesMatch && noUnsupportedNotation && applicationsHaveStructure && supportedClaims && validSignatures &&
     Boolean(bigThree && richSection(bigThree.sun) && richSection(bigThree.moon) && richSection(bigThree.ascendant)) && richSection(report.chartRuler, 800) &&
     Boolean(applications && richSection(applications.purposeAndWork) && richSection(applications.emotionalNeeds) && richSection(applications.relationshipsAndBoundaries)) &&
     Boolean(practical && threeStrings(practical.strengths) && threeStrings(practical.tensions) && threeStrings(practical.actions) && threeStrings(practical.questions, 15)) &&
@@ -157,7 +182,9 @@ export async function POST(request: Request) {
       ? [{ role: "system", content: `${rules}\nReturn only the structured Essential report.` }, { role: "user", content: JSON.stringify(value.facts) }]
       : [{ role: "system", content: `${rules}\nAct as a rigorous senior astrology editor. Verify every technical claim against the facts, remove repetition and generic language, preserve the three ranked signatures, and return a fully rewritten compliant report.` }, { role: "user", content: JSON.stringify({ facts: value.facts, draft: value.draft }) }];
     if (value.operation === "review" && !isReport(value.draft)) return NextResponse.json({ message: "Invalid draft." }, { status: 400 });
-    return NextResponse.json({ report: await callOpenAI(input, model) });
+    const report = await callOpenAI(input, model);
+    if (!isReport(report, value.facts)) return NextResponse.json({ message: "AI report failed chart validation." }, { status: 502 });
+    return NextResponse.json({ report });
   } catch {
     return NextResponse.json({ message: "AI generation failed." }, { status: 502 });
   }

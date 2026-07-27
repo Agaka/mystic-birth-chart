@@ -27,7 +27,8 @@ const facts = {
 };
 const report: EssentialReport = {
   title: "The Three Patterns Governing Your Chart",
-  chartSentence: prose(125),
+  chartSentence: "A concise statement of the chart's governing pattern.",
+  chartOverview: prose(110),
   dominantSignatures: chart.dominantSignatures.map((signature, index) => ({
     signatureRank: signature.rank, title: signature.title, interpretation: prose(205, index),
     constructiveExpression: prose(62, index + 2), shadow: prose(62, index + 4),

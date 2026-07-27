@@ -16,7 +16,8 @@ const facts = {
 test("Essential PDF renders the complete narrow promise as a substantial keepsake", async () => {
   const report = {
     title: "The Three Patterns Governing Your Chart",
-    chartSentence: paragraph,
+    chartSentence: "A concise statement of the chart's governing pattern.",
+    chartOverview: paragraph,
     dominantSignatures: chart.dominantSignatures.map((signature) => ({
       signatureRank: signature.rank, title: signature.title, interpretation: paragraph,
       constructiveExpression: paragraph, shadow: paragraph, practicalQuestion: "What would this pattern look like when used deliberately?",

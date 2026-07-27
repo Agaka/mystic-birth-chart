@@ -18,7 +18,7 @@ const deep = rgb(0.19, 0.095, 0.075);
 type Fonts = { serif: PDFFont; bold: PDFFont; italic: PDFFont; sans: PDFFont; sansBold: PDFFont };
 
 function safeText(value: string): string {
-  return value.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[\u2010-\u2015]/g, "-").replace(/[\u2018\u2019]/g, "'").replace(/[\u201c\u201d]/g, '"').replace(/[^\x20-\x7E\n]/g, "");
+  return value.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[\u2010-\u2015]/g, "-").replace(/[\u2018\u2019\u2032]/g, "'").replace(/[\u201c\u201d]/g, '"').replace(/[^\x20-\x7E\u00B0\n]/g, "");
 }
 
 function wrap(text: string, font: PDFFont, size: number, maxWidth: number): string[] {
@@ -44,9 +44,13 @@ function drawWrapped(page: PDFPage, text: string, font: PDFFont, size: number, x
 }
 
 function formatDegree(value: number): string {
-  const degree = Math.floor(value);
-  const minute = Math.round((value - degree) * 60);
-  return `${degree} deg ${String(minute).padStart(2, "0")}'`;
+  let degree = Math.floor(value); let minute = Math.round((value - degree) * 60);
+  if (minute === 60) { degree += 1; minute = 0; }
+  return `${degree}\u00b0${String(minute).padStart(2, "0")}'`;
+}
+
+function dignityLabel(placement: ChartFacts["chart"]["placements"][number]): string {
+  return placement.dignities.length ? placement.dignities.join(" and ") : "no major essential dignity";
 }
 
 function addPaper(page: PDFPage, pageNumber: number, texture: PDFImage, fonts: Fonts): void {
@@ -203,15 +207,17 @@ export async function createEssentialPdf(facts: ChartFacts, report: EssentialRep
   wheelPage.drawText("PLANETARY POSITIONS / WHOLE-SIGN HOUSES", { x: MARGIN, y: 142, size: 7, font: fonts.sansBold, color: gold });
   facts.chart.placements.forEach((placement, index) => {
     const column = index < 5 ? 0 : 1; const row = index % 5; const x = MARGIN + column * 250; const py = 122 - row * 18;
-    wheelPage.drawText(`${placement.body.padEnd(8)} ${formatDegree(placement.degree)} ${placement.sign} / H${placement.house} / ${placement.dignity}`, { x, y: py, size: 7.5, font: fonts.sans, color: ink });
+    wheelPage.drawText(`${placement.body.padEnd(8)} ${formatDegree(placement.degree)} ${placement.sign} / H${placement.house} / ${dignityLabel(placement)}`, { x, y: py, size: 7.5, font: fonts.sans, color: ink });
   });
 
   const sentencePage = addPage(doc, texture, fonts);
   y = pageTitle(sentencePage, "Plate 04 / First judgment", "Your chart in one sentence", fonts);
-  y = drawWrapped(sentencePage, report.chartSentence, fonts.serif, 13.2, MARGIN, y, WIDTH - MARGIN * 2, 19.4, ink);
-  sentencePage.drawText("THE THREE SIGNATURES SELECTED", { x: MARGIN, y: y - 30, size: 8, font: fonts.sansBold, color: gold });
+  y = drawWrapped(sentencePage, report.chartSentence, fonts.bold, 18, MARGIN, y, WIDTH - MARGIN * 2, 23, aubergine);
+  sentencePage.drawText("THE LONGER VIEW", { x: MARGIN, y: y - 18, size: 8, font: fonts.sansBold, color: gold });
+  y = drawWrapped(sentencePage, report.chartOverview, fonts.serif, 11.2, MARGIN, y - 40, WIDTH - MARGIN * 2, 15.5, ink);
+  sentencePage.drawText("THE THREE SIGNATURES SELECTED", { x: MARGIN, y: y - 24, size: 8, font: fonts.sansBold, color: gold });
   facts.chart.dominantSignatures.forEach((signature, index) => {
-    const top = y - 54 - index * 76;
+    const top = y - 48 - index * 76;
     sentencePage.drawRectangle({ x: MARGIN, y: top - 52, width: WIDTH - MARGIN * 2, height: 60, color: rgb(0.985, 0.965, 0.91), borderColor: parchmentDark, borderWidth: 0.7 });
     sentencePage.drawText(`0${index + 1}`, { x: MARGIN + 16, y: top - 18, size: 18, font: fonts.bold, color: gold });
     sentencePage.drawText(safeText(signature.title), { x: MARGIN + 58, y: top - 12, size: 13, font: fonts.bold, color: aubergine });
@@ -220,11 +226,11 @@ export async function createEssentialPdf(facts: ChartFacts, report: EssentialRep
   });
 
   report.dominantSignatures.forEach((signature, index) => signaturePage(doc, texture, fonts, signature, facts.chart.dominantSignatures[index]?.evidence || "Calculated dominant signature"));
-  sectionPage(doc, texture, fonts, "Plate 08 / Solar principle", report.bigThree.sun, `${sun.body} at ${formatDegree(sun.degree)} ${sun.sign}, whole-sign house ${sun.house}, ${sun.dignity}`);
-  sectionPage(doc, texture, fonts, "Plate 09 / Lunar principle", report.bigThree.moon, `${moon.body} at ${formatDegree(moon.degree)} ${moon.sign}, whole-sign house ${moon.house}, ${moon.dignity}; ${facts.chart.moonPhase.name}`);
+  sectionPage(doc, texture, fonts, "Plate 08 / Solar principle", report.bigThree.sun, `${sun.body} at ${formatDegree(sun.degree)} ${sun.sign}, whole-sign house ${sun.house}, ${dignityLabel(sun)}`);
+  sectionPage(doc, texture, fonts, "Plate 09 / Lunar principle", report.bigThree.moon, `${moon.body} at ${formatDegree(moon.degree)} ${moon.sign}, whole-sign house ${moon.house}, ${dignityLabel(moon)}; ${facts.chart.moonPhase.name}`);
   sectionPage(doc, texture, fonts, "Plate 10 / Eastern horizon", report.bigThree.ascendant, `Ascendant at ${formatDegree(facts.chart.angles.ascendant.degree)} ${facts.chart.angles.ascendant.sign}; traditional ruler ${facts.chart.chartRuler}`);
   const ruler = facts.chart.placements.find((item) => item.body === facts.chart.chartRuler)!;
-  sectionPage(doc, texture, fonts, "Plate 11 / Chart ruler", report.chartRuler, `${ruler.body} at ${formatDegree(ruler.degree)} ${ruler.sign}, whole-sign house ${ruler.house}, ${ruler.dignity}`);
+  sectionPage(doc, texture, fonts, "Plate 11 / Chart ruler", report.chartRuler, `${ruler.body} at ${formatDegree(ruler.degree)} ${ruler.sign}, whole-sign house ${ruler.house}, ${dignityLabel(ruler)}`);
   sectionPage(doc, texture, fonts, "Plate 12 / Application", report.applications.purposeAndWork);
   sectionPage(doc, texture, fonts, "Plate 13 / Application", report.applications.emotionalNeeds);
   sectionPage(doc, texture, fonts, "Plate 14 / Application", report.applications.relationshipsAndBoundaries);
@@ -255,7 +261,7 @@ export async function createEssentialPdf(facts: ChartFacts, report: EssentialRep
   finalPage.drawRectangle({ x: MARGIN, y: 92, width: WIDTH - MARGIN * 2, height: 112, color: deep, borderColor: gold, borderWidth: 0.8 });
   finalPage.drawText("WHEN YOU WANT THE WHOLE CHART JUDGED", { x: MARGIN + 22, y: 174, size: 7, font: fonts.sansBold, color: parchmentDark });
   finalPage.drawText("Complete Natal Reading / $97", { x: MARGIN + 22, y: 145, size: 18, font: fonts.bold, color: parchment });
-  drawWrapped(finalPage, "Individually reviewed across all planets, houses, rulers, dignities, aspects, receptions, and repeated testimony.", fonts.sans, 9.5, MARGIN + 22, 124, WIDTH - MARGIN * 2 - 44, 13, parchmentDark);
+  drawWrapped(finalPage, "A hand-prepared reading that connects your chart's major patterns to practical questions about work, relationships, money, temperament, and direction.", fonts.sans, 9.5, MARGIN + 22, 124, WIDTH - MARGIN * 2 - 44, 13, parchmentDark);
   finalPage.drawText("mysticbirthchart.com/complete-natal-chart-reading", { x: MARGIN + 22, y: 74, size: 8.5, font: fonts.sansBold, color: gold });
 
   return doc.save();

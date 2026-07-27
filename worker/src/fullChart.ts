@@ -8,11 +8,12 @@ type AstronomyBody = import("astronomy-engine").Body;
 export type Sign = "Aries" | "Taurus" | "Gemini" | "Cancer" | "Leo" | "Virgo" | "Libra" | "Scorpio" | "Sagittarius" | "Capricorn" | "Aquarius" | "Pisces";
 export type ChartBody = "Sun" | "Moon" | "Mercury" | "Venus" | "Mars" | "Jupiter" | "Saturn" | "Uranus" | "Neptune" | "Pluto";
 export type AspectType = "conjunction" | "sextile" | "square" | "trine" | "opposition";
+export type EssentialDignity = "domicile" | "exaltation" | "detriment" | "fall";
 
 export interface FullChartInput { date: string; time: string; latitude: number; longitude: number; timezone: string; }
-export interface Placement { body: ChartBody; longitude: number; sign: Sign; degree: number; house: number; dignity: "domicile" | "exaltation" | "detriment" | "fall" | "neutral"; }
+export interface Placement { body: ChartBody; longitude: number; sign: Sign; degree: number; house: number; dignity: EssentialDignity | "neutral"; dignities: EssentialDignity[]; }
 export interface ChartAspect { body1: ChartBody | "Ascendant" | "Midheaven"; body2: ChartBody | "Ascendant" | "Midheaven"; type: AspectType; orb: number; exactAngle: number; }
-export interface DominantSignature { rank: number; title: string; evidence: string; score: number; }
+export interface DominantSignature { rank: number; title: string; evidence: string; supportingModernEvidence: string[]; score: number; }
 export interface FullChart {
   utc: string;
   utcOffset: number;
@@ -69,17 +70,20 @@ function angles(date: Date, latitude: number, longitude: number): { ascendant: n
   return { ascendant, midheaven };
 }
 
-function dignity(body: ChartBody, sign: Sign): Placement["dignity"] {
+function dignities(body: ChartBody, sign: Sign): EssentialDignity[] {
   const domicile: Partial<Record<ChartBody, Sign[]>> = { Sun: ["Leo"], Moon: ["Cancer"], Mercury: ["Gemini", "Virgo"], Venus: ["Taurus", "Libra"], Mars: ["Aries", "Scorpio"], Jupiter: ["Sagittarius", "Pisces"], Saturn: ["Capricorn", "Aquarius"] };
   const exaltation: Partial<Record<ChartBody, Sign>> = { Sun: "Aries", Moon: "Taurus", Mercury: "Virgo", Venus: "Pisces", Mars: "Capricorn", Jupiter: "Cancer", Saturn: "Libra" };
   const detriment: Partial<Record<ChartBody, Sign[]>> = { Sun: ["Aquarius"], Moon: ["Capricorn"], Mercury: ["Sagittarius", "Pisces"], Venus: ["Aries", "Scorpio"], Mars: ["Taurus", "Libra"], Jupiter: ["Gemini", "Virgo"], Saturn: ["Cancer", "Leo"] };
   const fall: Partial<Record<ChartBody, Sign>> = { Sun: "Libra", Moon: "Scorpio", Mercury: "Pisces", Venus: "Virgo", Mars: "Cancer", Jupiter: "Capricorn", Saturn: "Aries" };
-  if (domicile[body]?.includes(sign)) return "domicile";
-  if (exaltation[body] === sign) return "exaltation";
-  if (detriment[body]?.includes(sign)) return "detriment";
-  if (fall[body] === sign) return "fall";
-  return "neutral";
+  const result: EssentialDignity[] = [];
+  if (domicile[body]?.includes(sign)) result.push("domicile");
+  if (exaltation[body] === sign) result.push("exaltation");
+  if (detriment[body]?.includes(sign)) result.push("detriment");
+  if (fall[body] === sign) result.push("fall");
+  return result;
 }
+
+function primaryDignity(values: EssentialDignity[]): Placement["dignity"] { return values[0] || "neutral"; }
 
 function aspectOrb(a: number, b: number, exact: number): number {
   const distance = Math.abs(normalize(a - b));
@@ -102,24 +106,67 @@ function findAspects(points: Array<{ body: ChartAspect["body1"]; longitude: numb
   return results.sort((a, b) => a.orb - b.orb);
 }
 
-function rankSignatures(aspects: ChartAspect[], chartRuler: string): DominantSignature[] {
-  const candidates = aspects.map((aspect) => {
-    const bodiesInvolved = [aspect.body1, aspect.body2];
-    const angular = bodiesInvolved.some((body) => body === "Ascendant" || body === "Midheaven");
-    const luminary = bodiesInvolved.some((body) => body === "Sun" || body === "Moon");
-    const ruler = bodiesInvolved.includes(chartRuler as ChartAspect["body1"]);
-    const outer = bodiesInvolved.some((body) => body === "Uranus" || body === "Neptune" || body === "Pluto");
-    let score = 45 - aspect.orb * 10;
-    if (angular) score += 30;
-    if (luminary) score += 35;
-    if (ruler) score += 15;
-    if (aspect.type === "conjunction") score += 18;
-    if (angular && aspect.type === "conjunction") score += 12;
-    if (outer) score += luminary ? 10 : -12;
-    return { title: `${aspect.body1} ${aspect.type} ${aspect.body2}`, evidence: `${aspect.body1} ${aspect.type} ${aspect.body2}, orb ${aspect.orb.toFixed(2)} degrees`, score: round(score, 2) };
-  });
+const traditionalBodies = new Set<ChartBody>(["Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn"]);
+const outerBodies = new Set<ChartBody>(["Uranus", "Neptune", "Pluto"]);
+
+function isChartBody(value: ChartAspect["body1"]): value is ChartBody { return bodies.some(([body]) => body === value); }
+function isAngular(placement: Placement): boolean { return [1, 4, 7, 10].includes(placement.house); }
+function formatAstroDegree(value: number): string {
+  let degree = Math.floor(value); let minute = Math.round((value - degree) * 60);
+  if (minute === 60) { degree += 1; minute = 0; }
+  return `${degree}\u00b0${String(minute).padStart(2, "0")}\u2032`;
+}
+function aspectWord(type: AspectType): string { return ({ conjunction: "conjunct", sextile: "sextile", square: "square", trine: "trine", opposition: "opposite" })[type]; }
+function aspectEvidence(aspect: ChartAspect): string { return `${aspect.body1} ${aspectWord(aspect.type)} ${aspect.body2}, ${formatAstroDegree(aspect.orb)} orb`; }
+
+function rankSignatures(placements: Placement[], aspects: ChartAspect[], chartRuler: FullChart["chartRuler"], sect: FullChart["sect"]): DominantSignature[] {
+  const byBody = new Map(placements.map((placement) => [placement.body, placement]));
+  const sectLight: ChartBody = sect === "Day chart" ? "Sun" : "Moon";
+  const ascendantSign = placements.find((placement) => placement.house === 1)?.sign;
+  const relevantHouseRulers = new Set<ChartBody>();
+  if (ascendantSign) for (const house of [1, 7, 10]) relevantHouseRulers.add(traditionalRulers[signs[(signs.indexOf(ascendantSign) + house - 1) % 12]]);
+  const modernSupport = (involved: ChartAspect["body1"][]): string[] => aspects
+    .filter((aspect) => aspect.orb <= 1.5 && ((outerBodies.has(aspect.body1 as ChartBody) && involved.includes(aspect.body2)) || (outerBodies.has(aspect.body2 as ChartBody) && involved.includes(aspect.body1))))
+    .map(aspectEvidence);
+  const candidates = aspects
+    .filter((aspect) => [aspect.body1, aspect.body2].some((body) => traditionalBodies.has(body as ChartBody)) && ![aspect.body1, aspect.body2].some((body) => outerBodies.has(body as ChartBody)))
+    .map((aspect) => {
+      const involved = [aspect.body1, aspect.body2];
+      let score = 80 - aspect.orb * 4;
+      for (const body of involved) {
+        if (!isChartBody(body)) continue;
+        const placement = byBody.get(body)!;
+        if (body === chartRuler) score += 110;
+        if (body === sectLight) score += 85;
+        if (relevantHouseRulers.has(body)) score += 45;
+        if (isAngular(placement)) score += 30;
+        if (placement.dignities.some((value) => value === "domicile" || value === "exaltation")) score += 22;
+        if (placement.dignities.some((value) => value === "detriment" || value === "fall")) score += 14;
+        const other = involved.find((item) => item !== body);
+        if (other && isChartBody(other) && traditionalRulers[placement.sign] === other) score += 16;
+      }
+      if (aspect.body1 === "Ascendant" || aspect.body2 === "Ascendant" || aspect.body1 === "Midheaven" || aspect.body2 === "Midheaven") score += 85;
+      if (aspect.type === "conjunction") score += 14;
+      if ((aspect.body1 === "Midheaven" || aspect.body2 === "Midheaven") && aspect.type === "conjunction") score += 100;
+      return { title: `${aspect.body1} ${aspectWord(aspect.type)} ${aspect.body2}`, evidence: aspectEvidence(aspect), supportingModernEvidence: modernSupport(involved), score: round(score, 2) };
+    });
+  const fallbackCandidates = placements
+    .filter((placement) => traditionalBodies.has(placement.body) && (placement.body === chartRuler || placement.body === sectLight || isAngular(placement) || placement.dignities.length > 0))
+    .map((placement) => {
+      let score = 30;
+      if (placement.body === chartRuler) score += 110;
+      if (placement.body === sectLight) score += 85;
+      if (relevantHouseRulers.has(placement.body)) score += 45;
+      if (isAngular(placement)) score += 30;
+      score += placement.dignities.length * 22;
+      return {
+        title: `${placement.body} in ${placement.sign}, whole-sign house ${placement.house}`,
+        evidence: `${placement.body} at ${formatAstroDegree(placement.degree)} ${placement.sign}, whole-sign house ${placement.house}${placement.dignities.length ? `, ${placement.dignities.join(" and ")}` : ", no major essential dignity"}`,
+        supportingModernEvidence: modernSupport([placement.body]), score: round(score, 2),
+      };
+    });
   const selected: typeof candidates = [];
-  for (const candidate of candidates.sort((a, b) => b.score - a.score)) {
+  for (const candidate of [...candidates, ...fallbackCandidates].sort((a, b) => b.score - a.score)) {
     if (selected.some((item) => item.title === candidate.title)) continue;
     selected.push(candidate);
     if (selected.length === 3) break;
@@ -141,7 +188,8 @@ export function calculateFullChart(input: FullChartInput): FullChart {
   const placements = bodies.map(([body, astronomyBody]) => {
     const longitude = planetaryLongitude(astronomyBody, instant.date);
     const sign = signOf(longitude);
-    return { body, longitude: round(longitude), sign, degree: round(degreeInSign(longitude), 2), house: ((signs.indexOf(sign) - ascendantIndex + 12) % 12) + 1, dignity: dignity(body, sign) };
+    const placementDignities = dignities(body, sign);
+    return { body, longitude: round(longitude), sign, degree: round(degreeInSign(longitude), 2), house: ((signs.indexOf(sign) - ascendantIndex + 12) % 12) + 1, dignity: primaryDignity(placementDignities), dignities: placementDignities };
   });
   const points = [...placements.map((item) => ({ body: item.body as ChartAspect["body1"], longitude: item.longitude })), { body: "Ascendant" as const, longitude: angleValues.ascendant }, { body: "Midheaven" as const, longitude: angleValues.midheaven }];
   const aspects = findAspects(points);
@@ -158,7 +206,7 @@ export function calculateFullChart(input: FullChartInput): FullChart {
       ascendant: { longitude: round(angleValues.ascendant), sign: ascendantSign, degree: round(degreeInSign(angleValues.ascendant), 2) },
       midheaven: { longitude: round(angleValues.midheaven), sign: signOf(angleValues.midheaven), degree: round(degreeInSign(angleValues.midheaven), 2) },
     },
-    placements, aspects, dominantSignatures: rankSignatures(aspects, chartRuler), chartRuler,
+    placements, aspects, dominantSignatures: rankSignatures(placements, aspects, chartRuler, sunAboveHorizon ? "Day chart" : "Night chart"), chartRuler,
     sect: sunAboveHorizon ? "Day chart" : "Night chart", moonPhase: moonPhase(sun.longitude, moon.longitude),
   };
 }

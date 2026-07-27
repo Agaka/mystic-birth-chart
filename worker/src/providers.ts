@@ -12,6 +12,7 @@ export interface EssentialSignature {
 export interface EssentialReport {
   title: string;
   chartSentence: string;
+  chartOverview: string;
   dominantSignatures: EssentialSignature[];
   bigThree: { sun: EssentialSection; moon: EssentialSection; ascendant: EssentialSection };
   chartRuler: EssentialSection;

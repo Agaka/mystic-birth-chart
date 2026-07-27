@@ -50,7 +50,31 @@ test("finds tight aspects and ranks chart-specific dominant signatures", () => {
   const evidence = chart.dominantSignatures.map((item) => item.evidence).join(" | ");
   assert.match(evidence, /Jupiter.*Midheaven|Midheaven.*Jupiter/);
   assert.match(evidence, /Sun.*Mars|Mars.*Sun/);
-  assert.match(evidence, /Sun.*Uranus|Saturn.*Uranus/);
+  assert.doesNotMatch(evidence, /Uranus|Neptune|Pluto/);
+});
+
+test("records every major essential dignity instead of flattening Mercury in Virgo", () => {
+  const chart = calculateFullChart(birth);
+  const mercury = chart.placements.find((item) => item.body === "Mercury")!;
+
+  assert.deepEqual(mercury.dignities, ["domicile", "exaltation"]);
+  assert.deepEqual(chart.placements.find((item) => item.body === "Mars")!.dignities, []);
+});
+
+test("ranks the chart ruler and sect light above a tighter outer-planet aspect", () => {
+  const chart = calculateFullChart({
+    date: "2000-09-27",
+    time: "01:28",
+    latitude: -30.0328,
+    longitude: -51.2302,
+    timezone: "America/Sao_Paulo",
+  });
+
+  assert.equal(chart.chartRuler, "Moon");
+  assert.equal(chart.sect, "Night chart");
+  assert.match(chart.dominantSignatures[0].title, /Moon.*Saturn|Saturn.*Moon/);
+  assert.ok(chart.dominantSignatures.every((signature) => !/Uranus|Neptune|Pluto/.test(signature.title)));
+  assert.ok(chart.dominantSignatures.some((signature) => signature.supportingModernEvidence.some((evidence) => /Neptune/.test(evidence))));
 });
 
 test("uses the Sun's observed altitude for sect near the horizon", () => {
