@@ -1236,6 +1236,7 @@ Newsletter:
 - The AI provider key stays only in Vercel as `OPENAI_API_KEY`; it is never stored on the VPS or exposed to the browser. The worker calls the private Vercel route `/api/internal/essential-ai` using HMAC headers and receives only the structured report result.
 - The worker uses `AI_PROXY_URL=https://mysticbirthchart.com`; Vercel uses `ESSENTIAL_WORKER_URL=https://worker.mysticbirthchart.com`. `ESSENTIAL_WORKER_SHARED_SECRET` protects the Vercel-to-worker and worker-to-AI-proxy calls. `ESSENTIAL_TEST_SECRET` protects the no-payment test route.
 - The VPS worker is deployed at `https://worker.mysticbirthchart.com` behind Caddy and its public `/healthz` endpoint is healthy. Never print or commit any secret values.
+- Essential PDF email delivery uses the private Vercel route `/api/internal/essential-email`, so the Hostinger SMTP password remains in Vercel and is not copied to the VPS. The worker uses `EMAIL_PROXY_URL=https://mysticbirthchart.com` and sends the signed PDF payload through that route.
 - The test route is intended for a controlled Essential fulfillment test without a Stripe charge. After a production deployment, use it once and confirm the PDF email and worker logs before declaring the purchase path complete.
 
 Social:

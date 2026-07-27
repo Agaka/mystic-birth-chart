@@ -1,3 +1,4 @@
+import { createHmac } from "node:crypto";
 import nodemailer from "nodemailer";
 
 function escapeHtml(value: string): string {
@@ -10,6 +11,23 @@ function escapeHtml(value: string): string {
 }
 
 export async function sendEssentialDelivery(input: { to: string; name: string; url: string; pdf: Uint8Array }) {
+  const proxyBase = process.env.EMAIL_PROXY_URL;
+  const sharedSecret = process.env.ESSENTIAL_WORKER_SHARED_SECRET;
+  if (proxyBase && sharedSecret) {
+    const endpoint = new URL("/api/internal/essential-email", proxyBase);
+    const body = JSON.stringify({ to: input.to, name: input.name, url: input.url, pdfBase64: Buffer.from(input.pdf).toString("base64") });
+    const timestamp = String(Math.floor(Date.now() / 1000));
+    const signature = createHmac("sha256", sharedSecret).update(`POST\n${endpoint.pathname}\n${timestamp}\n${body}`).digest("hex");
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-mystic-timestamp": timestamp, "x-mystic-signature": signature },
+      body,
+      signal: AbortSignal.timeout(30_000),
+    });
+    if (!response.ok) throw new Error(`email-proxy-http-${response.status}`);
+    return;
+  }
+
   const from = process.env.SMTP_FROM || "hello@mysticbirthchart.com";
   if (!process.env.SMTP_PASSWORD) throw new Error("smtp-not-configured");
 
