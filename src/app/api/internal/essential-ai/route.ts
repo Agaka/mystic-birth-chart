@@ -125,6 +125,20 @@ function hasSupportedAspectClaims(text: string, facts: ChartFacts): boolean {
   return [...text.matchAll(pattern)].every((match) => facts.chart.aspects.some((aspect) => aspect.type === words[match[2].toLowerCase()] && [aspect.body1, aspect.body2].includes(match[1]) && [aspect.body1, aspect.body2].includes(match[3])));
 }
 
+function hasReportShape(value: unknown): value is EssentialReport {
+  if (!value || typeof value !== "object") return false;
+  const report = value as Record<string, unknown>;
+  const bigThree = report.bigThree as Record<string, unknown> | undefined;
+  const applications = report.applications as Record<string, unknown> | undefined;
+  const practical = report.practicalDirection as Record<string, unknown> | undefined;
+  return typeof report.title === "string" && typeof report.chartSentence === "string" && typeof report.chartOverview === "string" &&
+    Array.isArray(report.dominantSignatures) && report.dominantSignatures.length === 3 &&
+    Boolean(bigThree && bigThree.sun && bigThree.moon && bigThree.ascendant) && typeof report.chartRuler === "object" &&
+    Boolean(applications && applications.purposeAndWork && applications.emotionalNeeds && applications.relationshipsAndBoundaries) &&
+    Boolean(practical && Array.isArray(practical.strengths) && Array.isArray(practical.tensions) && Array.isArray(practical.actions) && Array.isArray(practical.questions)) &&
+    typeof report.closing === "string" && typeof report.scopeNote === "string";
+}
+
 function isReport(value: unknown, facts?: ChartFacts): value is EssentialReport {
   if (!value || typeof value !== "object") return false;
   const report = value as Record<string, unknown>;
@@ -167,7 +181,7 @@ async function callOpenAI(input: unknown, model: string): Promise<EssentialRepor
   const outputText = payload.output_text || payload.output?.flatMap((item) => item.content || []).find((item) => item.type === "output_text")?.text;
   if (!outputText) throw new Error("openai-empty-output");
   const report = JSON.parse(outputText) as unknown;
-  if (!isReport(report)) throw new Error("openai-invalid-report");
+  if (!hasReportShape(report)) throw new Error("openai-invalid-report-shape");
   return report;
 }
 
@@ -181,9 +195,12 @@ export async function POST(request: Request) {
     const input = value.operation === "write"
       ? [{ role: "system", content: `${rules}\nReturn only the structured Essential report.` }, { role: "user", content: JSON.stringify(value.facts) }]
       : [{ role: "system", content: `${rules}\nAct as a rigorous senior astrology editor. Verify every technical claim against the facts, remove repetition and generic language, preserve the three ranked signatures, and return a fully rewritten compliant report.` }, { role: "user", content: JSON.stringify({ facts: value.facts, draft: value.draft }) }];
-    if (value.operation === "review" && !isReport(value.draft)) return NextResponse.json({ message: "Invalid draft." }, { status: 400 });
+    if (value.operation === "review" && !hasReportShape(value.draft)) return NextResponse.json({ message: "Invalid draft." }, { status: 400 });
     const report = await callOpenAI(input, model);
-    if (!isReport(report, value.facts)) return NextResponse.json({ message: "AI report failed chart validation." }, { status: 502 });
+    if (!isReport(report, value.facts)) {
+      console.error("essential-ai-chart-validation-failed", { title: report.title, chartSentenceLength: report.chartSentence.length, chartOverviewLength: report.chartOverview.length });
+      return NextResponse.json({ message: "AI report failed chart validation." }, { status: 502 });
+    }
     return NextResponse.json({ report });
   } catch (error) {
     console.error("essential-ai-generation-failed", error instanceof Error ? error.message : error);
