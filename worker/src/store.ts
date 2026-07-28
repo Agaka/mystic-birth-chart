@@ -15,6 +15,7 @@ export interface WorkerEssentialJob {
   notes?: string;
   partnerData?: string;
   annual?: { cycleYear?: number; returnCity?: string };
+  forecast?: { startDate?: string; presentationTimezone?: string };
   subscriptionId?: string;
 }
 
@@ -49,6 +50,10 @@ function asOrder(row: Record<string, unknown>): StoredEssentialOrder {
     annual: {
       cycleYear: Number(row.annual_cycle_year) || undefined,
       returnCity: typeof row.annual_return_city === "string" ? row.annual_return_city : "",
+    },
+    forecast: {
+      startDate: typeof row.forecast_start_date === "string" ? row.forecast_start_date : "",
+      presentationTimezone: typeof row.presentation_timezone === "string" ? row.presentation_timezone : "",
     },
     subscriptionId: typeof row.subscription_id === "string" ? row.subscription_id : "",
     status: String(row.status) as OrderStatus,
@@ -91,6 +96,8 @@ export class EssentialStore {
     this.ensureColumn("annual_cycle_year", "INTEGER");
     this.ensureColumn("annual_return_city", "TEXT NOT NULL DEFAULT ''");
     this.ensureColumn("subscription_id", "TEXT NOT NULL DEFAULT ''");
+    this.ensureColumn("forecast_start_date", "TEXT NOT NULL DEFAULT ''");
+    this.ensureColumn("presentation_timezone", "TEXT NOT NULL DEFAULT ''");
   }
 
   private ensureColumn(name: string, definition: string): void {
@@ -120,10 +127,10 @@ export class EssentialStore {
     this.db.prepare(`
       INSERT INTO essential_orders (
         order_id, mode, status, tier, customer_name, email, birth_date, birth_time, birth_city, focus, notes, partner_data,
-        annual_cycle_year, annual_return_city, subscription_id,
+        annual_cycle_year, annual_return_city, forecast_start_date, presentation_timezone, subscription_id,
         report_token, attempts, created_at, updated_at, expires_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(job.orderId, job.mode, "processing", tier, job.customer.name, job.customer.email, job.birth.date, job.birth.time, job.birth.city, job.focus, job.notes || "", job.partnerData || "", job.annual?.cycleYear || null, job.annual?.returnCity || "", job.subscriptionId || "", reportToken, 1, now, now, expiresAt);
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(job.orderId, job.mode, "processing", tier, job.customer.name, job.customer.email, job.birth.date, job.birth.time, job.birth.city, job.focus, job.notes || "", job.partnerData || "", job.annual?.cycleYear || null, job.annual?.returnCity || "", job.forecast?.startDate || "", job.forecast?.presentationTimezone || "", job.subscriptionId || "", reportToken, 1, now, now, expiresAt);
     return { kind: "claimed", order: this.findByOrderId(job.orderId)! };
   }
 

@@ -41,6 +41,10 @@ export function buildFulfillmentJob(session: EssentialStripeSessionData, email: 
       cycleYear: Number(metadata.annual_cycle_year) || undefined,
       returnCity: metadata.annual_return_city || "",
     },
+    forecast: {
+      startDate: metadata.forecast_start_date || "",
+      presentationTimezone: metadata.presentation_timezone || "",
+    },
     subscriptionId: typeof session.subscription === "string" ? session.subscription : session.subscription?.id || "",
   };
 }
@@ -63,6 +67,7 @@ export function buildSubscriptionRenewalJob(subscription: SubscriptionRenewalDat
     notes: metadata.customer_notes || "",
     partnerData: metadata.partner_data || "",
     annual: { cycleYear: Number(metadata.annual_cycle_year) || undefined, returnCity: metadata.annual_return_city || "" },
+    forecast: { startDate: metadata.forecast_start_date || "", presentationTimezone: metadata.presentation_timezone || "" },
     subscriptionId: subscription.id,
   };
 }

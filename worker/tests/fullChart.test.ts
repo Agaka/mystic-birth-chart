@@ -61,6 +61,14 @@ test("records every major essential dignity instead of flattening Mercury in Vir
   assert.deepEqual(chart.placements.find((item) => item.body === "Mars")!.dignities, []);
 });
 
+test("calculates Fortune and Spirit with the sect-sensitive traditional formulas", () => {
+  const chart = calculateFullChart({ date: "2002-08-18", time: "11:05", latitude: -30.0346, longitude: -51.2177, timezone: "America/Sao_Paulo" });
+  assert.ok(chart.lots.fortune.degreeLabel.includes("°"));
+  assert.ok(chart.lots.spirit.degreeLabel.includes("°"));
+  assert.notEqual(chart.lots.fortune.longitude, chart.lots.spirit.longitude);
+  assert.ok(chart.lots.fortune.house >= 1 && chart.lots.fortune.house <= 12);
+});
+
 test("keeps an out-of-sign aspect secondary to the chart ruler and sect light", () => {
   const chart = calculateFullChart({
     date: "2000-09-27",

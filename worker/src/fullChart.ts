@@ -21,6 +21,7 @@ export interface FullChart {
   houseSystem: "Whole Sign";
   coordinates: { latitude: number; longitude: number };
   angles: { ascendant: { longitude: number; sign: Sign; degree: number; degreeLabel: string }; midheaven: { longitude: number; sign: Sign; degree: number; degreeLabel: string } };
+  lots: { fortune: { longitude: number; sign: Sign; degree: number; degreeLabel: string; house: number }; spirit: { longitude: number; sign: Sign; degree: number; degreeLabel: string; house: number } };
   placements: Placement[];
   aspects: ChartAspect[];
   dominantSignatures: DominantSignature[];
@@ -195,6 +196,13 @@ function moonPhase(sun: number, moon: number): FullChart["moonPhase"] {
   return { name: names[Math.floor(angle / 45)], angle: roundedAngle, illumination: round((1 - Math.cos(radians(angle))) / 2, 3), timingLabel };
 }
 
+function lot(longitude: number, ascendantIndex: number): FullChart["lots"]["fortune"] {
+  const normalized = round(normalize(longitude));
+  const sign = signOf(normalized);
+  const degree = round(degreeInSign(normalized), 4);
+  return { longitude: normalized, sign, degree, degreeLabel: formatAstroDegree(degree), house: ((signs.indexOf(sign) - ascendantIndex + 12) % 12) + 1 };
+}
+
 function calculateChartAtInstant(input: Pick<FullChartInput, "latitude" | "longitude">, instant: { date: Date; utcOffset: number }): FullChart {
   const angleValues = angles(instant.date, input.latitude, input.longitude);
   const ascendantSign = signOf(angleValues.ascendant);
@@ -214,6 +222,13 @@ function calculateChartAtInstant(input: Pick<FullChartInput, "latitude" | "longi
   const observer = new Astronomy.Observer(input.latitude, input.longitude, 0);
   const equatorialSun = Astronomy.Equator(Astronomy.Body.Sun, instant.date, observer, true, true);
   const sunAboveHorizon = Astronomy.Horizon(instant.date, observer, equatorialSun.ra, equatorialSun.dec, "normal").altitude >= 0;
+  const sect = sunAboveHorizon ? "Day chart" : "Night chart";
+  const fortuneLongitude = sect === "Day chart"
+    ? normalize(angleValues.ascendant + moon.longitude - sun.longitude)
+    : normalize(angleValues.ascendant + sun.longitude - moon.longitude);
+  const spiritLongitude = sect === "Day chart"
+    ? normalize(angleValues.ascendant + sun.longitude - moon.longitude)
+    : normalize(angleValues.ascendant + moon.longitude - sun.longitude);
   return {
     utc: instant.date.toISOString(), utcOffset: instant.utcOffset, zodiac: "Tropical", houseSystem: "Whole Sign",
     coordinates: { latitude: input.latitude, longitude: input.longitude },
@@ -221,8 +236,9 @@ function calculateChartAtInstant(input: Pick<FullChartInput, "latitude" | "longi
       ascendant: { longitude: round(angleValues.ascendant), sign: ascendantSign, degree: round(degreeInSign(angleValues.ascendant), 4), degreeLabel: formatAstroDegree(degreeInSign(angleValues.ascendant)) },
       midheaven: { longitude: round(angleValues.midheaven), sign: signOf(angleValues.midheaven), degree: round(degreeInSign(angleValues.midheaven), 4), degreeLabel: formatAstroDegree(degreeInSign(angleValues.midheaven)) },
     },
-    placements, aspects, dominantSignatures: rankSignatures(placements, aspects, ascendantSign, chartRuler, sunAboveHorizon ? "Day chart" : "Night chart"), chartRuler,
-    sect: sunAboveHorizon ? "Day chart" : "Night chart", moonPhase: moonPhase(sun.longitude, moon.longitude),
+    lots: { fortune: lot(fortuneLongitude, ascendantIndex), spirit: lot(spiritLongitude, ascendantIndex) },
+    placements, aspects, dominantSignatures: rankSignatures(placements, aspects, ascendantSign, chartRuler, sect), chartRuler,
+    sect, moonPhase: moonPhase(sun.longitude, moon.longitude),
   };
 }
 

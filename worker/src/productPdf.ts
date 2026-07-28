@@ -73,19 +73,21 @@ function identityPage(doc: PDFDocument, texture: PDFImage, fonts: Fonts, bluepri
   record.drawText("Calculation Record", { x: margin, y: 710, size: 28, font: fonts.serif, color: ink });
   const rows = [
     ["Birth", `${facts.natal.birth.date} at ${facts.natal.birth.time}`], ["Place", facts.natal.birth.location], ["Coordinates", `${facts.natal.birth.latitude.toFixed(4)}, ${facts.natal.birth.longitude.toFixed(4)}`], ["Time zone", facts.natal.birth.timezone],
-    ["System", `${facts.natal.chart.zodiac} zodiac / ${facts.natal.chart.houseSystem} houses`], ["Ascendant", `${facts.natal.chart.angles.ascendant.degreeLabel} ${facts.natal.chart.angles.ascendant.sign}`], ["Midheaven", `${facts.natal.chart.angles.midheaven.degreeLabel} ${facts.natal.chart.angles.midheaven.sign}`], ["Sect", facts.natal.chart.sect], ["Moon phase", `${facts.natal.chart.moonPhase.name} / ${facts.natal.chart.moonPhase.timingLabel}`],
+    ["System", `${facts.natal.chart.zodiac} zodiac / ${facts.natal.chart.houseSystem} houses`], ...(facts.natalTimeKnown ? [["Ascendant", `${facts.natal.chart.angles.ascendant.degreeLabel} ${facts.natal.chart.angles.ascendant.sign}`], ["Midheaven", `${facts.natal.chart.angles.midheaven.degreeLabel} ${facts.natal.chart.angles.midheaven.sign}`], ["Sect", facts.natal.chart.sect]] : [["Birth-time reliability", facts.natalReliabilityNote]]), ["Moon phase", `${facts.natal.chart.moonPhase.name} / ${facts.natal.chart.moonPhase.timingLabel}`],
   ];
   rows.forEach(([label, value], index) => { const y = 650 - index * 48; record.drawText(label.toUpperCase(), { x: margin, y, size: 8, font: fonts.sansBold, color: gold }); record.drawText(clean(value), { x: margin, y: y - 18, size: 13, font: fonts.serif, color: ink }); });
 }
 
 function referencePages(doc: PDFDocument, texture: PDFImage, fonts: Fonts, blueprint: ReportBlueprint, facts: ProductFacts): void {
-  const positions = facts.natal.chart.placements.map((placement) => [placement.body, `${placement.degreeLabel} ${placement.sign}`, `House ${placement.house}`, placement.dignities.length ? placement.dignities.join(" and ") : "No major essential dignity"]);
-  positions.push(["Ascendant", `${facts.natal.chart.angles.ascendant.degreeLabel} ${facts.natal.chart.angles.ascendant.sign}`, "First house", `Chart ruler: ${facts.natal.chart.chartRuler}`]);
-  positions.push(["Midheaven", `${facts.natal.chart.angles.midheaven.degreeLabel} ${facts.natal.chart.angles.midheaven.sign}`, "", ""]);
+  const positions = facts.natal.chart.placements.map((placement) => [placement.body, `${placement.degreeLabel} ${placement.sign}`, facts.natalTimeKnown ? `House ${placement.house}` : "", placement.dignities.length ? placement.dignities.join(" and ") : "No major essential dignity"]);
+  if (facts.natalTimeKnown) {
+    positions.push(["Ascendant", `${facts.natal.chart.angles.ascendant.degreeLabel} ${facts.natal.chart.angles.ascendant.sign}`, "First house", `Chart ruler: ${facts.natal.chart.chartRuler}`]);
+    positions.push(["Midheaven", `${facts.natal.chart.angles.midheaven.degreeLabel} ${facts.natal.chart.angles.midheaven.sign}`, "", ""]);
+  }
   const tables: Array<{ title: string; rows: string[][] }> = [
     { title: "Planetary Positions and Conditions", rows: positions },
     { title: "Aspect Record", rows: facts.natal.chart.aspects.map((aspect) => [`${aspect.body1} ${aspect.outOfSign ? "out-of-sign " : ""}${aspect.type} ${aspect.body2}`, `${aspect.orbLabel} orb`, aspect.outOfSign ? "Secondary testimony" : "Sign-based aspect"]) },
-    { title: "Whole-Sign Houses and Rulers", rows: Array.from({ length: 12 }, (_, index) => { const signs = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"]; const rulers: Record<string, string> = { Aries: "Mars", Taurus: "Venus", Gemini: "Mercury", Cancer: "Moon", Leo: "Sun", Virgo: "Mercury", Libra: "Venus", Scorpio: "Mars", Sagittarius: "Jupiter", Capricorn: "Saturn", Aquarius: "Saturn", Pisces: "Jupiter" }; const sign = signs[(signs.indexOf(facts.natal.chart.angles.ascendant.sign) + index) % 12]!; const occupants = facts.natal.chart.placements.filter((placement) => placement.house === index + 1).map((placement) => placement.body).join(", ") || "No planets"; return [`House ${index + 1}`, sign, `Ruler: ${rulers[sign]}`, occupants]; }) },
+    ...(facts.natalTimeKnown ? [{ title: "Whole-Sign Houses and Rulers", rows: Array.from({ length: 12 }, (_, index) => { const signs = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"]; const rulers: Record<string, string> = { Aries: "Mars", Taurus: "Venus", Gemini: "Mercury", Cancer: "Moon", Leo: "Sun", Virgo: "Mercury", Libra: "Venus", Scorpio: "Mars", Sagittarius: "Jupiter", Capricorn: "Saturn", Aquarius: "Saturn", Pisces: "Jupiter" }; const sign = signs[(signs.indexOf(facts.natal.chart.angles.ascendant.sign) + index) % 12]!; const occupants = facts.natal.chart.placements.filter((placement) => placement.house === index + 1).map((placement) => placement.body).join(", ") || "No planets"; return [`House ${index + 1}`, sign, `Ruler: ${rulers[sign]}`, occupants]; }) }] : []),
   ];
   if (facts.annual) tables.push(
     { title: "Annual Cycle at a Glance", rows: [
@@ -96,6 +98,16 @@ function referencePages(doc: PDFDocument, texture: PDFImage, fonts: Fonts, bluep
     ] },
     { title: "Monthly Annual Record", rows: facts.annual.monthlySky.map((month) => ["Month " + month.month, month.startsAt.slice(0, 10), `Ascendant ${month.chart.angles.ascendant.degreeLabel} ${month.chart.angles.ascendant.sign}`, month.chart.moonPhase.name]) },
   );
+  if (facts.forecast) tables.push(
+    { title: "Forecast Period and Profections", rows: [["Period", `${facts.forecast.period.startsAt.slice(0, 10)} to ${facts.forecast.period.endsAt.slice(0, 10)}`, facts.forecast.period.presentationTimezone], ...facts.forecast.profections.map((item) => ["Profection", `${item.startsAt.slice(0, 10)} to ${item.endsAt.slice(0, 10)}`, `House ${item.house} / ${item.sign}`, `Lord: ${item.lordOfYear}`])] },
+    { title: "Selected Transit Activations", rows: facts.forecast.activations.map((item) => [item.date.slice(0, 10), `${item.transit} ${item.aspect} ${item.target}`, `${item.orbLabel} orb`, item.category]) },
+  );
+  if (facts.almanac) tables.push({ title: "This Month at a Glance", rows: [
+    ["Period", `${facts.almanac.month.startsAt.slice(0, 10)} to ${facts.almanac.month.endsAt.slice(0, 10)}`, facts.almanac.month.presentationTimezone],
+    ["Solar month", `Sun through ${facts.almanac.month.themeSign}`, `Natal house ${facts.almanac.month.sunHouse}`],
+    ["Annual profection", `House ${facts.almanac.profection.house} / ${facts.almanac.profection.sign}`, `Lord: ${facts.almanac.profection.lordOfYear}`],
+    ...facts.almanac.activations.map((item) => [item.date.slice(0, 10), `${item.transit} ${item.aspect} ${item.target}`, `${item.orbLabel} orb`, item.category]),
+  ] });
   for (const table of tables) {
     let current = page(doc, texture, fonts, blueprint.eyebrow); let y = 710;
     current.drawText(table.title, { x: margin, y, size: 25, font: fonts.serif, color: ink }); y -= 45;

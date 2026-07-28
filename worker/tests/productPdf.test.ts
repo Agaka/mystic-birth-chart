@@ -9,6 +9,8 @@ import type { ProductFacts } from "../src/reportFacts.ts";
 const chart = calculateFullChart({ date: "2002-08-18", time: "11:05", latitude: -30.0346, longitude: -51.2177, timezone: "America/Sao_Paulo" });
 const facts: ProductFacts = {
   generatedAt: "2026-07-28T00:00:00.000Z",
+  natalTimeKnown: true,
+  natalReliabilityNote: "Birth time supplied; angles and whole-sign houses may be used.",
   natal: { birth: { date: "2002-08-18", time: "11:05", location: "Porto Alegre, Rio Grande do Sul, Brazil", timezone: "America/Sao_Paulo", utcOffset: -3, latitude: -30.0346, longitude: -51.2177 }, chart, focus: "general" },
 };
 const paragraph = "This sample paragraph verifies the printable long-form layout while preserving a readable rhythm of technical evidence, lived application, and practical reflection. ";

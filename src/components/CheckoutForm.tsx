@@ -38,6 +38,8 @@ interface CheckoutDraft {
   partnerData?: string;
   annualCycleYear?: string;
   annualReturnCity?: string;
+  forecastStartDate?: string;
+  presentationTimezone?: string;
   newsletter: boolean;
 }
 
@@ -49,8 +51,10 @@ export function CheckoutForm({
   const isEssential = tier === "basic";
   const isFocused = tier === "love" || tier === "career";
   const isSynastry = tier === "synastry";
-  const isAnnual = tier === "year-ahead" || tier === "dossier";
+  const isDossier = tier === "dossier";
+  const isForecast = tier === "year-ahead";
   const isAutomated = isEssential;
+  const canUseUnknownTime = isSynastry;
   
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
@@ -63,8 +67,9 @@ export function CheckoutForm({
       try {
         const checkoutDraft = readSessionDraft<CheckoutDraft>(checkoutSessionKey);
         if (checkoutDraft?.tier === tier) {
-          setTimeUnknown(Boolean(checkoutDraft.timeUnknown || checkoutDraft.birthTime === "unknown"));
-          setDraft(checkoutDraft);
+          const draftAllowsUnknownTime = canUseUnknownTime && Boolean(checkoutDraft.timeUnknown || checkoutDraft.birthTime === "unknown");
+          setTimeUnknown(draftAllowsUnknownTime);
+          setDraft({ ...checkoutDraft, birthTime: draftAllowsUnknownTime ? "unknown" : checkoutDraft.birthTime === "unknown" ? "" : checkoutDraft.birthTime, timeUnknown: draftAllowsUnknownTime });
           return;
         }
 
@@ -75,14 +80,14 @@ export function CheckoutForm({
             name: "",
             email: "",
             birthDate: freeChartDraft.birthDate,
-            birthTime: freeChartDraft.birthTime,
-            timeUnknown: freeChartDraft.timeUnknown,
+            birthTime: canUseUnknownTime && freeChartDraft.timeUnknown ? "unknown" : freeChartDraft.birthTime === "unknown" ? "" : freeChartDraft.birthTime,
+            timeUnknown: canUseUnknownTime && freeChartDraft.timeUnknown,
             birthCity: freeChartDraft.birthCity,
             focus: freeChartDraft.focus,
             notes: "",
             newsletter: false,
           });
-          setTimeUnknown(freeChartDraft.timeUnknown);
+          setTimeUnknown(canUseUnknownTime && freeChartDraft.timeUnknown);
         }
       } catch {
         window.sessionStorage.removeItem(checkoutSessionKey);
@@ -90,7 +95,7 @@ export function CheckoutForm({
     }, 0);
 
     return () => window.clearTimeout(timer);
-  }, [tier]);
+  }, [tier, canUseUnknownTime]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -124,8 +129,10 @@ export function CheckoutForm({
       focus: String(formData.get("focus") || "general"),
       notes: String(formData.get("notes") || ""),
       partnerData: isSynastry ? String(formData.get("partnerData") || "") : undefined,
-      annualCycleYear: isAnnual ? String(formData.get("annualCycleYear") || "") : undefined,
-      annualReturnCity: isAnnual ? String(formData.get("annualReturnCity") || "") : undefined,
+      annualCycleYear: isDossier ? String(formData.get("annualCycleYear") || "") : undefined,
+      annualReturnCity: isDossier ? String(formData.get("annualReturnCity") || "") : undefined,
+      forecastStartDate: isForecast ? String(formData.get("forecastStartDate") || "") : undefined,
+      presentationTimezone: isForecast ? String(formData.get("presentationTimezone") || "") : undefined,
       newsletter: Boolean(formData.get("newsletter")),
     };
 
@@ -155,6 +162,8 @@ export function CheckoutForm({
           partnerData: checkoutDraft.partnerData || "",
           annualCycleYear: checkoutDraft.annualCycleYear || "",
           annualReturnCity: checkoutDraft.annualReturnCity || "",
+          forecastStartDate: checkoutDraft.forecastStartDate || "",
+          presentationTimezone: checkoutDraft.presentationTimezone || "",
           newsletter: checkoutDraft.newsletter,
           promotekitReferral: (window as any).promotekit_referral,
         }),
@@ -263,7 +272,7 @@ export function CheckoutForm({
             id="birthTime"
             name="birthTime"
             type="time"
-            required={isEssential && !timeUnknown}
+            required={!timeUnknown}
             disabled={timeUnknown}
             aria-describedby="checkout-birth-time-help"
             defaultValue={draft?.birthTime === "unknown" ? "" : draft?.birthTime || ""}
@@ -271,20 +280,22 @@ export function CheckoutForm({
           />
           <p id="checkout-birth-time-help" className="mt-1 text-xs text-ink/52">
             {timeUnknown
-              ? "The reading will use a noon estimate. Rising sign, houses, chart ruler, and day/night status will be provisional."
+              ? "This person will be read without Rising sign, houses, angles, sect, or house overlays."
               : isAutomated
               ? "Required for the automated Essential reading, because it calculates Rising sign and chart ruler."
               : "Exact time gives the best house analysis."}
           </p>
-          <label className="mt-3 flex min-h-11 items-start gap-3 text-sm leading-relaxed text-ink/65">
-            <input
-              type="checkbox"
-              checked={timeUnknown}
-              onChange={(event) => setTimeUnknown(event.target.checked)}
-              className="mt-1 h-4 w-4 accent-gold"
-            />
-            <span>I do not know my exact birth time.</span>
-          </label>
+          {canUseUnknownTime ? (
+            <label className="mt-3 flex min-h-11 items-start gap-3 text-sm leading-relaxed text-ink/65">
+              <input
+                type="checkbox"
+                checked={timeUnknown}
+                onChange={(event) => setTimeUnknown(event.target.checked)}
+                className="mt-1 h-4 w-4 accent-gold"
+              />
+              <span>I do not know my exact birth time.</span>
+            </label>
+          ) : null}
         </div>
       </div>
 
@@ -359,7 +370,7 @@ export function CheckoutForm({
         </div>
       )}
 
-      {isAnnual && (
+      {isDossier && (
         <div className="grid grid-cols-1 gap-4 border border-gold/25 bg-gold/[0.04] p-4 sm:grid-cols-2">
           <div>
             <label htmlFor="annualCycleYear" className="mb-2 block font-ui text-sm font-medium text-ink/70">
@@ -389,6 +400,23 @@ export function CheckoutForm({
               placeholder="City and country"
               className="w-full border border-ink/15 bg-white px-4 py-3 font-body text-ink placeholder:text-ink/30 focus:border-gold focus:outline-none"
             />
+          </div>
+        </div>
+      )}
+
+      {isForecast && (
+        <div className="grid grid-cols-1 gap-4 border border-gold/25 bg-gold/[0.04] p-4 sm:grid-cols-2">
+          <div>
+            <label htmlFor="forecastStartDate" className="mb-2 block font-ui text-sm font-medium text-ink/70">
+              Forecast begins
+            </label>
+            <input id="forecastStartDate" name="forecastStartDate" type="date" required defaultValue={draft?.forecastStartDate || new Date().toISOString().slice(0, 10)} className="w-full border border-ink/15 bg-white px-4 py-3 font-body text-ink focus:border-gold focus:outline-none" />
+          </div>
+          <div>
+            <label htmlFor="presentationTimezone" className="mb-2 block font-ui text-sm font-medium text-ink/70">
+              Time zone for forecast dates
+            </label>
+            <input id="presentationTimezone" name="presentationTimezone" type="text" required defaultValue={draft?.presentationTimezone || Intl.DateTimeFormat().resolvedOptions().timeZone} className="w-full border border-ink/15 bg-white px-4 py-3 font-body text-ink focus:border-gold focus:outline-none" />
           </div>
         </div>
       )}

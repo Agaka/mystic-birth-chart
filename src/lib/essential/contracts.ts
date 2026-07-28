@@ -34,6 +34,10 @@ export interface EssentialJob {
     cycleYear?: number;
     returnCity?: string;
   };
+  forecast?: {
+    startDate?: string;
+    presentationTimezone?: string;
+  };
   subscriptionId?: string;
 }
 

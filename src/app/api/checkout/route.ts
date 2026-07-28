@@ -23,6 +23,8 @@ export async function POST(request: Request) {
     partnerData?: string;
     annualCycleYear?: string;
     annualReturnCity?: string;
+    forecastStartDate?: string;
+    presentationTimezone?: string;
     newsletter?: boolean;
     promotekitReferral?: string;
   };
@@ -41,12 +43,16 @@ export async function POST(request: Request) {
   const partnerData = String(body.partnerData || "").trim().slice(0, 450);
   const annualCycleYear = String(body.annualCycleYear || "").trim().slice(0, 4);
   const annualReturnCity = String(body.annualReturnCity || "").trim().slice(0, 180);
+  const forecastStartDate = String(body.forecastStartDate || "").trim().slice(0, 20);
+  const presentationTimezone = String(body.presentationTimezone || "").trim().slice(0, 80);
   const promotekitReferral =
     typeof body.promotekitReferral === "string"
       ? body.promotekitReferral.trim().slice(0, 500)
       : "";
-  const annualTier = body.tier === "year-ahead" || body.tier === "dossier";
-  if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !birthDate || !birthCity || (body.tier === "basic" && !birthTime) || (annualTier && (!/^20\d{2}$/.test(annualCycleYear) || !annualReturnCity))) {
+  const dossierTier = body.tier === "dossier";
+  const forecastTier = body.tier === "year-ahead";
+  const needsExactBirthTime = body.tier !== "synastry";
+  if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !birthDate || !birthCity || (needsExactBirthTime && (!birthTime || birthTime === "unknown")) || (dossierTier && (!/^20\d{2}$/.test(annualCycleYear) || !annualReturnCity)) || (forecastTier && (!/^20\d{2}-\d{2}-\d{2}$/.test(forecastStartDate) || !presentationTimezone))) {
     return NextResponse.json(
       { message: "Enter a valid name and email before continuing." },
       { status: 400 },
@@ -91,6 +97,8 @@ export async function POST(request: Request) {
         partner_data: partnerData,
         annual_cycle_year: annualCycleYear,
         annual_return_city: annualReturnCity,
+        forecast_start_date: forecastStartDate,
+        presentation_timezone: presentationTimezone,
         newsletter_opt_in: body.newsletter ? "yes" : "no",
         fulfillment_status: "pending",
         ...(promotekitReferral ? { promotekit_referral: promotekitReferral } : {}),
@@ -110,6 +118,9 @@ export async function POST(request: Request) {
               partner_data: partnerData,
               annual_cycle_year: annualCycleYear,
               annual_return_city: annualReturnCity,
+              forecast_start_date: forecastStartDate,
+              presentation_timezone: presentationTimezone,
+              ...(promotekitReferral ? { promotekit_referral: promotekitReferral } : {}),
             },
             },
           }
