@@ -19,9 +19,9 @@ type ChartFacts = {
   birth: { date: string; time: string; location: string; timezone: string; utcOffset: number; latitude: number; longitude: number };
   chart: {
     zodiac: string; houseSystem: string; chartRuler: string; sect: string;
-    angles: { ascendant: { longitude: number; sign: string; degree: number }; midheaven: { longitude: number; sign: string; degree: number } };
-    placements: Array<{ body: string; longitude: number; sign: string; degree: number; house: number; dignity: string; dignities?: string[] }>;
-    aspects: Array<{ body1: string; body2: string; type: string; orb: number }>;
+    angles: { ascendant: { longitude: number; sign: string; degree: number; degreeLabel?: string }; midheaven: { longitude: number; sign: string; degree: number; degreeLabel?: string } };
+    placements: Array<{ body: string; longitude: number; sign: string; degree: number; degreeLabel?: string; house: number; dignity: string; dignities?: string[] }>;
+    aspects: Array<{ body1: string; body2: string; type: string; orb: number; outOfSign?: boolean }>;
     dominantSignatures: Array<{ rank: number; title: string; evidence: string; supportingModernEvidence?: string[]; score: number }>;
     moonPhase: { name: string; angle: number; illumination: number };
   };
@@ -78,11 +78,11 @@ const schema = {
 
 const rules = `Write a premium automated Essential Birth Chart Reading in warm, precise English. It must be complete within one narrow promise: identify and interpret the three calculated patterns that most strongly organize this chart. Use only the calculated chart JSON. Never invent a degree, house, aspect, dignity, ruler, biography, event, or prediction.
 
-Traditional-first hierarchy is mandatory. Treat the ranked dominant signatures as authoritative: they already prioritize chart ruler and its condition, sect light, angles and angular planets, relevant house rulers, essential dignity or debility, close traditional aspects, dispositors, and repeated testimony. Uranus, Neptune, and Pluto are secondary modern layers only. Discuss one only when it appears in supportingModernEvidence for the same signature, never as a standalone dominant signature and never ahead of stronger traditional testimony.
+Traditional-first hierarchy is mandatory. Treat the ranked dominant signatures as authoritative: they already prioritize chart ruler and its condition, sect light, angles and angular planets, relevant house rulers, essential dignity or debility, close traditional sign-based aspects, dispositors, and repeated testimony. Uranus, Neptune, and Pluto are secondary modern layers only. Discuss one only when it appears in supportingModernEvidence for the same signature, never as a standalone dominant signature and never ahead of stronger traditional testimony. An aspect marked outOfSign is secondary testimony only: never make it a dominant signature and label it explicitly as an out-of-sign aspect if you mention it.
 
 Use whole-sign houses and traditional rulers. State every degree and orb as 25°28′ Leo or 0°46′ orb, never as decimal degrees. Use every dignity listed in dignities; Mercury in Virgo must be called both domicile and exaltation. Say "no major essential dignity" instead of "neutral". Do not expose software limitations or call chart facts supplied factors.
 
-The chartSentence must be exactly one memorable sentence, 18-38 words. chartOverview is the longer 95-125 word explanation beneath it. The three signature titles must exactly match the calculated dominant signature titles. Each signature interpretation gives the complete technical evidence once; later chapters must become concrete and experiential rather than repeat the same degrees and orbs.
+The chartSentence must be exactly one memorable sentence, 18-38 words. chartOverview is the longer 95-125 word explanation beneath it. The three signature titles must exactly match the calculated dominant signature titles. Each signature interpretation gives the complete technical evidence once; later chapters must become concrete and experiential rather than repeat the same degrees and orbs. For each Big Three section, write exactly three concise paragraphs: core expression, pressure point, and practical support. Each paragraph must add a distinct experiential observation, not merely restate an aspect.
 
 Purpose and work must begin with the tenth whole-sign house, Midheaven, ruler of the tenth, planets in the tenth, and their relationship with the chart ruler before practical conclusions. Relationships and boundaries must begin with the seventh whole-sign house, its traditional ruler, and that ruler's sign, house, dignity, sect condition, and main aspects before integrating Venus, Moon, and repeated testimony.
 
@@ -122,7 +122,12 @@ function oneSentence(value: string): boolean { return value.trim().split(/[.!?]+
 function hasSupportedAspectClaims(text: string, facts: ChartFacts): boolean {
   const words: Record<string, string> = { conjunct: "conjunction", conjunction: "conjunction", sextile: "sextile", sextiles: "sextile", square: "square", squares: "square", trine: "trine", trines: "trine", opposite: "opposition", opposes: "opposition", opposition: "opposition" };
   const pattern = /\b(?:the )?(Sun|Moon|Mercury|Venus|Mars|Jupiter|Saturn|Uranus|Neptune|Pluto)\s+(conjunct|conjunction|sextile|sextiles|square|squares|trine|trines|opposite|opposes|opposition)\s+(?:the )?(Sun|Moon|Mercury|Venus|Mars|Jupiter|Saturn|Uranus|Neptune|Pluto|Ascendant|Midheaven)\b/gi;
-  return [...text.matchAll(pattern)].every((match) => facts.chart.aspects.some((aspect) => aspect.type === words[match[2].toLowerCase()] && [aspect.body1, aspect.body2].includes(match[1]) && [aspect.body1, aspect.body2].includes(match[3])));
+  return [...text.matchAll(pattern)].every((match) => {
+    const aspect = facts.chart.aspects.find((candidate) => candidate.type === words[match[2].toLowerCase()] && [candidate.body1, candidate.body2].includes(match[1]) && [candidate.body1, candidate.body2].includes(match[3]));
+    if (!aspect) return false;
+    const context = text.slice(Math.max(0, (match.index || 0) - 40), (match.index || 0) + match[0].length + 40);
+    return !aspect.outOfSign || /out-of-sign/i.test(context);
+  });
 }
 
 function hasReportShape(value: unknown): value is EssentialReport {

@@ -43,12 +43,6 @@ function drawWrapped(page: PDFPage, text: string, font: PDFFont, size: number, x
   return y - lines.length * lineHeight;
 }
 
-function formatDegree(value: number): string {
-  let degree = Math.floor(value); let minute = Math.round((value - degree) * 60);
-  if (minute === 60) { degree += 1; minute = 0; }
-  return `${degree}\u00b0${String(minute).padStart(2, "0")}'`;
-}
-
 function dignityLabel(placement: ChartFacts["chart"]["placements"][number]): string {
   return placement.dignities.length ? placement.dignities.join(" and ") : "no major essential dignity";
 }
@@ -75,7 +69,15 @@ function addPage(doc: PDFDocument, texture: PDFImage, fonts: Fonts): PDFPage {
   return page;
 }
 
-function sectionPage(doc: PDFDocument, texture: PDFImage, fonts: Fonts, plate: string, section: EssentialSection, evidence?: string): void {
+function splitThreeWays(text: string): [string, string, string] {
+  const paragraphs = text.split(/\n\s*\n/).map((paragraph) => paragraph.trim()).filter(Boolean);
+  if (paragraphs.length >= 3) return [paragraphs[0], paragraphs[1], paragraphs.slice(2).join(" ")];
+  const sentences = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g)?.map((sentence) => sentence.trim()).filter(Boolean) || [text];
+  const size = Math.ceil(sentences.length / 3);
+  return [sentences.slice(0, size).join(" "), sentences.slice(size, size * 2).join(" "), sentences.slice(size * 2).join(" ")];
+}
+
+function sectionPage(doc: PDFDocument, texture: PDFImage, fonts: Fonts, plate: string, section: EssentialSection, evidence?: string, threePart = false): void {
   const page = addPage(doc, texture, fonts);
   let y = pageTitle(page, plate, section.title, fonts);
   if (evidence) {
@@ -84,7 +86,15 @@ function sectionPage(doc: PDFDocument, texture: PDFImage, fonts: Fonts, plate: s
     page.drawText(safeText(evidence), { x: MARGIN + 14, y: y - 35, size: 10, font: fonts.bold, color: aubergine });
     y -= 68;
   }
-  drawWrapped(page, section.body, fonts.serif, 12.2, MARGIN, y, WIDTH - MARGIN * 2, 18.2, ink);
+  if (!threePart) { drawWrapped(page, section.body, fonts.serif, 12.2, MARGIN, y, WIDTH - MARGIN * 2, 18.2, ink); return; }
+  const headings = ["CORE EXPRESSION", "PRESSURE POINT", "PRACTICAL SUPPORT"];
+  const blocks = splitThreeWays(section.body);
+  blocks.forEach((block, index) => {
+    const top = y - index * 154;
+    page.drawRectangle({ x: MARGIN, y: top - 132, width: WIDTH - MARGIN * 2, height: 124, color: rgb(0.985, 0.965, 0.91), borderColor: parchmentDark, borderWidth: 0.7 });
+    page.drawText(headings[index], { x: MARGIN + 16, y: top - 28, size: 7.5, font: fonts.sansBold, color: gold });
+    drawWrapped(page, block, fonts.serif, 10.3, MARGIN + 16, top - 49, WIDTH - MARGIN * 2 - 32, 14.1, ink);
+  });
 }
 
 function signaturePage(doc: PDFDocument, texture: PDFImage, fonts: Fonts, signature: EssentialSignature, evidence: string): void {
@@ -136,7 +146,7 @@ function drawWheel(page: PDFPage, facts: ChartFacts, fonts: Fonts): void {
     page.drawCircle({ x: point.x, y: point.y, size: 15, color: parchment, borderColor: gold, borderWidth: 0.7 });
     page.drawText(abbreviations[placement.body] || placement.body.slice(0, 2).toUpperCase(), { x: point.x - 7, y: point.y - 3, size: 7, font: fonts.sansBold, color: aubergine });
   }
-  for (const aspect of facts.chart.aspects.filter((item) => item.orb <= 3 && points.has(item.body1) && points.has(item.body2)).slice(0, 14)) {
+  for (const aspect of facts.chart.aspects.filter((item) => !item.outOfSign && item.orb <= 3 && points.has(item.body1) && points.has(item.body2)).slice(0, 14)) {
     const a = points.get(aspect.body1)!; const b = points.get(aspect.body2)!;
     const color = aspect.type === "trine" || aspect.type === "sextile" ? gold : aubergine;
     page.drawLine({ start: a, end: b, thickness: 0.55, color, opacity: 0.42 });
@@ -183,9 +193,9 @@ export async function createEssentialPdf(facts: ChartFacts, report: EssentialRep
     ["Converted instant", utcInstant],
     ["Coordinates", `${facts.birth.latitude.toFixed(4)}, ${facts.birth.longitude.toFixed(4)}`],
     ["Framework", `${facts.chart.zodiac} zodiac / ${facts.chart.houseSystem} houses`],
-    ["Ascendant", `${formatDegree(facts.chart.angles.ascendant.degree)} ${facts.chart.angles.ascendant.sign}`],
-    ["Midheaven", `${formatDegree(facts.chart.angles.midheaven.degree)} ${facts.chart.angles.midheaven.sign}`],
-    ["Sect and lunar phase", `${facts.chart.sect} / ${facts.chart.moonPhase.name} (${facts.chart.moonPhase.angle.toFixed(1)} deg)`],
+    ["Ascendant", `${facts.chart.angles.ascendant.degreeLabel} ${facts.chart.angles.ascendant.sign}`],
+    ["Midheaven", `${facts.chart.angles.midheaven.degreeLabel} ${facts.chart.angles.midheaven.sign}`],
+    ["Sect and lunar phase", `${facts.chart.sect} / ${facts.chart.moonPhase.name} (${facts.chart.moonPhase.timingLabel})`],
   ];
   rows.forEach(([label, value], index) => {
     const rowY = y - index * 43;
@@ -207,7 +217,7 @@ export async function createEssentialPdf(facts: ChartFacts, report: EssentialRep
   wheelPage.drawText("PLANETARY POSITIONS / WHOLE-SIGN HOUSES", { x: MARGIN, y: 142, size: 7, font: fonts.sansBold, color: gold });
   facts.chart.placements.forEach((placement, index) => {
     const column = index < 5 ? 0 : 1; const row = index % 5; const x = MARGIN + column * 250; const py = 122 - row * 18;
-    wheelPage.drawText(`${placement.body.padEnd(8)} ${formatDegree(placement.degree)} ${placement.sign} / H${placement.house} / ${dignityLabel(placement)}`, { x, y: py, size: 7.5, font: fonts.sans, color: ink });
+    wheelPage.drawText(safeText(`${placement.body.padEnd(8)} ${placement.degreeLabel} ${placement.sign} / H${placement.house} / ${dignityLabel(placement)}`), { x, y: py, size: 7.5, font: fonts.sans, color: ink });
   });
 
   const sentencePage = addPage(doc, texture, fonts);
@@ -226,11 +236,11 @@ export async function createEssentialPdf(facts: ChartFacts, report: EssentialRep
   });
 
   report.dominantSignatures.forEach((signature, index) => signaturePage(doc, texture, fonts, signature, facts.chart.dominantSignatures[index]?.evidence || "Calculated dominant signature"));
-  sectionPage(doc, texture, fonts, "Plate 08 / Solar principle", report.bigThree.sun, `${sun.body} at ${formatDegree(sun.degree)} ${sun.sign}, whole-sign house ${sun.house}, ${dignityLabel(sun)}`);
-  sectionPage(doc, texture, fonts, "Plate 09 / Lunar principle", report.bigThree.moon, `${moon.body} at ${formatDegree(moon.degree)} ${moon.sign}, whole-sign house ${moon.house}, ${dignityLabel(moon)}; ${facts.chart.moonPhase.name}`);
-  sectionPage(doc, texture, fonts, "Plate 10 / Eastern horizon", report.bigThree.ascendant, `Ascendant at ${formatDegree(facts.chart.angles.ascendant.degree)} ${facts.chart.angles.ascendant.sign}; traditional ruler ${facts.chart.chartRuler}`);
+  sectionPage(doc, texture, fonts, "Plate 08 / Solar principle", report.bigThree.sun, `${sun.body} at ${sun.degreeLabel} ${sun.sign}, whole-sign house ${sun.house}, ${dignityLabel(sun)}`, true);
+  sectionPage(doc, texture, fonts, "Plate 09 / Lunar principle", report.bigThree.moon, `${moon.body} at ${moon.degreeLabel} ${moon.sign}, whole-sign house ${moon.house}, ${dignityLabel(moon)}; ${facts.chart.moonPhase.name}`, true);
+  sectionPage(doc, texture, fonts, "Plate 10 / Eastern horizon", report.bigThree.ascendant, `Ascendant at ${facts.chart.angles.ascendant.degreeLabel} ${facts.chart.angles.ascendant.sign}; traditional ruler ${facts.chart.chartRuler}`, true);
   const ruler = facts.chart.placements.find((item) => item.body === facts.chart.chartRuler)!;
-  sectionPage(doc, texture, fonts, "Plate 11 / Chart ruler", report.chartRuler, `${ruler.body} at ${formatDegree(ruler.degree)} ${ruler.sign}, whole-sign house ${ruler.house}, ${dignityLabel(ruler)}`);
+  sectionPage(doc, texture, fonts, "Plate 11 / Chart ruler", report.chartRuler, `${ruler.body} at ${ruler.degreeLabel} ${ruler.sign}, whole-sign house ${ruler.house}, ${dignityLabel(ruler)}`);
   sectionPage(doc, texture, fonts, "Plate 12 / Application", report.applications.purposeAndWork);
   sectionPage(doc, texture, fonts, "Plate 13 / Application", report.applications.emotionalNeeds);
   sectionPage(doc, texture, fonts, "Plate 14 / Application", report.applications.relationshipsAndBoundaries);

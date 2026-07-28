@@ -48,9 +48,9 @@ test("finds tight aspects and ranks chart-specific dominant signatures", () => {
 
   assert.equal(chart.dominantSignatures.length, 3);
   const evidence = chart.dominantSignatures.map((item) => item.evidence).join(" | ");
-  assert.match(evidence, /Jupiter.*Midheaven|Midheaven.*Jupiter/);
   assert.match(evidence, /Sun.*Mars|Mars.*Sun/);
   assert.doesNotMatch(evidence, /Uranus|Neptune|Pluto/);
+  assert.ok(chart.dominantSignatures.every((signature) => !chart.aspects.some((aspect) => aspect.outOfSign && signature.title.includes(aspect.body1) && signature.title.includes(aspect.body2))));
 });
 
 test("records every major essential dignity instead of flattening Mercury in Virgo", () => {
@@ -61,7 +61,7 @@ test("records every major essential dignity instead of flattening Mercury in Vir
   assert.deepEqual(chart.placements.find((item) => item.body === "Mars")!.dignities, []);
 });
 
-test("ranks the chart ruler and sect light above a tighter outer-planet aspect", () => {
+test("keeps an out-of-sign aspect secondary to the chart ruler and sect light", () => {
   const chart = calculateFullChart({
     date: "2000-09-27",
     time: "01:28",
@@ -72,7 +72,10 @@ test("ranks the chart ruler and sect light above a tighter outer-planet aspect",
 
   assert.equal(chart.chartRuler, "Moon");
   assert.equal(chart.sect, "Night chart");
-  assert.match(chart.dominantSignatures[0].title, /Moon.*Saturn|Saturn.*Moon/);
+  const moonSaturn = chart.aspects.find((aspect) => aspect.type === "trine" && [aspect.body1, aspect.body2].includes("Moon") && [aspect.body1, aspect.body2].includes("Saturn"));
+  assert.equal(moonSaturn?.outOfSign, true);
+  assert.equal(chart.dominantSignatures[0].title, "Moon as chart ruler and sect light in Virgo, whole-sign house 3");
+  assert.ok(chart.dominantSignatures[0].score >= 270, "chart ruler should also receive first-house rulership weight");
   assert.ok(chart.dominantSignatures.every((signature) => !/Uranus|Neptune|Pluto/.test(signature.title)));
   assert.ok(chart.dominantSignatures.some((signature) => signature.supportingModernEvidence.some((evidence) => /Neptune/.test(evidence))));
 });
