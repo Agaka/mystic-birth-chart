@@ -1246,6 +1246,15 @@ Newsletter:
 - Essential report links first open a branded HTML landing page; its visible `Download your PDF` button points to the dedicated `/reports/:token/download` endpoint. This avoids relying on a mobile browser's broken inline PDF viewer.
 - The expanded production test on 2026-07-27 completed with `delivered`; the generated Essential PDF was 15 pages and approximately 348 KB. The earlier four-page PDF remains an old test artifact and is not retroactively replaced.
 
+### 2026-07-28 specialized automated report foundation
+
+- The signed VPS worker and private Vercel AI proxy now share one fulfillment architecture for every current reading tier: Essential, Complete, Love, Career, 12-Month Transit Forecast, Synastry, Hermetic Kabbalah, Premium Natal & Year-Ahead, and the recurring Hermetic Almanac.
+- Public product promises and current hand-prepared wording were intentionally not changed in this implementation pass. Do not alter customer-facing delivery copy unless the owner explicitly requests it.
+- Every specialized report uses a tier-specific blueprint, a draft-plus-review AI pass per chapter, and the branded PDF/email delivery path. Love begins from the seventh house; Career begins from the tenth house and includes Fortune and Spirit; the Forecast uses its own start date and presentation time zone rather than a solar return; the Dossier retains the solar-return annual cycle input.
+- Synastry supports an unknown time for either person. When a time is unknown, the report must omit that person's houses, angles, sect, chart ruler, and house overlays rather than treating a noon estimate as reliable.
+- The Hermetic Kabbalah Reading draws exact esoteric names only from the closed, versioned Golden Dawn correspondence data in `worker/src/hermeticCorrespondences.ts`. Never let the AI invent correspondences.
+- The Almanac is now generated from the subscriber's current local month, including the Sun's natal house, current profection, and selected current activations. Stripe `invoice.paid` remains the trigger for active recurring subscriptions, and worker order IDs provide duplicate protection.
+
 Social:
 
 - Create Instagram.
