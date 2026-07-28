@@ -1,5 +1,5 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
-import type { EssentialJob } from "./contracts";
+import type { EssentialJob, FulfillmentJob } from "./contracts";
 
 const MAX_SIGNATURE_AGE_SECONDS = 5 * 60;
 
@@ -45,15 +45,15 @@ export function verifyDispatchSignature(
 }
 
 function workerEndpoint(workerUrl: string): URL {
-  const endpoint = new URL("/jobs/essential", workerUrl);
+  const endpoint = new URL("/jobs/reports", workerUrl);
   if (endpoint.protocol !== "https:" && process.env.NODE_ENV === "production") {
     throw new Error("Essential worker must use HTTPS in production.");
   }
   return endpoint;
 }
 
-export async function dispatchEssentialJob(
-  job: EssentialJob,
+export async function dispatchReportJob(
+  job: FulfillmentJob,
   options: EssentialDispatchOptions = {},
 ): Promise<Response> {
   const workerUrl = options.workerUrl || process.env.ESSENTIAL_WORKER_URL;
@@ -83,10 +83,18 @@ export async function dispatchEssentialJob(
     });
 
     if (!response.ok) {
-      throw new Error(`Essential worker rejected dispatch with status ${response.status}.`);
+      throw new Error(`Mystic report worker rejected dispatch with status ${response.status}.`);
     }
     return response;
   } finally {
     clearTimeout(timeout);
   }
+}
+
+/** The Essential route now shares the universal report queue. */
+export async function dispatchEssentialJob(
+  job: EssentialJob,
+  options: EssentialDispatchOptions = {},
+): Promise<Response> {
+  return dispatchReportJob({ ...job, tier: job.tier || "basic" }, options);
 }

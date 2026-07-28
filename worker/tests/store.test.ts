@@ -45,3 +45,23 @@ test("report tokens are not derived from the Stripe order id", () => {
     rmSync(directory, { recursive: true, force: true });
   }
 });
+
+test("store persists the additional private inputs needed by specialized reports", () => {
+  const directory = mkdtempSync(join(tmpdir(), "mystic-store-"));
+  const store = new EssentialStore(join(directory, "essential.sqlite"));
+  try {
+    const result = store.claimOrder({
+      ...job("test_dossier"),
+      tier: "dossier",
+      notes: "Focus on work.",
+      annual: { cycleYear: 2027, returnCity: "Lisbon, Portugal" },
+    });
+    assert.equal(result.kind, "claimed");
+    assert.equal(result.order.tier, "dossier");
+    assert.equal(result.order.annual?.cycleYear, 2027);
+    assert.equal(result.order.annual?.returnCity, "Lisbon, Portugal");
+  } finally {
+    store.close();
+    rmSync(directory, { recursive: true, force: true });
+  }
+});

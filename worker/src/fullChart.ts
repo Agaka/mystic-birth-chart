@@ -195,8 +195,7 @@ function moonPhase(sun: number, moon: number): FullChart["moonPhase"] {
   return { name: names[Math.floor(angle / 45)], angle: roundedAngle, illumination: round((1 - Math.cos(radians(angle))) / 2, 3), timingLabel };
 }
 
-export function calculateFullChart(input: FullChartInput): FullChart {
-  const instant = instantFromLocal(input);
+function calculateChartAtInstant(input: Pick<FullChartInput, "latitude" | "longitude">, instant: { date: Date; utcOffset: number }): FullChart {
   const angleValues = angles(instant.date, input.latitude, input.longitude);
   const ascendantSign = signOf(angleValues.ascendant);
   const ascendantIndex = signs.indexOf(ascendantSign);
@@ -225,4 +224,13 @@ export function calculateFullChart(input: FullChartInput): FullChart {
     placements, aspects, dominantSignatures: rankSignatures(placements, aspects, ascendantSign, chartRuler, sunAboveHorizon ? "Day chart" : "Night chart"), chartRuler,
     sect: sunAboveHorizon ? "Day chart" : "Night chart", moonPhase: moonPhase(sun.longitude, moon.longitude),
   };
+}
+
+export function calculateFullChart(input: FullChartInput): FullChart {
+  return calculateChartAtInstant(input, instantFromLocal(input));
+}
+
+/** Used for return charts and current-sky reports, where the moment is already known in UTC. */
+export function calculateFullChartAtUtc(input: Pick<FullChartInput, "latitude" | "longitude" | "timezone">, date: Date): FullChart {
+  return calculateChartAtInstant(input, { date, utcOffset: offsetAt(date.getTime(), input.timezone) });
 }

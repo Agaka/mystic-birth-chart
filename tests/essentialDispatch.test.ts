@@ -50,7 +50,7 @@ test("dispatch sends a signed job to the worker", async () => {
   assert.equal(response.status, 202);
   assert.equal(calls.length, 1);
   const call = calls[0]!;
-  assert.equal(call.url, "https://worker.example.com/jobs/essential");
+  assert.equal(call.url, "https://worker.example.com/jobs/reports");
   assert.equal(call.init?.method, "POST");
   assert.ok(new Headers(call.init?.headers).get("x-mystic-signature"));
   assert.ok(new Headers(call.init?.headers).get("x-mystic-timestamp"));

@@ -1,19 +1,46 @@
 export type EssentialJobMode = "live" | "test";
 
+export type ReadingJobTier =
+  | "basic"
+  | "love"
+  | "career"
+  | "year-ahead"
+  | "synastry"
+  | "complete"
+  | "kabbalah"
+  | "dossier"
+  | "almanac";
+
+export interface BirthDetails {
+  date: string;
+  time: string;
+  city: string;
+}
+
 export interface EssentialJob {
   orderId: string;
   mode: EssentialJobMode;
+  /** Defaults to basic for backwards-compatible Essential test requests. */
+  tier?: ReadingJobTier;
   customer: {
     name: string;
     email: string;
   };
-  birth: {
-    date: string;
-    time: string;
-    city: string;
-  };
+  birth: BirthDetails;
   focus: string;
+  notes?: string;
+  partnerData?: string;
+  annual?: {
+    cycleYear?: number;
+    returnCity?: string;
+  };
+  subscriptionId?: string;
 }
+
+export type FulfillmentJob = Required<Pick<EssentialJob, "orderId" | "mode" | "customer" | "birth" | "focus">> &
+  Omit<EssentialJob, "orderId" | "mode" | "customer" | "birth" | "focus"> & {
+    tier: ReadingJobTier;
+  };
 
 export interface ChartFacts {
   sun: string;

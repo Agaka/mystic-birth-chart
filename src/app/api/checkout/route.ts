@@ -21,6 +21,8 @@ export async function POST(request: Request) {
     focus?: string;
     notes?: string;
     partnerData?: string;
+    annualCycleYear?: string;
+    annualReturnCity?: string;
     newsletter?: boolean;
     promotekitReferral?: string;
   };
@@ -37,11 +39,14 @@ export async function POST(request: Request) {
   const focus = String(body.focus || "general").trim().slice(0, 60);
   const notes = String(body.notes || "").trim().slice(0, 450);
   const partnerData = String(body.partnerData || "").trim().slice(0, 450);
+  const annualCycleYear = String(body.annualCycleYear || "").trim().slice(0, 4);
+  const annualReturnCity = String(body.annualReturnCity || "").trim().slice(0, 180);
   const promotekitReferral =
     typeof body.promotekitReferral === "string"
       ? body.promotekitReferral.trim().slice(0, 500)
       : "";
-  if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !birthDate || !birthCity || (body.tier === "basic" && !birthTime)) {
+  const annualTier = body.tier === "year-ahead" || body.tier === "dossier";
+  if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !birthDate || !birthCity || (body.tier === "basic" && !birthTime) || (annualTier && (!/^20\d{2}$/.test(annualCycleYear) || !annualReturnCity))) {
     return NextResponse.json(
       { message: "Enter a valid name and email before continuing." },
       { status: 400 },
@@ -68,7 +73,7 @@ export async function POST(request: Request) {
     const isSubscription = offer.isSubscription;
 
     const checkoutParams: Stripe.Checkout.SessionCreateParams = {
-      mode: "payment",
+      mode: isSubscription ? "subscription" : "payment",
       customer_email: email,
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${siteUrl}/thank-you?tier=${offer.tier}&session_id={CHECKOUT_SESSION_ID}`,
@@ -84,14 +89,28 @@ export async function POST(request: Request) {
         reading_focus: focus,
         customer_notes: notes,
         partner_data: partnerData,
+        annual_cycle_year: annualCycleYear,
+        annual_return_city: annualReturnCity,
         newsletter_opt_in: body.newsletter ? "yes" : "no",
         fulfillment_status: "pending",
         ...(promotekitReferral ? { promotekit_referral: promotekitReferral } : {}),
       },
       ...(isSubscription
         ? {
-            subscription_data: {
-              description: `${offer.product.name} - ${siteConfig.name}`,
+          subscription_data: {
+            description: `${offer.product.name} - ${siteConfig.name}`,
+            metadata: {
+              reading_tier: offer.tier,
+              customer_name: name,
+              birth_date: birthDate,
+              birth_time: birthTime,
+              birth_city: birthCity,
+              reading_focus: focus,
+              customer_notes: notes,
+              partner_data: partnerData,
+              annual_cycle_year: annualCycleYear,
+              annual_return_city: annualReturnCity,
+            },
             },
           }
         : {

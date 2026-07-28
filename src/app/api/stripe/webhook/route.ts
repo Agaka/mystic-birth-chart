@@ -1,8 +1,7 @@
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
-import { POST as fulfillOrder } from "@/app/api/email/route";
-import { dispatchEssentialJob } from "@/lib/essential/dispatch";
-import { buildEssentialJob } from "@/lib/essential/job";
+import { dispatchReportJob } from "@/lib/essential/dispatch";
+import { buildFulfillmentJob, buildSubscriptionRenewalJob } from "@/lib/essential/job";
 
 export const runtime = "nodejs";
 
@@ -20,6 +19,24 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json({ message: "Invalid webhook signature." }, { status: 400 });
   }
+  if (event.type === "invoice.paid") {
+    const invoice = event.data.object as Stripe.Invoice;
+    const parent = invoice.parent as { subscription_details?: { subscription?: string | Stripe.Subscription } } | null;
+    const subscriptionRef = parent?.subscription_details?.subscription;
+    const subscriptionId = typeof subscriptionRef === "string" ? subscriptionRef : subscriptionRef?.id;
+    const email = String(invoice.customer_email || "").toLowerCase();
+    if (!subscriptionId || !email) return NextResponse.json({ received: true, ignored: "invoice-without-subscription" });
+    try {
+      const stripe = new Stripe(secretKey);
+      const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+      if (subscription.metadata.reading_tier !== "almanac") return NextResponse.json({ received: true, ignored: "non-almanac-invoice" });
+      await dispatchReportJob(buildSubscriptionRenewalJob(subscription, invoice.id, email));
+      return NextResponse.json({ received: true, dispatched: true, tier: "almanac", renewal: true });
+    } catch {
+      return NextResponse.json({ message: "Almanac renewal dispatch failed and Stripe should retry." }, { status: 500 });
+    }
+  }
+
   if (event.type !== "checkout.session.completed" && event.type !== "checkout.session.async_payment_succeeded") {
     return NextResponse.json({ received: true });
   }
@@ -27,33 +44,13 @@ export async function POST(request: Request) {
   const metadata = session.metadata || {};
   const email = String(session.customer_details?.email || session.customer_email || "").toLowerCase();
   const tier = metadata.reading_tier || session.client_reference_id || "";
-  if (tier === "basic") {
-    try {
-      await dispatchEssentialJob(buildEssentialJob(session, email));
-      return NextResponse.json({ received: true, dispatched: true });
-    } catch {
-      return NextResponse.json({ message: "Essential dispatch failed and Stripe should retry." }, { status: 500 });
-    }
+  // Stripe's invoice.paid event is the single delivery trigger for subscriptions,
+  // including the first paid month. This prevents a duplicate first Almanac.
+  if (tier === "almanac") return NextResponse.json({ received: true, awaitingInvoice: true });
+  try {
+    await dispatchReportJob(buildFulfillmentJob(session, email));
+    return NextResponse.json({ received: true, dispatched: true, tier });
+  } catch {
+    return NextResponse.json({ message: "Report dispatch failed and Stripe should retry." }, { status: 500 });
   }
-  const fulfillmentRequest = new Request("http://internal/api/email", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      sessionId: session.id,
-      tier,
-      name: metadata.customer_name || session.customer_details?.name || "",
-      email,
-      birthDate: metadata.birth_date || "",
-      birthTime: metadata.birth_time || "",
-      birthCity: metadata.birth_city || "",
-      focus: metadata.reading_focus || "general",
-      notes: metadata.customer_notes || "",
-      partnerData: metadata.partner_data || "",
-    }),
-  });
-  const response = await fulfillOrder(fulfillmentRequest);
-  if (!response.ok) {
-    return NextResponse.json({ message: "Fulfillment failed and Stripe should retry." }, { status: 500 });
-  }
-  return NextResponse.json({ received: true, fulfilled: true });
 }

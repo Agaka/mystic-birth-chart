@@ -36,6 +36,8 @@ interface CheckoutDraft {
   focus: string;
   notes: string;
   partnerData?: string;
+  annualCycleYear?: string;
+  annualReturnCity?: string;
   newsletter: boolean;
 }
 
@@ -47,6 +49,7 @@ export function CheckoutForm({
   const isEssential = tier === "basic";
   const isFocused = tier === "love" || tier === "career";
   const isSynastry = tier === "synastry";
+  const isAnnual = tier === "year-ahead" || tier === "dossier";
   const isAutomated = isEssential;
   
   const [pending, setPending] = useState(false);
@@ -121,6 +124,8 @@ export function CheckoutForm({
       focus: String(formData.get("focus") || "general"),
       notes: String(formData.get("notes") || ""),
       partnerData: isSynastry ? String(formData.get("partnerData") || "") : undefined,
+      annualCycleYear: isAnnual ? String(formData.get("annualCycleYear") || "") : undefined,
+      annualReturnCity: isAnnual ? String(formData.get("annualReturnCity") || "") : undefined,
       newsletter: Boolean(formData.get("newsletter")),
     };
 
@@ -148,6 +153,8 @@ export function CheckoutForm({
           focus: checkoutDraft.focus,
           notes: checkoutDraft.notes,
           partnerData: checkoutDraft.partnerData || "",
+          annualCycleYear: checkoutDraft.annualCycleYear || "",
+          annualReturnCity: checkoutDraft.annualReturnCity || "",
           newsletter: checkoutDraft.newsletter,
           promotekitReferral: (window as any).promotekit_referral,
         }),
@@ -349,6 +356,40 @@ export function CheckoutForm({
             className="w-full resize-y border border-aubergine/15 bg-aubergine/[0.02] px-4 py-3 font-body text-ink placeholder:text-ink/40 focus:border-aubergine focus:outline-none"
             placeholder="Please provide: First Name, Date of Birth, Exact Time (or unknown), and Birth City/Country."
           />
+        </div>
+      )}
+
+      {isAnnual && (
+        <div className="grid grid-cols-1 gap-4 border border-gold/25 bg-gold/[0.04] p-4 sm:grid-cols-2">
+          <div>
+            <label htmlFor="annualCycleYear" className="mb-2 block font-ui text-sm font-medium text-ink/70">
+              Annual cycle begins in
+            </label>
+            <input
+              id="annualCycleYear"
+              name="annualCycleYear"
+              type="number"
+              min="2020"
+              max="2100"
+              required
+              defaultValue={draft?.annualCycleYear || new Date().getFullYear()}
+              className="w-full border border-ink/15 bg-white px-4 py-3 font-body text-ink focus:border-gold focus:outline-none"
+            />
+          </div>
+          <div>
+            <label htmlFor="annualReturnCity" className="mb-2 block font-ui text-sm font-medium text-ink/70">
+              City for your solar return
+            </label>
+            <input
+              id="annualReturnCity"
+              name="annualReturnCity"
+              type="text"
+              required
+              defaultValue={draft?.annualReturnCity || draft?.birthCity || ""}
+              placeholder="City and country"
+              className="w-full border border-ink/15 bg-white px-4 py-3 font-body text-ink placeholder:text-ink/30 focus:border-gold focus:outline-none"
+            />
+          </div>
         </div>
       )}
 

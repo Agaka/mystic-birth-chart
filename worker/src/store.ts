@@ -3,16 +3,23 @@ import Database from "better-sqlite3";
 
 export type OrderMode = "live" | "test";
 export type OrderStatus = "processing" | "generated" | "delivered" | "retry_pending" | "failed";
+export type ReportTier = "basic" | "love" | "career" | "year-ahead" | "synastry" | "complete" | "kabbalah" | "dossier" | "almanac";
 
 export interface WorkerEssentialJob {
   orderId: string;
   mode: OrderMode;
+  tier?: ReportTier;
   customer: { name: string; email: string };
   birth: { date: string; time: string; city: string };
   focus: string;
+  notes?: string;
+  partnerData?: string;
+  annual?: { cycleYear?: number; returnCity?: string };
+  subscriptionId?: string;
 }
 
 export interface StoredEssentialOrder extends WorkerEssentialJob {
+  tier: ReportTier;
   status: OrderStatus;
   reportToken: string;
   reportPath: string | null;
@@ -33,9 +40,17 @@ function asOrder(row: Record<string, unknown>): StoredEssentialOrder {
   return {
     orderId: String(row.order_id),
     mode: String(row.mode) as OrderMode,
+    tier: (String(row.tier || "basic") as ReportTier),
     customer: { name: String(row.customer_name), email: String(row.email) },
     birth: { date: String(row.birth_date), time: String(row.birth_time), city: String(row.birth_city) },
     focus: String(row.focus),
+    notes: typeof row.notes === "string" ? row.notes : "",
+    partnerData: typeof row.partner_data === "string" ? row.partner_data : "",
+    annual: {
+      cycleYear: Number(row.annual_cycle_year) || undefined,
+      returnCity: typeof row.annual_return_city === "string" ? row.annual_return_city : "",
+    },
+    subscriptionId: typeof row.subscription_id === "string" ? row.subscription_id : "",
     status: String(row.status) as OrderStatus,
     reportToken: String(row.report_token),
     reportPath: typeof row.report_path === "string" ? row.report_path : null,
@@ -70,6 +85,17 @@ export class EssentialStore {
         expires_at TEXT NOT NULL
       );
     `);
+    this.ensureColumn("tier", "TEXT NOT NULL DEFAULT 'basic'");
+    this.ensureColumn("notes", "TEXT NOT NULL DEFAULT ''");
+    this.ensureColumn("partner_data", "TEXT NOT NULL DEFAULT ''");
+    this.ensureColumn("annual_cycle_year", "INTEGER");
+    this.ensureColumn("annual_return_city", "TEXT NOT NULL DEFAULT ''");
+    this.ensureColumn("subscription_id", "TEXT NOT NULL DEFAULT ''");
+  }
+
+  private ensureColumn(name: string, definition: string): void {
+    const columns = this.db.prepare("PRAGMA table_info(essential_orders)").all() as Array<{ name: string }>;
+    if (!columns.some((column) => column.name === name)) this.db.exec(`ALTER TABLE essential_orders ADD COLUMN ${name} ${definition}`);
   }
 
   close(): void {
@@ -77,6 +103,7 @@ export class EssentialStore {
   }
 
   claimOrder(job: WorkerEssentialJob): ClaimResult {
+    const tier = job.tier || "basic";
     const current = this.findByOrderId(job.orderId);
     if (current?.status === "delivered") return { kind: "duplicate", order: current };
     if (current?.status === "processing" || current?.status === "generated") return { kind: "duplicate", order: current };
@@ -92,10 +119,11 @@ export class EssentialStore {
     const reportToken = randomBytes(32).toString("base64url");
     this.db.prepare(`
       INSERT INTO essential_orders (
-        order_id, mode, status, customer_name, email, birth_date, birth_time, birth_city, focus,
+        order_id, mode, status, tier, customer_name, email, birth_date, birth_time, birth_city, focus, notes, partner_data,
+        annual_cycle_year, annual_return_city, subscription_id,
         report_token, attempts, created_at, updated_at, expires_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(job.orderId, job.mode, "processing", job.customer.name, job.customer.email, job.birth.date, job.birth.time, job.birth.city, job.focus, reportToken, 1, now, now, expiresAt);
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(job.orderId, job.mode, "processing", tier, job.customer.name, job.customer.email, job.birth.date, job.birth.time, job.birth.city, job.focus, job.notes || "", job.partnerData || "", job.annual?.cycleYear || null, job.annual?.returnCity || "", job.subscriptionId || "", reportToken, 1, now, now, expiresAt);
     return { kind: "claimed", order: this.findByOrderId(job.orderId)! };
   }
 
