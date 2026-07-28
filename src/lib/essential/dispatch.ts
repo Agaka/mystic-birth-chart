@@ -52,15 +52,20 @@ function workerEndpoint(workerUrl: string): URL {
   return endpoint;
 }
 
-export async function dispatchReportJob(
-  job: FulfillmentJob,
-  options: EssentialDispatchOptions = {},
-): Promise<Response> {
+function configuredWorkerUrl(options: EssentialDispatchOptions): { workerUrl: string; sharedSecret: string } {
   const workerUrl = options.workerUrl || process.env.ESSENTIAL_WORKER_URL;
   const sharedSecret = options.sharedSecret || process.env.ESSENTIAL_WORKER_SHARED_SECRET;
   if (!workerUrl || !sharedSecret) {
     throw new Error("Essential delivery worker is not configured.");
   }
+  return { workerUrl, sharedSecret };
+}
+
+export async function dispatchReportJob(
+  job: FulfillmentJob,
+  options: EssentialDispatchOptions = {},
+): Promise<Response> {
+  const { workerUrl, sharedSecret } = configuredWorkerUrl(options);
 
   const endpoint = workerEndpoint(workerUrl);
   const body = JSON.stringify(job);
@@ -89,6 +94,30 @@ export async function dispatchReportJob(
   } finally {
     clearTimeout(timeout);
   }
+}
+
+export async function getAlmanacSubscription(
+  libraryToken: string,
+  options: EssentialDispatchOptions = {},
+): Promise<{ subscriptionId: string }> {
+  const { workerUrl, sharedSecret } = configuredWorkerUrl(options);
+  const path = `/libraries/${encodeURIComponent(libraryToken)}/subscription`;
+  const endpoint = new URL(path, workerUrl);
+  if (endpoint.protocol !== "https:" && process.env.NODE_ENV === "production") {
+    throw new Error("Essential worker must use HTTPS in production.");
+  }
+  const timestamp = String(Math.floor((options.now || Date.now)() / 1000));
+  const signature = createDispatchSignature("GET", endpoint.pathname, timestamp, "", sharedSecret);
+  const response = await (options.fetchImpl || fetch)(endpoint, {
+    method: "GET",
+    headers: {
+      "x-mystic-timestamp": timestamp,
+      "x-mystic-signature": signature,
+    },
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error(`Unable to resolve Almanac subscription (${response.status}).`);
+  return response.json() as Promise<{ subscriptionId: string }>;
 }
 
 /** The Essential route now shares the universal report queue. */

@@ -1,9 +1,12 @@
 import { createRequire } from "node:module";
 import type * as AstronomyTypes from "astronomy-engine";
 import { buildChartFacts, type ChartFacts } from "./chartFacts.ts";
-import { calculateFullChartAtUtc, type FullChart } from "./fullChart.ts";
+import { calculateFullChart, calculateFullChartAtUtc, type FullChart, type Sign } from "./fullChart.ts";
 import type { StoredEssentialOrder } from "./store.ts";
 import { hermeticCorrespondences, quinanceFor } from "./hermeticCorrespondences.ts";
+import { buildNatalEvidence, type NatalEvidence } from "./natalEvidence.ts";
+import { buildTimingCycle, selectPrincipalEvents, type TimingCycle } from "./timingEngine.ts";
+import { buildSynastryEvidence, type SynastryEvidence } from "./synastryEngine.ts";
 
 const require = createRequire(import.meta.url);
 const Astronomy = require("astronomy-engine") as typeof AstronomyTypes;
@@ -16,32 +19,38 @@ export type AnnualFacts = {
   period: { startsAt: string; endsAt: string; returnLocation: string; timezone: string };
   profection: { age: number; house: number; sign: string; lordOfYear: string; natalHousesRuled: number[] };
   solarReturn: FullChart;
+  solarReturnEvidence: {
+    ascendantRuler: string;
+    midheavenRuler: string;
+    angularPlanets: string[];
+    occupiedHouses: Array<{ house: number; planets: string[] }>;
+    natalOverlays: Array<{ planet: string; natalHouse: number }>;
+    returnToNatalAspects: Array<{ returnBody: string; natalBody: string; aspect: string; orbLabel: string; outOfSign: boolean }>;
+  };
   monthlySky: Array<{ month: number; startsAt: string; chart: FullChart }>;
 };
 
-export type ForecastFacts = {
-  period: { startsAt: string; endsAt: string; presentationTimezone: string };
-  profections: Array<{ startsAt: string; endsAt: string; house: number; sign: string; lordOfYear: string }>;
-  monthlySky: Array<{ month: number; startsAt: string; chart: FullChart }>;
-  activations: Array<{ date: string; transit: string; target: string; aspect: string; orbLabel: string; category: "expansion" | "pressure" | "review" | "decision" }>;
-};
+export type ForecastFacts = TimingCycle;
 
 export type AlmanacFacts = {
   month: { startsAt: string; endsAt: string; presentationTimezone: string; sunHouse: number; themeSign: string };
-  profection: ForecastFacts["profections"][number];
-  activations: ForecastFacts["activations"];
+  profection: TimingCycle["profections"][number];
+  lunations: Array<{ kind: "New Moon" | "Full Moon"; exactAt: string; sign: string; degreeLabel: string; natalHouse: number; closeNatalContacts: string[] }>;
+  timing: TimingCycle;
 };
 
 export type ProductFacts = {
   natal: ChartFacts;
+  natalEvidence?: NatalEvidence;
   natalTimeKnown: boolean;
   natalReliabilityNote: string;
   partner?: { facts: ChartFacts; timeKnown: boolean; reliabilityNote: string };
-  synastry?: Array<{ bodyA: string; bodyB: string; aspect: string; orbLabel: string; classification: "supportive" | "demanding" | "mixed" | "highly consequential" }>;
+  synastry?: SynastryEvidence;
   hermetic?: { version: string; system: string; sources: readonly string[]; planetarySpheres: typeof hermeticCorrespondences.planetarySpheres; selectedQuinances: Array<{ subject: string; sign: string; degreeLabel: string; quinance: ReturnType<typeof quinanceFor> }>; zodiac: typeof hermeticCorrespondences.zodiac };
   annual?: AnnualFacts;
   forecast?: ForecastFacts;
   almanac?: AlmanacFacts;
+  almanacHistory?: { title: string; chapterDigests: Array<{ key: string; digest: string }> };
   generatedAt: string;
 };
 
@@ -69,32 +78,35 @@ function parsePartnerBirth(value: string): { date: string; time: string; city: s
   return { date, time: timeKnown ? timeRaw : "12:00", city, timeKnown };
 }
 
-function synastryContacts(a: ChartFacts, b: ChartFacts, timesKnown: boolean): NonNullable<ProductFacts["synastry"]> {
-  const aspects: Array<[string, number, "supportive" | "demanding" | "mixed" | "highly consequential"]> = [["conjunction", 0, "highly consequential"], ["sextile", 60, "supportive"], ["square", 90, "demanding"], ["trine", 120, "supportive"], ["opposition", 180, "mixed"]];
-  const contacts: Array<NonNullable<ProductFacts["synastry"]>[number] & { score: number }> = [];
-  for (const first of a.chart.placements.filter((placement) => ["Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn"].includes(placement.body))) for (const second of b.chart.placements.filter((placement) => ["Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn"].includes(placement.body))) {
-    const distance = angularDistance(first.longitude, second.longitude);
-    for (const [aspect, angle, classification] of aspects) {
-      const orb = Math.abs(distance - angle); if (orb > 5) continue;
-      contacts.push({ bodyA: first.body, bodyB: second.body, aspect, orbLabel: labelOrb(orb), classification: orb < 1 ? "highly consequential" : classification, score: orb });
-    }
-  }
-  if (timesKnown) {
-    const angles = [{ bodyA: "Ascendant", longitude: a.chart.angles.ascendant.longitude }, { bodyA: "Midheaven", longitude: a.chart.angles.midheaven.longitude }];
-    for (const first of angles) for (const second of b.chart.placements.filter((placement) => ["Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn"].includes(placement.body))) {
-      const found = transitAspect(first.longitude, second.longitude); if (!found || found.orb > 3) continue;
-      contacts.push({ bodyA: first.bodyA, bodyB: second.body, aspect: found.aspect, orbLabel: labelOrb(found.orb), classification: found.orb < 1 ? "highly consequential" : found.aspect === "square" ? "demanding" : "mixed", score: found.orb });
-    }
-  }
-  return contacts.sort((x, y) => x.score - y.score).slice(0, 24).map(({ score: _score, ...contact }) => contact);
-}
-
 function wholeSignHouseSign(ascendant: string, house: number): string {
   return signs[(signs.indexOf(ascendant) + house - 1) % 12];
 }
 
 function housesRuled(chart: FullChart, body: string): number[] {
   return Array.from({ length: 12 }, (_, index) => index + 1).filter((house) => rulers[wholeSignHouseSign(chart.angles.ascendant.sign, house)] === body);
+}
+
+function aspectBetween(first: number, second: number): { aspect: string; orb: number } | null {
+  const distance = Math.abs(((first - second + 540) % 360) - 180);
+  const found = [["conjunction", 0], ["sextile", 60], ["square", 90], ["trine", 120], ["opposition", 180]].map(([aspect, angle]) => ({ aspect: String(aspect), orb: Math.abs(distance - Number(angle)) })).sort((a, b) => a.orb - b.orb)[0]!;
+  return found.orb <= 3 ? found : null;
+}
+
+export function buildSolarReturnEvidence(natal: FullChart, solarReturn: FullChart): AnnualFacts["solarReturnEvidence"] {
+  const traditional = ["Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn"];
+  const natalAscendantIndex = signs.indexOf(natal.angles.ascendant.sign);
+  const angularPlanets = solarReturn.placements.filter((item) => [1, 4, 7, 10].includes(item.house)).map((item) => item.body);
+  const occupiedHouses = Array.from({ length: 12 }, (_, index) => ({ house: index + 1, planets: solarReturn.placements.filter((item) => item.house === index + 1).map((item) => item.body) })).filter((item) => item.planets.length);
+  const natalOverlays = solarReturn.placements.map((item) => ({ planet: item.body, natalHouse: ((signs.indexOf(item.sign) - natalAscendantIndex + 12) % 12) + 1 }));
+  const returnToNatalAspects: AnnualFacts["solarReturnEvidence"]["returnToNatalAspects"] = [];
+  for (const returning of solarReturn.placements.filter((item) => traditional.includes(item.body))) for (const natalPlacement of natal.placements.filter((item) => traditional.includes(item.body))) {
+    const found = aspectBetween(returning.longitude, natalPlacement.longitude); if (!found) continue;
+    const rawDistance = Math.abs(signs.indexOf(returning.sign) - signs.indexOf(natalPlacement.sign));
+    const signDistance = Math.min(rawDistance, 12 - rawDistance);
+    const expected = ({ conjunction: 0, sextile: 2, square: 3, trine: 4, opposition: 6 } as Record<string, number>)[found.aspect];
+    returnToNatalAspects.push({ returnBody: returning.body, natalBody: natalPlacement.body, aspect: found.aspect, orbLabel: `${Math.floor(found.orb)}\u00b0${String(Math.round((found.orb % 1) * 60)).padStart(2, "0")}\u2032`, outOfSign: signDistance !== expected });
+  }
+  return { ascendantRuler: rulers[solarReturn.angles.ascendant.sign], midheavenRuler: rulers[solarReturn.angles.midheaven.sign], angularPlanets, occupiedHouses, natalOverlays, returnToNatalAspects: returnToNatalAspects.sort((a, b) => Number(a.outOfSign) - Number(b.outOfSign) || a.orbLabel.localeCompare(b.orbLabel)).slice(0, 24) };
 }
 
 async function buildAnnualFacts(order: StoredEssentialOrder, natal: ChartFacts): Promise<AnnualFacts> {
@@ -122,6 +134,7 @@ async function buildAnnualFacts(order: StoredEssentialOrder, natal: ChartFacts):
     period: { startsAt: moment.date.toISOString(), endsAt: nextStart.toISOString(), returnLocation: returnPlace.label, timezone: returnPlace.timezone },
     profection: { age, house: profectionHouse, sign: profectionSign, lordOfYear, natalHousesRuled: housesRuled(natal.chart, lordOfYear) },
     solarReturn,
+    solarReturnEvidence: buildSolarReturnEvidence(natal.chart, solarReturn),
     monthlySky,
   };
 }
@@ -135,59 +148,39 @@ function astroDate(value: string, timezone: string): Date {
   return new Date(presumed - minutes * 60_000);
 }
 
-function angularDistance(a: number, b: number): number { const raw = Math.abs(((a - b + 540) % 360) - 180); return Math.min(raw, 360 - raw); }
-function transitAspect(a: number, b: number): { aspect: string; orb: number } | null {
-  const distance = angularDistance(a, b);
-  const candidates: Array<[string, number]> = [["conjunction", 0], ["sextile", 60], ["square", 90], ["trine", 120], ["opposition", 180]];
-  const closest = candidates.map(([aspect, angle]) => ({ aspect, orb: Math.abs(distance - angle) })).sort((x, y) => x.orb - y.orb)[0]!;
-  return closest.orb <= 0.35 ? closest : null;
-}
-
-function labelOrb(value: number): string { const degree = Math.floor(value); const minute = Math.round((value - degree) * 60); return `${degree}\u00b0${String(minute).padStart(2, "0")}\u2032`; }
-
-function forecastProfections(natal: ChartFacts, start: Date, end: Date): ForecastFacts["profections"] {
-  const birth = natal.birth.date.split("-").map(Number); const ascIndex = signs.indexOf(natal.chart.angles.ascendant.sign);
-  const points: Date[] = [start];
-  for (let year = start.getUTCFullYear() - 1; year <= end.getUTCFullYear() + 1; year += 1) {
-    const birthday = new Date(Date.UTC(year, birth[1] - 1, birth[2], 12)); if (birthday > start && birthday < end) points.push(birthday);
-  }
-  points.push(end); points.sort((a, b) => a.getTime() - b.getTime());
-  return points.slice(0, -1).map((from, index) => {
-    const age = from.getUTCFullYear() - birth[0] - (from.getUTCMonth() + 1 < birth[1] || (from.getUTCMonth() + 1 === birth[1] && from.getUTCDate() < birth[2]) ? 1 : 0);
-    const house = (age % 12) + 1; const sign = signs[(ascIndex + house - 1) % 12]!;
-    return { startsAt: from.toISOString(), endsAt: points[index + 1]!.toISOString(), house, sign, lordOfYear: rulers[sign]! };
-  });
-}
-
-function buildTransitActivations(natal: ChartFacts, start: Date, end: Date): ForecastFacts["activations"] {
-  const targets = [
-    ...natal.chart.placements.filter((placement) => ["Sun", "Moon", natal.chart.chartRuler].includes(placement.body)).map((placement) => ({ label: placement.body, longitude: placement.longitude })),
-    { label: "Ascendant", longitude: natal.chart.angles.ascendant.longitude }, { label: "Midheaven", longitude: natal.chart.angles.midheaven.longitude },
-  ];
-  const entries: Array<ForecastFacts["activations"][number] & { score: number }> = [];
-  for (let point = new Date(start); point <= end; point.setUTCDate(point.getUTCDate() + 1)) {
-    const sky = calculateFullChartAtUtc({ latitude: natal.birth.latitude, longitude: natal.birth.longitude, timezone: natal.birth.timezone }, point);
-    for (const transit of sky.placements.filter((placement) => ["Jupiter", "Saturn", "Mars", "Mercury", "Venus"].includes(placement.body))) for (const target of targets) {
-      const found = transitAspect(transit.longitude, target.longitude); if (!found) continue;
-      const category = transit.body === "Jupiter" ? "expansion" : transit.body === "Saturn" ? "pressure" : transit.body === "Mercury" ? "review" : transit.body === "Mars" ? "decision" : "expansion";
-      entries.push({ date: point.toISOString(), transit: transit.body, target: target.label, aspect: found.aspect, orbLabel: labelOrb(found.orb), category, score: found.orb });
-    }
-  }
-  const selected: typeof entries = [];
-  for (const candidate of entries.sort((a, b) => a.score - b.score)) {
-    const nearDuplicate = selected.some((existing) => existing.transit === candidate.transit && existing.target === candidate.target && existing.aspect === candidate.aspect && Math.abs(Date.parse(existing.date) - Date.parse(candidate.date)) < 9 * 86_400_000);
-    if (!nearDuplicate) selected.push(candidate);
-    if (selected.length === 15) break;
-  }
-  return selected.map(({ score: _score, ...item }) => item);
-}
-
 function buildForecastFacts(order: StoredEssentialOrder, natal: ChartFacts): ForecastFacts {
   const timezone = order.forecast?.presentationTimezone || natal.birth.timezone;
   const start = astroDate(order.forecast?.startDate || new Date().toISOString().slice(0, 10), timezone);
   const end = new Date(start); end.setUTCFullYear(end.getUTCFullYear() + 1);
-  const monthlySky = Array.from({ length: 12 }, (_, index) => { const date = new Date(start); date.setUTCMonth(date.getUTCMonth() + index); return { month: index + 1, startsAt: date.toISOString(), chart: calculateFullChartAtUtc({ latitude: natal.birth.latitude, longitude: natal.birth.longitude, timezone }, date) }; });
-  return { period: { startsAt: start.toISOString(), endsAt: end.toISOString(), presentationTimezone: timezone }, profections: forecastProfections(natal, start, end), monthlySky, activations: buildTransitActivations(natal, start, end) };
+  const localizedNatal = { ...natal, birth: { ...natal.birth, timezone } };
+  return selectPrincipalEvents(buildTimingCycle(localizedNatal, start, end), localizedNatal);
+}
+
+function moonSignsForUnknown(facts: ChartFacts): Sign[] {
+  const input = { date: facts.birth.date, latitude: facts.birth.latitude, longitude: facts.birth.longitude, timezone: facts.birth.timezone };
+  const atStart = calculateFullChart({ ...input, time: "00:01" }).placements.find((item) => item.body === "Moon")!.sign;
+  const atEnd = calculateFullChart({ ...input, time: "23:59" }).placements.find((item) => item.body === "Moon")!.sign;
+  return atStart === atEnd ? [atStart] : [atStart, atEnd];
+}
+
+export function buildMonthlyLunations(natal: ChartFacts, start: Date, end: Date): AlmanacFacts["lunations"] {
+  const values: AlmanacFacts["lunations"] = [];
+  for (const [kind, phase] of [["New Moon", 0], ["Full Moon", 180]] as const) {
+    let cursor = new Date(start.getTime() - 2 * 86_400_000);
+    for (let guard = 0; guard < 3; guard += 1) {
+      const moment = Astronomy.SearchMoonPhase(phase, cursor, 40);
+      if (!moment || moment.date >= end) break;
+      if (moment.date >= start) {
+        const chart = calculateFullChartAtUtc({ latitude: natal.birth.latitude, longitude: natal.birth.longitude, timezone: natal.birth.timezone }, moment.date);
+        const moon = chart.placements.find((item) => item.body === "Moon")!;
+        const natalHouse = ((signs.indexOf(moon.sign) - signs.indexOf(natal.chart.angles.ascendant.sign) + 12) % 12) + 1;
+        const closeNatalContacts = natal.chart.placements.filter((item) => Math.abs(((moon.longitude - item.longitude + 540) % 360) - 180) <= 3).map((item) => `conjunction natal ${item.body}`);
+        values.push({ kind, exactAt: moment.date.toISOString(), sign: moon.sign, degreeLabel: moon.degreeLabel, natalHouse, closeNatalContacts });
+      }
+      cursor = new Date(moment.date.getTime() + 2 * 86_400_000);
+    }
+  }
+  return values.sort((a, b) => Date.parse(a.exactAt) - Date.parse(b.exactAt));
 }
 
 function buildAlmanacFacts(order: StoredEssentialOrder, natal: ChartFacts): AlmanacFacts {
@@ -201,12 +194,14 @@ function buildAlmanacFacts(order: StoredEssentialOrder, natal: ChartFacts): Alma
   const sun = sky.placements.find((placement) => placement.body === "Sun");
   if (!sun) throw new Error("monthly-sun-not-found");
   const sunHouse = ((signs.indexOf(sun.sign) - signs.indexOf(natal.chart.angles.ascendant.sign) + 12) % 12) + 1;
-  const profection = forecastProfections(natal, start, end)[0];
+  const timing = buildTimingCycle(natal, start, end);
+  const profection = timing.profections[0];
   if (!profection) throw new Error("monthly-profection-not-found");
   return {
     month: { startsAt: start.toISOString(), endsAt: end.toISOString(), presentationTimezone: timezone, sunHouse, themeSign: sun.sign },
     profection,
-    activations: buildTransitActivations(natal, start, end).slice(0, 6),
+    lunations: buildMonthlyLunations(natal, start, end),
+    timing,
   };
 }
 
@@ -216,6 +211,7 @@ export async function buildProductFacts(order: StoredEssentialOrder): Promise<Pr
   if (!natalTimeKnown) natal.birth.time = "Unknown (planetary positions calculated at noon; houses and angles omitted)";
   const facts: ProductFacts = {
     natal,
+    natalEvidence: natalTimeKnown ? buildNatalEvidence(natal.chart) : undefined,
     natalTimeKnown,
     natalReliabilityNote: natalTimeKnown
       ? "Birth time supplied; angles and whole-sign houses may be used."
@@ -227,10 +223,18 @@ export async function buildProductFacts(order: StoredEssentialOrder): Promise<Pr
     const partner = await buildChartFacts({ ...order, birth: { date: partnerBirth.date, time: partnerBirth.time, city: partnerBirth.city }, focus: "synastry" });
     if (!partnerBirth.timeKnown) partner.birth.time = "Unknown (planetary positions calculated at noon; houses and angles omitted)";
     facts.partner = { facts: partner, timeKnown: partnerBirth.timeKnown, reliabilityNote: partnerBirth.timeKnown ? "Birth time supplied; angles and whole-sign houses may be used." : "Birth time unknown; do not use houses, Ascendant, Midheaven, sect, chart ruler, or house overlays for this person." };
-    facts.synastry = synastryContacts(natal, partner, natalTimeKnown && partnerBirth.timeKnown);
+    facts.synastry = buildSynastryEvidence(natal.chart, partner.chart, {
+      firstTimeKnown: natalTimeKnown,
+      secondTimeKnown: partnerBirth.timeKnown,
+      firstMoonSigns: natalTimeKnown ? undefined : moonSignsForUnknown(natal),
+      secondMoonSigns: partnerBirth.timeKnown ? undefined : moonSignsForUnknown(partner),
+    });
   }
-  if (order.tier === "year-ahead" || order.tier === "dossier") facts.annual = await buildAnnualFacts(order, natal);
-  if (order.tier === "year-ahead") { delete facts.annual; facts.forecast = buildForecastFacts(order, natal); }
+  if (order.tier === "dossier") {
+    facts.annual = await buildAnnualFacts(order, natal);
+    facts.forecast = selectPrincipalEvents(buildTimingCycle(natal, new Date(facts.annual.period.startsAt), new Date(facts.annual.period.endsAt)), natal);
+  }
+  if (order.tier === "year-ahead") facts.forecast = buildForecastFacts(order, natal);
   if (order.tier === "almanac") facts.almanac = buildAlmanacFacts(order, natal);
   if (order.tier === "kabbalah") {
     const select = ["Sun", "Moon", natal.chart.chartRuler].map((body) => natal.chart.placements.find((placement) => placement.body === body)!).filter(Boolean);

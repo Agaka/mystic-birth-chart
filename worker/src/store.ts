@@ -24,7 +24,12 @@ export interface StoredEssentialOrder extends WorkerEssentialJob {
   status: OrderStatus;
   reportToken: string;
   reportPath: string | null;
+  summaryPath: string | null;
+  calendarPath: string | null;
+  libraryToken: string | null;
+  sourcePath: string | null;
   attempts: number;
+  createdAt: string;
   expiresAt: string;
 }
 
@@ -59,7 +64,12 @@ function asOrder(row: Record<string, unknown>): StoredEssentialOrder {
     status: String(row.status) as OrderStatus,
     reportToken: String(row.report_token),
     reportPath: typeof row.report_path === "string" ? row.report_path : null,
+    summaryPath: typeof row.summary_path === "string" ? row.summary_path : null,
+    calendarPath: typeof row.calendar_path === "string" ? row.calendar_path : null,
+    libraryToken: typeof row.library_token === "string" && row.library_token ? row.library_token : null,
+    sourcePath: typeof row.report_source_path === "string" ? row.report_source_path : null,
     attempts: Number(row.attempts),
+    createdAt: String(row.created_at),
     expiresAt: String(row.expires_at),
   };
 }
@@ -98,6 +108,10 @@ export class EssentialStore {
     this.ensureColumn("subscription_id", "TEXT NOT NULL DEFAULT ''");
     this.ensureColumn("forecast_start_date", "TEXT NOT NULL DEFAULT ''");
     this.ensureColumn("presentation_timezone", "TEXT NOT NULL DEFAULT ''");
+    this.ensureColumn("summary_path", "TEXT");
+    this.ensureColumn("calendar_path", "TEXT");
+    this.ensureColumn("library_token", "TEXT");
+    this.ensureColumn("report_source_path", "TEXT");
   }
 
   private ensureColumn(name: string, definition: string): void {
@@ -124,13 +138,17 @@ export class EssentialStore {
 
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
     const reportToken = randomBytes(32).toString("base64url");
+    const priorLibrary = tier === "almanac" && job.subscriptionId
+      ? this.db.prepare("SELECT library_token FROM essential_orders WHERE subscription_id = ? AND library_token IS NOT NULL ORDER BY created_at ASC LIMIT 1").get(job.subscriptionId) as { library_token?: string } | undefined
+      : undefined;
+    const libraryToken = tier === "almanac" ? priorLibrary?.library_token || randomBytes(32).toString("base64url") : null;
     this.db.prepare(`
       INSERT INTO essential_orders (
         order_id, mode, status, tier, customer_name, email, birth_date, birth_time, birth_city, focus, notes, partner_data,
         annual_cycle_year, annual_return_city, forecast_start_date, presentation_timezone, subscription_id,
-        report_token, attempts, created_at, updated_at, expires_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(job.orderId, job.mode, "processing", tier, job.customer.name, job.customer.email, job.birth.date, job.birth.time, job.birth.city, job.focus, job.notes || "", job.partnerData || "", job.annual?.cycleYear || null, job.annual?.returnCity || "", job.forecast?.startDate || "", job.forecast?.presentationTimezone || "", job.subscriptionId || "", reportToken, 1, now, now, expiresAt);
+        report_token, library_token, attempts, created_at, updated_at, expires_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(job.orderId, job.mode, "processing", tier, job.customer.name, job.customer.email, job.birth.date, job.birth.time, job.birth.city, job.focus, job.notes || "", job.partnerData || "", job.annual?.cycleYear || null, job.annual?.returnCity || "", job.forecast?.startDate || "", job.forecast?.presentationTimezone || "", job.subscriptionId || "", reportToken, libraryToken, 1, now, now, expiresAt);
     return { kind: "claimed", order: this.findByOrderId(job.orderId)! };
   }
 
@@ -144,14 +162,39 @@ export class EssentialStore {
     return row ? asOrder(row) : null;
   }
 
+  findLibrary(token: string): StoredEssentialOrder[] {
+    const rows = this.db.prepare("SELECT * FROM essential_orders WHERE library_token = ? AND tier = 'almanac' AND status IN ('generated', 'delivered') ORDER BY created_at DESC").all(token) as Record<string, unknown>[];
+    return rows.map(asOrder);
+  }
+
+  findLibraryReport(token: string, orderId: string): StoredEssentialOrder | null {
+    const row = this.db.prepare("SELECT * FROM essential_orders WHERE library_token = ? AND order_id = ? AND tier = 'almanac' AND status IN ('generated', 'delivered')").get(token, orderId) as Record<string, unknown> | undefined;
+    return row ? asOrder(row) : null;
+  }
+
+  findLibrarySubscription(token: string): string | null {
+    const row = this.db.prepare("SELECT subscription_id FROM essential_orders WHERE library_token = ? AND tier = 'almanac' AND subscription_id != '' ORDER BY created_at DESC LIMIT 1").get(token) as { subscription_id?: string } | undefined;
+    return row?.subscription_id || null;
+  }
+
+  findPreviousAlmanac(subscriptionId: string, excludeOrderId: string): StoredEssentialOrder | null {
+    const row = this.db.prepare("SELECT * FROM essential_orders WHERE subscription_id = ? AND order_id != ? AND tier = 'almanac' AND status = 'delivered' AND report_source_path IS NOT NULL ORDER BY created_at DESC LIMIT 1").get(subscriptionId, excludeOrderId) as Record<string, unknown> | undefined;
+    return row ? asOrder(row) : null;
+  }
+
+  findRecoverableOrders(): StoredEssentialOrder[] {
+    const rows = this.db.prepare("SELECT * FROM essential_orders WHERE status IN ('processing', 'generated', 'retry_pending') ORDER BY created_at ASC").all() as Record<string, unknown>[];
+    return rows.map(asOrder);
+  }
+
   getPublicStatus(orderId: string): EssentialOrderStatus | null {
     const row = this.db.prepare("SELECT status, updated_at FROM essential_orders WHERE order_id = ?").get(orderId) as { status: OrderStatus; updated_at: string } | undefined;
     return row ? { status: row.status, updatedAt: row.updated_at } : null;
   }
 
-  markGenerated(orderId: string, reportPath: string): void {
-    this.db.prepare("UPDATE essential_orders SET status = ?, report_path = ?, updated_at = ? WHERE order_id = ?")
-      .run("generated", reportPath, new Date().toISOString(), orderId);
+  markGenerated(orderId: string, reportPath: string, artifacts?: { summaryPath?: string; calendarPath?: string; sourcePath?: string }): void {
+    this.db.prepare("UPDATE essential_orders SET status = ?, report_path = ?, summary_path = ?, calendar_path = ?, report_source_path = ?, updated_at = ? WHERE order_id = ?")
+      .run("generated", reportPath, artifacts?.summaryPath || null, artifacts?.calendarPath || null, artifacts?.sourcePath || null, new Date().toISOString(), orderId);
   }
 
   markRetryPending(orderId: string, errorCode: string): void {
@@ -160,6 +203,10 @@ export class EssentialStore {
 
   markDelivered(orderId: string): void {
     this.updateStatus(orderId, "delivered", null);
+  }
+
+  markFailed(orderId: string, errorCode: string): void {
+    this.updateStatus(orderId, "failed", errorCode);
   }
 
   private updateStatus(orderId: string, status: OrderStatus, errorCode: string | null): void {

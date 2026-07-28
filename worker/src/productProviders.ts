@@ -1,6 +1,7 @@
 import { createHmac } from "node:crypto";
 import type { ProductFacts } from "./reportFacts.ts";
 import type { ReportBlueprint, ReportChapter } from "./reportCatalog.ts";
+import { evidenceForChapter } from "./productEvidence.ts";
 
 export type ProductReportChapter = { key: string; title: string; body: string };
 export type ProductReport = {
@@ -55,9 +56,10 @@ export async function generateReviewedProductReport(blueprint: ReportBlueprint, 
   const minimum = Math.max(2600, Math.round(targetWords(blueprint) * 4));
   const chapters: ProductReportChapter[] = [];
   for (const chapter of blueprint.chapters) {
-    const draftResponse = await callProxy({ operation: "chapter-write", blueprint, chapter, facts, targetWords: targetWords(blueprint) });
+    const chapterFacts = evidenceForChapter(blueprint, chapter, facts);
+    const draftResponse = await callProxy({ operation: "chapter-write", blueprint, chapter, facts: chapterFacts, targetWords: targetWords(blueprint) });
     const draft = checkChapter(draftResponse.chapter, chapter, minimum);
-    const reviewResponse = await callProxy({ operation: "chapter-review", blueprint, chapter, facts, draft, targetWords: targetWords(blueprint) });
+    const reviewResponse = await callProxy({ operation: "chapter-review", blueprint, chapter, facts: chapterFacts, draft, targetWords: targetWords(blueprint) });
     chapters.push(checkChapter(reviewResponse.chapter, chapter, minimum));
   }
   return { ...framing, chapters };

@@ -21,9 +21,12 @@ export type ReportBlueprint = {
 
 const natalFoundation: ReportChapter[] = [
   { key: "chartArchitecture", title: "Chart Architecture", purpose: "The ranked structure, sect, angles, house rulers, dignities, receptions, and repeated testimony that organize the natal figure." },
-  { key: "temperament", title: "Temperament and Authority", purpose: "Sect, distribution of authority, the luminaries, chart ruler, angular planets, and major strengths or pressures." },
-  { key: "planetaryChapters", title: "The Traditional Planets", purpose: "An integrated judgment of Sun, Moon, Mercury, Venus, Mars, Jupiter, and Saturn, with modern planets only as supporting layers." },
-  { key: "lifeAreas", title: "The Twelve Houses", purpose: "Each house through its sign, ruler, condition, occupants, relevant aspects, receptions, and repeated testimony." },
+  { key: "authority", title: "Temperament and Planetary Authority", purpose: "Sect, distribution of authority, the luminaries, chart ruler, angular planets, and major strengths or pressures." },
+  { key: "planetaryJudgments", title: "The Seven Traditional Planets", purpose: "An individual but integrated judgment of Sun, Moon, Mercury, Venus, Mars, Jupiter, and Saturn, with modern planets only as supporting layers." },
+  { key: "dispositorsReceptions", title: "Dispositors, Receptions, and Repeated Testimony", purpose: "Trace dispositors and receptions from the supplied evidence, identify cycles or final dispositors, and explain contradictions and themes repeated by multiple techniques." },
+  { key: "houses1to4", title: "Houses One Through Four", purpose: "Identity and direction; resources; learning and local environment; home, ancestry, and foundations. Judge each through sign, ruler condition, occupants, aspects, and reception." },
+  { key: "houses5to8", title: "Houses Five Through Eight", purpose: "Creativity and pleasure; service and maintenance; relationship and commitment; shared resources, trust, and dependency. Keep health language symbolic and non-diagnostic." },
+  { key: "houses9to12", title: "Houses Nine Through Twelve", purpose: "Study and worldview; vocation and authority; alliances and future projects; retreat and private life. Judge each through the supplied house evidence." },
   { key: "appliedSynthesis", title: "Applied Synthesis", purpose: "Practical priorities, contradictions, questions, and the relationships among work, private life, money, intimacy, and autonomy." },
 ];
 
@@ -40,7 +43,7 @@ export const reportCatalog: Record<ReportTier, ReportBlueprint> = {
   },
   love: {
     tier: "love", fileName: "love-relationship-pattern.pdf", title: "Love & Relationship Pattern", eyebrow: "Focused Natal Study",
-    targetPages: [24, 32], targetWords: [6500, 9000], requiresPartner: false, requiresAnnualCycle: false, recurring: false,
+    targetPages: [24, 32], targetWords: [6000, 9000], requiresPartner: false, requiresAnnualCycle: false, recurring: false,
     chapters: [
       { key: "relationshipStructure", title: "The Relationship Structure", purpose: "Begin with the seventh whole-sign house: sign, ruler, condition of that ruler, occupants, main aspects, and chart ruler. Then judge Venus for attraction, values and reciprocity; the Moon for security and continuity; Mars for desire, initiative, conflict and limits; and Mercury for language and negotiation." },
       { key: "intimacyAndCommitment", title: "Romance, Trust, and Commitment", purpose: "Read the fifth house for romance and expression, eighth for trust, vulnerability and shared resources, fourth for domestic intimacy and emotional base, Saturn for commitment and delay, and Jupiter for confidence and generosity. Distinguish attraction from commitment and identify repeated testimony across houses and rulers." },
@@ -49,7 +52,7 @@ export const reportCatalog: Record<ReportTier, ReportBlueprint> = {
   },
   career: {
     tier: "career", fileName: "career-vocation-reading.pdf", title: "Career & Vocation", eyebrow: "Focused Natal Study",
-    targetPages: [24, 32], targetWords: [6500, 9000], requiresPartner: false, requiresAnnualCycle: false, recurring: false,
+    targetPages: [24, 32], targetWords: [6000, 9000], requiresPartner: false, requiresAnnualCycle: false, recurring: false,
     chapters: [
       { key: "vocationStructure", title: "The Vocation Structure", purpose: "Begin with the tenth house, Midheaven, ruler of the tenth, planets in the tenth, aspects to the Midheaven, and the relationship to the chart ruler. Integrate the Sun for authorship and recognition, Mercury for skill and communication, Mars for execution, Jupiter for growth, and Saturn for structure and maturation." },
       { key: "workResources", title: "Work, Resources, and Authority", purpose: "Judge second house resources, sixth house routine and workload, ninth house education and specialization, eleventh house networks and collective projects, the Lot of Fortune, the Lot of Spirit, and the dignities or debilities of vocational planets. Explain working style, leadership and authority, autonomy versus structure, and supportive environments." },
@@ -79,14 +82,25 @@ export const reportCatalog: Record<ReportTier, ReportBlueprint> = {
     targetPages: [45, 65], targetWords: [12000, 18000], requiresPartner: false, requiresAnnualCycle: false, recurring: false,
     chapters: [
       { key: "natalFoundation", title: "The Natal Spiritual Hierarchy", purpose: "Start from the chart ruler, sect light, dominant and pressured traditional planets, then map their hierarchy through the selected Hermetic correspondence system. Do not make esoteric symbolism outrank natal evidence." },
-      { key: "planetaryTree", title: "Spheres, Paths, and Balance", purpose: "Use only the supplied closed correspondence database for planetary spheres, Sephiroth, paths, Tarot, letters, colors, metals, perfumes, angels, Psalms and decans. Explain dominant and balancing spheres, virtues and imbalances, and explicitly distinguish Hermetic Qabalah from Jewish Kabbalah." },
-      { key: "decansAndPractice", title: "Decans and Contemplative Practice", purpose: "Cover the decans of Sun, Moon, Ascendant, chart ruler and Midheaven, plus database-backed angelic/intelligence correspondences only. Provide solar, lunar, mercurial, venusian, martial, jovian and saturnian contemplative practices; a principal practice, secondary practices, seven-day plan, four-week plan, observation journal and correspondence table. Practices must be devotional, voluntary, safe and non-coercive; never claim initiation, supernatural proof, healing, protection or material manifestation." },
+      { key: "planetarySpheres", title: "The Seven Planetary Spheres", purpose: "Rank the seven traditional planets from the natal evidence, then use only the supplied closed table for their Sephiroth, virtues and imbalances. Explain what requires cultivation and what requires balance without claiming spiritual superiority." },
+      { key: "treeAndPaths", title: "The Tree, Signs, and Paths", purpose: "Relate the selected natal signs to the supplied Hermetic Qabalah paths, Hebrew-letter transliterations and Tarot correspondences. Explicitly distinguish this Golden Dawn-derived system from Jewish Kabbalah and do not invent missing attributions." },
+      { key: "decansAndIntelligences", title: "Decans and Contemplative Intelligences", purpose: "Cover the supplied quinances for Sun, Moon, Ascendant, chart ruler and Midheaven. Use only database-backed angelic names, planetary rulers and contemplative text references; never call one a proven guardian angel or promise intervention." },
+      { key: "planetaryPractices", title: "Seven Safe Planetary Practices", purpose: "Provide solar, lunar, mercurial, venusian, martial, jovian and saturnian contemplative practices tied to the natal hierarchy. Practices must be optional, devotional, safe and non-coercive, with no ingestion, dangerous smoke, deprivation, healing claim, protection guarantee or material promise." },
+      { key: "practicePlan", title: "A Seven-Day and Four-Week Plan", purpose: "Choose one principal practice and a small number of secondary practices, then build a realistic seven-day opening rhythm and four-week progression. Favor observation, prayer, journaling and ethical action over spectacle or intensity." },
+      { key: "journalAndSynthesis", title: "Observation Journal and Final Synthesis", purpose: "Give a structured journal, signs of healthy integration, signs to pause or simplify, a concise correspondence recap, and a final synthesis relating destiny, habit and conscious practice without deterministic or supernatural claims." },
     ],
   },
   dossier: {
     tier: "dossier", fileName: "premium-natal-year-ahead-reading.pdf", title: "Premium Natal & Year-Ahead Reading", eyebrow: "Premium Integrated Study",
     targetPages: [75, 100], targetWords: [22000, 32000], requiresPartner: false, requiresAnnualCycle: true, recurring: false,
-    chapters: [...natalFoundation, { key: "annualStructure", title: "The Annual Cycle", purpose: "Profection, solar return, selected transits, timeline, annual priorities, dates, and calendar material integrated with the natal chart." }],
+    chapters: [
+      ...natalFoundation,
+      { key: "annualStructure", title: "The Structure of the Year", purpose: "Exact covered period, age and house profected, lord of the year, its natal condition and houses ruled, and the main topics activated." },
+      { key: "solarReturn", title: "The Solar Return in Context", purpose: "Solar Return Ascendant and ruler, Midheaven, luminaries, lord of the year, angular planets, occupied houses, close aspects, natal overlays, and repeated testimony. Never interpret the return alone." },
+      { key: "selectedTransits", title: "Selected Transits and Convergence", purpose: "Only calculated transits to natal rulers, luminaries, angles, lord of the year, and dominant configurations. Explain application, exactness, separation, retrogradation, and convergent testimony." },
+      { key: "annualTimeline", title: "The Annual Timeline", purpose: "Four quarters and twelve compact months, including expansion, pressure, review, preparation, and decision windows from the supplied timing cycle." },
+      { key: "annualDirection", title: "Direction for the Cycle", purpose: "Three priorities, opportunities, tensions, preparation topics, quarterly questions, practical cycle plan, uncertainty, and final synthesis." },
+    ],
   },
   almanac: {
     tier: "almanac", fileName: "hermetic-almanac.pdf", title: "The Hermetic Almanac", eyebrow: "Personal Monthly Almanac",

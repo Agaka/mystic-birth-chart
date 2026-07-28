@@ -1255,6 +1255,19 @@ Newsletter:
 - The Hermetic Kabbalah Reading draws exact esoteric names only from the closed, versioned Golden Dawn correspondence data in `worker/src/hermeticCorrespondences.ts`. Never let the AI invent correspondences.
 - The Almanac is now generated from the subscriber's current local month, including the Sun's natal house, current profection, and selected current activations. Stripe `invoice.paid` remains the trigger for active recurring subscriptions, and worker order IDs provide duplicate protection.
 
+### 2026-07-29 complete reading engines
+
+- Every sold reading now has a deterministic evidence engine before AI prose: twelve-house natal judgment, dispositors and receptions, exact refined timing, reliable synastry contacts and overlays, annual profections, calculated solar return evidence, lunations, and repeated testimony.
+- Love and Career receive focused evidence packets beginning with the seventh and tenth houses respectively. Complete covers the seven traditional planets, all twelve houses, receptions, contradictions, and applied synthesis without timing.
+- The 12-Month Forecast uses profections and selected transits only. Premium Dossier combines the Complete natal foundation with a calculated solar return, selected timing, a separate four-page summary, and an importable ICS calendar.
+- Synastry renders two natal wheels and one contact wheel. Unknown birth times remove that person's houses, angles, sect, chart ruler, and overlays; the Moon is explicitly qualified when its sign can change that day.
+- House Almanac renewals are idempotent by Stripe invoice, reuse one permanent private library, compare the previous edition to reduce repetition, and expose Stripe Customer Portal management from the library. Failed payments create no edition and never delete history.
+- Specialized PDFs have product-specific page and word gates, useful chapter-opening plates, technical reference tables, the transparent astrolabe watermark, and post-render page validation. Local representative outputs were: Complete 45 pages, Synastry 37, Dossier 84 plus a four-page summary, Almanac 10, and Hermetic Kabbalah 52.
+- The long-form report proxy defaults to OpenAI. Set `REPORT_AI_PROVIDER=anthropic`, `ANTHROPIC_API_KEY`, and `ANTHROPIC_WRITER_MODEL` in Vercel to switch providers without changing the VPS worker.
+- A deterministic final validator rejects missing chapters, instruction leakage, forbidden claims, unsupported aspects, invented degree/sign pairs, unsupported dignities, impossible planet-house placements, unsupported rulers, word-count failures, and page-count failures before delivery.
+- The worker retries failed fulfillment up to three times, recovers unfinished orders after a container restart, and reuses an already-rendered PDF when only delivery failed so an email retry does not spend AI credits again.
+- The Hermetic Kabbalah correspondence dataset itself was not expanded or changed in this pass. The PDF prints only the existing closed/versioned system record, planetary spheres, selected natal quinances, and zodiac paths for later owner audit.
+
 Social:
 
 - Create Instagram.

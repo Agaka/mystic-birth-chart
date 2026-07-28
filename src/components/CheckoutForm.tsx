@@ -165,7 +165,7 @@ export function CheckoutForm({
           forecastStartDate: checkoutDraft.forecastStartDate || "",
           presentationTimezone: checkoutDraft.presentationTimezone || "",
           newsletter: checkoutDraft.newsletter,
-          promotekitReferral: (window as any).promotekit_referral,
+          promotekitReferral: (window as Window & { promotekit_referral?: string }).promotekit_referral,
         }),
       });
 

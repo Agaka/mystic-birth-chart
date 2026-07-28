@@ -65,3 +65,39 @@ test("store persists the additional private inputs needed by specialized reports
     rmSync(directory, { recursive: true, force: true });
   }
 });
+
+test("Almanac renewals share one private library and preserve report history", () => {
+  const directory = mkdtempSync(join(tmpdir(), "mystic-store-"));
+  const store = new EssentialStore(join(directory, "essential.sqlite"));
+  try {
+    const first = store.claimOrder({ ...job("invoice_1"), tier: "almanac", subscriptionId: "sub_1" });
+    assert.equal(first.kind, "claimed");
+    store.markGenerated("invoice_1", "/tmp/one.pdf"); store.markDelivered("invoice_1");
+    const second = store.claimOrder({ ...job("invoice_2"), tier: "almanac", subscriptionId: "sub_1" });
+    assert.equal(second.kind, "claimed");
+    store.markGenerated("invoice_2", "/tmp/two.pdf"); store.markDelivered("invoice_2");
+    assert.ok(first.order.libraryToken);
+    assert.equal(second.order.libraryToken, first.order.libraryToken);
+    assert.equal(store.findLibrary(first.order.libraryToken!).length, 2);
+    assert.equal(store.findLibraryReport(first.order.libraryToken!, "invoice_1")?.reportPath, "/tmp/one.pdf");
+    assert.equal(store.findLibrarySubscription(first.order.libraryToken!), "sub_1");
+  } finally {
+    store.close(); rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("store exposes unfinished orders for restart recovery and records terminal failure", () => {
+  const directory = mkdtempSync(join(tmpdir(), "mystic-store-"));
+  const store = new EssentialStore(join(directory, "essential.sqlite"));
+  try {
+    store.claimOrder(job("processing"));
+    store.claimOrder(job("retry")); store.markRetryPending("retry", "provider-timeout");
+    store.claimOrder(job("generated")); store.markGenerated("generated", "/tmp/generated.pdf");
+    store.claimOrder(job("delivered")); store.markDelivered("delivered");
+    assert.deepEqual(store.findRecoverableOrders().map((item) => item.orderId), ["processing", "retry", "generated"]);
+    store.markFailed("retry", "delivery-failed-after-3-attempts");
+    assert.equal(store.findByOrderId("retry")?.status, "failed");
+  } finally {
+    store.close(); rmSync(directory, { recursive: true, force: true });
+  }
+});

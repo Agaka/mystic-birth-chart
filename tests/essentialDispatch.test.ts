@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   createDispatchSignature,
   dispatchEssentialJob,
+  getAlmanacSubscription,
   verifyDispatchSignature,
 } from "../src/lib/essential/dispatch.ts";
 
@@ -25,6 +26,24 @@ test("dispatch signature binds method, path, timestamp and body", () => {
     verifyDispatchSignature("POST", "/jobs/essential", timestamp, body, signature, secret, Number(timestamp) + 301),
     false,
   );
+});
+
+test("resolves an Almanac subscription through a signed private worker request", async () => {
+  const calls: Array<{ url: string; init?: RequestInit }> = [];
+  const result = await getAlmanacSubscription("private token", {
+    workerUrl: "https://worker.example.com/base",
+    sharedSecret: secret,
+    now: () => Number(timestamp) * 1000,
+    fetchImpl: async (url, init) => {
+      calls.push({ url: String(url), init });
+      return Response.json({ subscriptionId: "sub_live_123" });
+    },
+  });
+
+  assert.equal(result.subscriptionId, "sub_live_123");
+  assert.equal(calls[0]?.url, "https://worker.example.com/libraries/private%20token/subscription");
+  assert.equal(calls[0]?.init?.method, "GET");
+  assert.ok(new Headers(calls[0]?.init?.headers).get("x-mystic-signature"));
 });
 
 test("dispatch sends a signed job to the worker", async () => {
