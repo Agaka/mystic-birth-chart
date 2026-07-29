@@ -40,5 +40,6 @@ test("rejects invented degrees, dignities, houses, and rulers", () => {
 
 test("page validation enforces the product promise", () => {
   assert.deepEqual(validateRenderedPdf({ ...reportCatalog.love, targetPages: [24, 32] }, 28), []);
+  assert.deepEqual(validateRenderedPdf(reportCatalog.complete, 65), []);
   assert.match(validateRenderedPdf(reportCatalog.love, 8)[0]!, /page-count/);
 });

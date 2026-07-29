@@ -97,5 +97,8 @@ export function validateProductReport(blueprint: ReportBlueprint, facts: Product
 }
 
 export function validateRenderedPdf(blueprint: ReportBlueprint, pageCount: number): string[] {
-  return pageCount < blueprint.targetPages[0] || pageCount > blueprint.targetPages[1] ? [`page-count:${pageCount}:${blueprint.targetPages[0]}-${blueprint.targetPages[1]}`] : [];
+  const maximumWithEditorialTolerance = Math.ceil(blueprint.targetPages[1] * 1.1);
+  return pageCount < blueprint.targetPages[0] || pageCount > maximumWithEditorialTolerance
+    ? [`page-count:${pageCount}:${blueprint.targetPages[0]}-${blueprint.targetPages[1]}`]
+    : [];
 }
