@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
+import { extractOpenAIOutputText, type OpenAIResponsePayload } from "@/lib/openAIResponse";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -53,9 +54,10 @@ async function callOpenAI(input: unknown, format: typeof chapterSchema | typeof 
   const model = process.env.OPENAI_WRITER_MODEL || "gpt-5.6-terra";
   const response = await fetch("https://api.openai.com/v1/responses", { method: "POST", headers: { "content-type": "application/json", authorization: `Bearer ${apiKey}` }, body: JSON.stringify({ model, input, max_output_tokens: maxOutputTokens, text: { format } }), cache: "no-store" });
   if (!response.ok) throw new Error(`openai-http-${response.status}`);
-  const value = await response.json() as { output_text?: string };
-  if (!value.output_text) throw new Error("openai-empty-output");
-  return JSON.parse(value.output_text) as unknown;
+  const value = await response.json() as OpenAIResponsePayload;
+  const outputText = extractOpenAIOutputText(value);
+  if (!outputText) throw new Error("openai-empty-output");
+  return JSON.parse(outputText) as unknown;
 }
 
 function parseJsonOnly(value: string): unknown {
