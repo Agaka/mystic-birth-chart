@@ -10,7 +10,7 @@ import { blueprintFor } from "./reportCatalog.ts";
 import { buildProductFacts } from "./reportFacts.ts";
 import { createDossierSummaryPdf, createProductPdf } from "./productPdf.ts";
 import { generateReviewedProductReport } from "./productProviders.ts";
-import { validateProductReport, validateRenderedPdf } from "./reportValidator.ts";
+import { normalizeNatalDegreeClaims, validateProductReport, validateRenderedPdf } from "./reportValidator.ts";
 import { createTimingCalendar } from "./calendar.ts";
 
 export async function processEssentialOrder(store: EssentialStore, orderId: string) {
@@ -51,7 +51,8 @@ export async function processReportOrder(store: EssentialStore, orderId: string)
         } catch { /* A missing historical source must not block the paid edition. */ }
       }
     }
-    const report = await generateReviewedProductReport(blueprint, facts);
+    const generatedReport = await generateReviewedProductReport(blueprint, facts);
+    const report = normalizeNatalDegreeClaims(blueprint, facts, generatedReport);
     const reportErrors = validateProductReport(blueprint, facts, report);
     if (reportErrors.length) throw new Error(`report-validation:${reportErrors.slice(0, 3).join(",")}`);
     const pdf = await createProductPdf(blueprint, facts, report);

@@ -16,6 +16,33 @@ function wordCount(value: string): number { return value.trim().split(/\s+/).fil
 function reportText(report: ProductReport): string { return [report.title, report.introduction, ...report.chapters.flatMap((item) => [item.title, item.body]), report.practicalSummary, report.closing, report.scopeNote].join("\n"); }
 function key(a: string, aspect: string, b: string): string { return [a, b].sort().join("|") + `|${aspect}`; }
 
+export function normalizeNatalDegreeClaims(blueprint: ReportBlueprint, facts: ProductFacts, report: ProductReport): ProductReport {
+  if (!["complete", "love", "career", "kabbalah"].includes(blueprint.tier)) return report;
+  const pattern = new RegExp(`\\b(${bodies}|Fortune|Spirit)\\s+(?:is\\s+)?(?:at\\s+)?(\\d{1,2}\\u00b0\\d{2}\\u2032)\\s+(${signs.join("|")})\\b`, "gi");
+  const expectedPoint = (body: string) => {
+    const placement = facts.natal.chart.placements.find((item) => item.body.toLowerCase() === body.toLowerCase());
+    if (placement) return { sign: placement.sign, degreeLabel: placement.degreeLabel };
+    if (body.toLowerCase() === "ascendant") return facts.natal.chart.angles.ascendant;
+    if (body.toLowerCase() === "midheaven") return facts.natal.chart.angles.midheaven;
+    if (body.toLowerCase() === "fortune") return facts.natal.chart.lots.fortune;
+    if (body.toLowerCase() === "spirit") return facts.natal.chart.lots.spirit;
+    return undefined;
+  };
+  const normalize = (value: string) => value.replace(pattern, (claim, body: string, degreeLabel: string, sign: string) => {
+    const expected = expectedPoint(body);
+    return expected?.sign.toLowerCase() === sign.toLowerCase() ? claim.replace(degreeLabel, expected.degreeLabel) : claim;
+  });
+  return {
+    ...report,
+    title: normalize(report.title),
+    introduction: normalize(report.introduction),
+    chapters: report.chapters.map((chapter) => ({ ...chapter, title: normalize(chapter.title), body: normalize(chapter.body) })),
+    practicalSummary: normalize(report.practicalSummary),
+    closing: normalize(report.closing),
+    scopeNote: normalize(report.scopeNote),
+  };
+}
+
 function supportedAspects(facts: ProductFacts): Set<string> {
   const result = new Set(facts.natal.chart.aspects.map((item) => key(item.body1, item.type, item.body2)));
   for (const item of facts.partner?.facts.chart.aspects || []) result.add(key(item.body1, item.type, item.body2));

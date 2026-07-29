@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { calculateFullChart } from "../src/fullChart.ts";
 import { reportCatalog } from "../src/reportCatalog.ts";
-import { validateProductReport, validateRenderedPdf } from "../src/reportValidator.ts";
+import { normalizeNatalDegreeClaims, validateProductReport, validateRenderedPdf } from "../src/reportValidator.ts";
 import type { ProductFacts } from "../src/reportFacts.ts";
 
 const chart = calculateFullChart({ date: "2002-08-18", time: "11:05", latitude: -30.0346, longitude: -51.2177, timezone: "America/Sao_Paulo" });
@@ -36,6 +36,22 @@ test("rejects invented degrees, dignities, houses, and rulers", () => {
   assert.ok(errors.some((item) => item.startsWith("unsupported-dignity")));
   assert.ok(errors.some((item) => item.startsWith("unsupported-house")));
   assert.ok(errors.some((item) => item.startsWith("unsupported-ruler")));
+});
+
+test("normalizes exact degree claims in natal-only reports from calculated facts", () => {
+  const blueprint = reportCatalog.complete;
+  const mars = facts.natal.chart.placements.find((placement) => placement.body === "Mars")!;
+  const report = {
+    title: blueprint.title,
+    introduction: `Mars at 17\u00b013\u2032 ${mars.sign} describes the initial pressure.`,
+    chapters: blueprint.chapters.map((chapter) => ({ key: chapter.key, title: chapter.title, body: "Grounded." })),
+    practicalSummary: "Grounded.", closing: "Grounded.", scopeNote: "Grounded.",
+  };
+
+  const normalized = normalizeNatalDegreeClaims(blueprint, facts, report);
+
+  assert.match(normalized.introduction, new RegExp(`Mars at ${mars.degreeLabel} ${mars.sign}`));
+  assert.doesNotMatch(normalized.introduction, /17\u00b013\u2032/);
 });
 
 test("page validation enforces the product promise", () => {
