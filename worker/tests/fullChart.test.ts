@@ -58,7 +58,19 @@ test("records every major essential dignity instead of flattening Mercury in Vir
   const mercury = chart.placements.find((item) => item.body === "Mercury")!;
 
   assert.deepEqual(mercury.dignities, ["domicile", "exaltation"]);
-  assert.deepEqual(chart.placements.find((item) => item.body === "Mars")!.dignities, []);
+  assert.ok(chart.placements.find((item) => item.body === "Mars")!.dignities.includes("face"));
+});
+
+test("records motion, station proximity, combustion, and modern-aspect limits for the Complete acceptance chart", () => {
+  const chart = calculateFullChart({ date: "2005-04-11", time: "23:41", latitude: -30.0346, longitude: -51.2177, timezone: "America/Sao_Paulo" });
+  const mercury = chart.placements.find((item) => item.body === "Mercury")!;
+  const jupiter = chart.placements.find((item) => item.body === "Jupiter")!;
+  const venus = chart.placements.find((item) => item.body === "Venus")!;
+  assert.equal(mercury.condition.motion, "direct");
+  assert.equal(mercury.condition.station, "stationing retrograde");
+  assert.equal(jupiter.condition.motion, "retrograde");
+  assert.equal(venus.condition.solarCondition, "combust");
+  assert.ok(chart.aspects.every((aspect) => !["Uranus", "Neptune", "Pluto"].includes(aspect.body1) && !["Uranus", "Neptune", "Pluto"].includes(aspect.body2) || aspect.orb <= 3));
 });
 
 test("calculates Fortune and Spirit with the sect-sensitive traditional formulas", () => {

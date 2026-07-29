@@ -18,7 +18,22 @@ const aubergine = rgb(0.28, 0.10, 0.09);
 type Fonts = { serif: PDFFont; bold: PDFFont; italic: PDFFont; sans: PDFFont; sansBold: PDFFont };
 
 function clean(value: string): string {
-  return value.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[\u2010-\u2015]/g, "-").replace(/[\u2018\u2019\u2032]/g, "'").replace(/[\u201c\u201d]/g, '"').replace(/[^\x20-\x7E\u00B0\n]/g, "");
+  return value.replace(/^\s{0,3}#{1,6}\s+/gm, "").replace(/(\*\*|__|`{1,3}|~~)/g, "").replace(/^\s*[-*+]\s+/gm, "").normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[\u2010-\u2015]/g, "-").replace(/[\u2018\u2019\u2032]/g, "'").replace(/[\u201c\u201d]/g, '"').replace(/[^\x20-\x7E\u00B0\n]/g, "");
+}
+
+function fitHeading(value: string, font: PDFFont, maximum: number, available: number): { size: number; lines: string[] } {
+  for (let size = maximum; size >= 20; size -= 1) {
+    const lines = wrap(value, font, size, available);
+    if (lines.length <= 3) return { size, lines };
+  }
+  return { size: 20, lines: wrap(value, font, 20, available).slice(0, 3) };
+}
+
+function editorialPurpose(key: string): string {
+  const copy: Record<string, string> = {
+    chartArchitecture: "A clear map of the forces that carry the most weight in this natal figure.", authority: "How sect, the luminaries, and planetary condition distribute emphasis across the chart.", planetaryJudgments: "A distinct study of the seven traditional planets and the work each one performs.", dispositorsReceptions: "The lines of planetary stewardship that connect separate placements into one structure.", houses1to4: "The foundations of identity, resources, learning, home, and private life.", houses5to8: "The territory of pleasure, labour, partnership, trust, and shared commitments.", houses9to12: "Study, vocation, community, retreat, and the longer horizon of the chart.", appliedSynthesis: "A practical reading of the chart's resources, pressures, and next questions.",
+  };
+  return copy[key] || "A focused reading of this part of the chart, grounded in the calculated record.";
 }
 
 function wrap(text: string, font: PDFFont, size: number, available: number): string[] {
@@ -56,13 +71,14 @@ function radians(value: number): number { return value * Math.PI / 180; }
 
 function drawChartWheel(doc: PDFDocument, texture: PDFImage, fonts: Fonts, eyebrow: string, title: string, chart: FullChart, timeKnown: boolean): void {
   const current = page(doc, texture, fonts, eyebrow);
-  wrap(title, fonts.serif, 27, width - margin * 2).slice(0, 2).forEach((line, index) => current.drawText(line, { x: margin, y: 710 - index * 31, size: 27, font: fonts.serif, color: ink }));
+  const fittedTitle = fitHeading(title, fonts.serif, 27, width - margin * 2);
+  fittedTitle.lines.forEach((line, index) => current.drawText(line, { x: margin, y: 710 - index * (fittedTitle.size + 4), size: fittedTitle.size, font: fonts.serif, color: ink }));
   const cx = 306; const cy = 380; const outer = 220; const inner = 145;
   const reference = timeKnown ? chart.angles.ascendant.longitude : 0;
   const angleOf = (longitude: number) => radians(180 + longitude - reference);
   current.drawCircle({ x: cx, y: cy, size: outer, borderColor: gold, borderWidth: 1.2 });
   current.drawCircle({ x: cx, y: cy, size: inner, borderColor: parchmentDark, borderWidth: 0.8 });
-  const labels = ["ARI", "TAU", "GEM", "CAN", "LEO", "VIR", "LIB", "SCO", "SAG", "CAP", "AQU", "PIS"];
+  const labels = ["Ar", "Ta", "Ge", "Cn", "Le", "Vi", "Li", "Sc", "Sg", "Cp", "Aq", "Pi"];
   for (let index = 0; index < 12; index += 1) {
     const boundary = angleOf(index * 30);
     current.drawLine({ start: { x: cx + Math.cos(boundary) * inner, y: cy + Math.sin(boundary) * inner }, end: { x: cx + Math.cos(boundary) * outer, y: cy + Math.sin(boundary) * outer }, thickness: 0.5, color: gold, opacity: 0.72 });
@@ -73,7 +89,7 @@ function drawChartWheel(doc: PDFDocument, texture: PDFImage, fonts: Fonts, eyebr
       current.drawText(`H${house}`, { x: cx + Math.cos(middle) * 165 - 7, y: cy + Math.sin(middle) * 165 - 3, size: 6.5, font: fonts.sansBold, color: muted });
     }
   }
-  const abbreviations: Record<string, string> = { Sun: "SU", Moon: "MO", Mercury: "ME", Venus: "VE", Mars: "MA", Jupiter: "JU", Saturn: "SA", Uranus: "UR", Neptune: "NE", Pluto: "PL" };
+  const abbreviations: Record<string, string> = { Sun: "Sun", Moon: "Moon", Mercury: "Merc", Venus: "Ven", Mars: "Mars", Jupiter: "Jup", Saturn: "Sat", Uranus: "Ura", Neptune: "Nep", Pluto: "Plu" };
   const points = new Map<string, { x: number; y: number }>();
   const used: number[] = [];
   for (const placement of [...chart.placements].sort((a, b) => a.longitude - b.longitude)) {
@@ -81,13 +97,19 @@ function drawChartWheel(doc: PDFDocument, texture: PDFImage, fonts: Fonts, eyebr
     const nearby = used.filter((longitude) => Math.min(Math.abs(longitude - placement.longitude), 360 - Math.abs(longitude - placement.longitude)) < 6).length;
     const radius = 122 - nearby * 29; used.push(placement.longitude);
     const point = { x: cx + Math.cos(angle) * radius, y: cy + Math.sin(angle) * radius }; points.set(placement.body, point);
-    current.drawCircle({ x: point.x, y: point.y, size: 14, color: parchment, borderColor: gold, borderWidth: 0.7 });
-    current.drawText(abbreviations[placement.body] || placement.body.slice(0, 2).toUpperCase(), { x: point.x - 7, y: point.y - 3, size: 7, font: fonts.sansBold, color: aubergine });
+    current.drawCircle({ x: point.x, y: point.y, size: 15, color: parchment, borderColor: gold, borderWidth: 0.7 });
+    const label = abbreviations[placement.body] || placement.body.slice(0, 3);
+    current.drawText(label, { x: point.x - Math.min(10, label.length * 2.4), y: point.y - 3, size: 5.8, font: fonts.sansBold, color: aubergine });
   }
   for (const aspect of chart.aspects.filter((item) => !item.outOfSign && item.orb <= 3 && points.has(item.body1) && points.has(item.body2)).slice(0, 16)) {
     current.drawLine({ start: points.get(aspect.body1)!, end: points.get(aspect.body2)!, thickness: 0.55, color: aspect.type === "trine" || aspect.type === "sextile" ? gold : aubergine, opacity: 0.4 });
   }
-  current.drawText(timeKnown ? "Whole-sign houses / traditional aspect structure" : "Planetary positions only / birth time unknown", { x: margin, y: 92, size: 9, font: fonts.italic, color: muted });
+  if (timeKnown) {
+    const asc = angleOf(chart.angles.ascendant.longitude); const mc = angleOf(chart.angles.midheaven.longitude);
+    current.drawText("ASC", { x: cx + Math.cos(asc) * 234 - 9, y: cy + Math.sin(asc) * 234 - 3, size: 8, font: fonts.sansBold, color: aubergine });
+    current.drawText("MC", { x: cx + Math.cos(mc) * 234 - 7, y: cy + Math.sin(mc) * 234 - 3, size: 8, font: fonts.sansBold, color: aubergine });
+  }
+  current.drawText(timeKnown ? "Whole-sign houses. Gold lines: flowing aspects. Wine lines: demanding aspects." : "Planetary positions only / birth time unknown", { x: margin, y: 92, size: 8.5, font: fonts.italic, color: muted });
 }
 
 function drawSynastryWheel(doc: PDFDocument, texture: PDFImage, fonts: Fonts, blueprint: ReportBlueprint, facts: ProductFacts): void {
@@ -121,9 +143,12 @@ function drawFlow(doc: PDFDocument, texture: PDFImage, fonts: Fonts, eyebrow: st
   const lines = wrap(body, fonts.serif, style.size, width - margin * 2);
   let current = page(doc, texture, fonts, eyebrow);
   let y = 714;
-  current.drawText(clean(title), { x: margin, y, size: 25, font: fonts.serif, color: ink }); y -= 46;
-  for (const line of lines) {
-    if (y < 72) { current = page(doc, texture, fonts, eyebrow); y = 714; }
+  const heading = fitHeading(title, fonts.serif, 25, width - margin * 2);
+  heading.lines.forEach((line, index) => current.drawText(line, { x: margin, y: y - index * (heading.size + 4), size: heading.size, font: fonts.serif, color: ink })); y -= heading.lines.length * (heading.size + 4) + 20;
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index]!;
+    const remaining = lines.length - index;
+    if (y < 72 || (y < 130 && remaining <= 3)) { current = page(doc, texture, fonts, eyebrow); y = 714; }
     if (line) current.drawText(line, { x: margin, y, size: style.size, font: fonts.serif, color: ink });
     y -= line ? style.line : style.blank;
   }
@@ -132,11 +157,11 @@ function drawFlow(doc: PDFDocument, texture: PDFImage, fonts: Fonts, eyebrow: st
 function contentsPage(doc: PDFDocument, texture: PDFImage, fonts: Fonts, blueprint: ReportBlueprint, facts: ProductFacts): void {
   const current = page(doc, texture, fonts, blueprint.eyebrow);
   current.drawText("Contents", { x: margin, y: 710, size: 28, font: fonts.serif, color: ink });
-  const entries = ["Calculation Record", "Natal Wheel", ...(facts.partner ? ["Second Natal Wheel", "Synastry Contact Wheel"] : []), "Reference Tables", ...blueprint.chapters.map((chapter) => chapter.title), "Applied Direction", "Closing Synthesis", "About This Reading"];
+  const entries = ["Calculation Record", "At a Glance", "Natal Wheel", ...(facts.partner ? ["Second Natal Wheel", "Synastry Contact Wheel"] : []), "Reference Tables", ...blueprint.chapters.map((chapter) => chapter.title), "Applied Direction", "Closing Synthesis", "About This Reading"];
   let y = 655;
   entries.forEach((entry, index) => {
     current.drawText(String(index + 1).padStart(2, "0"), { x: margin, y, size: 8, font: fonts.sansBold, color: gold });
-    current.drawText(clean(entry), { x: margin + 34, y: y - 2, size: 11.5, font: fonts.serif, color: ink });
+    current.drawText(clean(entry), { x: margin + 34, y: y - 2, size: 11.5, font: fonts.serif, color: ink }); current.drawText(String(index + 2).padStart(2, "0"), { x: width - margin - 22, y: y - 2, size: 8, font: fonts.sansBold, color: gold });
     y -= 29;
   });
 }
@@ -168,11 +193,11 @@ function chapterOpening(doc: PDFDocument, texture: PDFImage, seal: PDFImage, fon
   const current = page(doc, texture, fonts, blueprint.eyebrow);
   current.drawImage(seal, { x: 326, y: 260, width: 205, height: 205, opacity: 0.075 });
   current.drawText(`CHAPTER ${String(index + 1).padStart(2, "0")}`, { x: margin, y: 655, size: 9, font: fonts.sansBold, color: gold });
-  const titleLines = wrap(chapter.title, fonts.serif, 32, width - margin * 2);
-  titleLines.forEach((line, lineIndex) => current.drawText(line, { x: margin, y: 595 - lineIndex * 39, size: 32, font: fonts.serif, color: ink }));
-  const purposeY = 495 - Math.max(0, titleLines.length - 1) * 39;
+  const fitted = fitHeading(chapter.title, fonts.serif, 32, width - margin * 2);
+  fitted.lines.forEach((line, lineIndex) => current.drawText(line, { x: margin, y: 595 - lineIndex * (fitted.size + 7), size: fitted.size, font: fonts.serif, color: ink }));
+  const purposeY = 495 - Math.max(0, fitted.lines.length - 1) * (fitted.size + 7);
   let y = purposeY;
-  for (const line of wrap(chapter.purpose, fonts.serif, 12, width - margin * 2)) {
+  for (const line of wrap(editorialPurpose(chapter.key), fonts.serif, 12, width - margin * 2)) {
     if (line) current.drawText(line, { x: margin, y, size: 12, font: fonts.serif, color: muted });
     y -= line ? 19 : 10;
   }
@@ -199,15 +224,32 @@ function identityPage(doc: PDFDocument, texture: PDFImage, seal: PDFImage, fonts
   rows.forEach(([label, value], index) => { const y = 650 - index * 48; record.drawText(label.toUpperCase(), { x: margin, y, size: 8, font: fonts.sansBold, color: gold }); record.drawText(clean(value), { x: margin, y: y - 18, size: 13, font: fonts.serif, color: ink }); });
 }
 
+function atAGlancePage(doc: PDFDocument, texture: PDFImage, fonts: Fonts, blueprint: ReportBlueprint, facts: ProductFacts, report: ProductReport): void {
+  const current = page(doc, texture, fonts, blueprint.eyebrow);
+  current.drawText("At a Glance", { x: margin, y: 710, size: 28, font: fonts.serif, color: ink });
+  current.drawText("THE CHART THESIS", { x: margin, y: 660, size: 8, font: fonts.sansBold, color: gold });
+  const thesis = (report.introduction.split(/\n+/).find((line) => line.trim().length > 40) || report.title).trim();
+  wrap(thesis, fonts.italic, 15, width - margin * 2).slice(0, 4).forEach((line, index) => current.drawText(line, { x: margin, y: 630 - index * 22, size: 15, font: fonts.italic, color: aubergine }));
+  current.drawLine({ start: { x: margin, y: 515 }, end: { x: width - margin, y: 515 }, thickness: 0.7, color: gold });
+  current.drawText("DOMINANT TESTIMONIES", { x: margin, y: 490, size: 8, font: fonts.sansBold, color: gold });
+  const signatures = facts.natal.chart.dominantSignatures;
+  const testimony = [...signatures.map((item) => item.evidence), ...(facts.natalEvidence?.repeatedTestimony.slice(0, 7).map((item) => `${item.planet}: ${item.roles.join(", ")}.`) || [])].slice(0, 10);
+  testimony.forEach((item, index) => {
+    const y = 460 - index * 38;
+    current.drawText(String(index + 1).padStart(2, "0"), { x: margin, y, size: 8, font: fonts.sansBold, color: gold });
+    wrap(item, fonts.serif, 10.5, width - margin - 42).slice(0, 2).forEach((line, lineIndex) => current.drawText(line, { x: margin + 28, y: y - lineIndex * 14, size: 10.5, font: fonts.serif, color: ink }));
+  });
+}
+
 function referencePages(doc: PDFDocument, texture: PDFImage, fonts: Fonts, blueprint: ReportBlueprint, facts: ProductFacts): void {
-  const positions = facts.natal.chart.placements.map((placement) => [placement.body, `${placement.degreeLabel} ${placement.sign}`, facts.natalTimeKnown ? `House ${placement.house}` : "", placement.dignities.length ? placement.dignities.join(" and ") : "No major essential dignity"]);
+  const positions = facts.natal.chart.placements.map((placement) => [placement.body, `${placement.degreeLabel} ${placement.sign}`, facts.natalTimeKnown ? `House ${placement.house} / ${placement.condition.mundaneCondition}` : "", [placement.condition.motion, placement.condition.station, placement.condition.solarCondition, placement.condition.sectCondition, placement.dignities.length ? placement.dignities.join(" and ") : "no major essential dignity"].filter(Boolean).join("; ")]);
   if (facts.natalTimeKnown) {
     positions.push(["Ascendant", `${facts.natal.chart.angles.ascendant.degreeLabel} ${facts.natal.chart.angles.ascendant.sign}`, "First house", `Chart ruler: ${facts.natal.chart.chartRuler}`]);
     positions.push(["Midheaven", `${facts.natal.chart.angles.midheaven.degreeLabel} ${facts.natal.chart.angles.midheaven.sign}`, "", ""]);
   }
   const tables: Array<{ title: string; rows: string[][] }> = blueprint.tier === "almanac" ? [] : [
     { title: "Planetary Positions and Conditions", rows: positions },
-    { title: "Aspect Record", rows: facts.natal.chart.aspects.map((aspect) => [`${aspect.body1} ${aspect.outOfSign ? "out-of-sign " : ""}${aspect.type} ${aspect.body2}`, `${aspect.orbLabel} orb`, aspect.outOfSign ? "Secondary testimony" : "Sign-based aspect"]) },
+    { title: "Aspect Record", rows: facts.natal.chart.aspects.map((aspect) => [`${aspect.body1} ${aspect.outOfSign ? "out-of-sign " : ""}${aspect.type} ${aspect.body2}`, `${aspect.orbLabel} orb`, `${aspect.application}; ${aspect.outOfSign ? "secondary out-of-sign testimony" : "sign-based aspect"}`]) },
     ...(facts.natalTimeKnown ? [{ title: "Whole-Sign Houses and Rulers", rows: Array.from({ length: 12 }, (_, index) => { const signs = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"]; const rulers: Record<string, string> = { Aries: "Mars", Taurus: "Venus", Gemini: "Mercury", Cancer: "Moon", Leo: "Sun", Virgo: "Mercury", Libra: "Venus", Scorpio: "Mars", Sagittarius: "Jupiter", Capricorn: "Saturn", Aquarius: "Saturn", Pisces: "Jupiter" }; const sign = signs[(signs.indexOf(facts.natal.chart.angles.ascendant.sign) + index) % 12]!; const occupants = facts.natal.chart.placements.filter((placement) => placement.house === index + 1).map((placement) => placement.body).join(", ") || "No planets"; return [`House ${index + 1}`, sign, `Ruler: ${rulers[sign]}`, occupants]; }) }] : []),
   ];
   if (facts.partner) tables.push({ title: "Second Person / Planetary Positions", rows: facts.partner.facts.chart.placements.map((placement) => [placement.body, `${placement.degreeLabel} ${placement.sign}`, facts.partner!.timeKnown ? `House ${placement.house}` : "Houses omitted", placement.dignities.length ? placement.dignities.join(" and ") : "No major essential dignity"]) });
@@ -269,6 +311,7 @@ export async function createProductPdf(blueprint: ReportBlueprint, facts: Produc
   const fonts = { serif, bold, italic, sans, sansBold };
   identityPage(doc, texture, seal, fonts, blueprint, facts, report);
   if (blueprint.tier !== "almanac") contentsPage(doc, texture, fonts, blueprint, facts);
+  if (blueprint.tier === "complete") atAGlancePage(doc, texture, fonts, blueprint, facts, report);
   drawChartWheel(doc, texture, fonts, blueprint.eyebrow, facts.partner ? "Natal Wheel / First Person" : "Natal Wheel", facts.natal.chart, facts.natalTimeKnown);
   if (facts.partner) drawChartWheel(doc, texture, fonts, blueprint.eyebrow, "Natal Wheel / Second Person", facts.partner.facts.chart, facts.partner.timeKnown);
   if (facts.annual) drawChartWheel(doc, texture, fonts, blueprint.eyebrow, "Solar Return Wheel", facts.annual.solarReturn, true);
@@ -290,6 +333,7 @@ export async function createProductPdf(blueprint: ReportBlueprint, facts: Produc
   drawFlow(doc, texture, fonts, blueprint.eyebrow, "Applied Direction", report.practicalSummary, flowStyle);
   drawFlow(doc, texture, fonts, blueprint.eyebrow, "Closing Synthesis", report.closing, flowStyle);
   drawFlow(doc, texture, fonts, blueprint.eyebrow, "About This Reading", report.scopeNote, flowStyle);
+  if (blueprint.tier === "complete") drawFlow(doc, texture, fonts, blueprint.eyebrow, "A Further Cycle", "The Full Cycle Dossier extends this natal foundation into an annual study of profections, the solar return, and selected timing windows. It is designed for questions that need both natal structure and a practical view of the year ahead.", flowStyle);
   return doc.save();
 }
 

@@ -5,7 +5,8 @@ import type { ReportBlueprint } from "./reportCatalog.ts";
 const bodies = "Sun|Moon|Mercury|Venus|Mars|Jupiter|Saturn|Uranus|Neptune|Pluto|Ascendant|Midheaven";
 const aspectPattern = new RegExp(`\\b(${bodies})\\s+(?:applying\\s+to\\s+an?\\s+|separating\\s+from\\s+an?\\s+|out-of-sign\\s+)?(conjunction|sextile|square|trine|opposition)(?:\\s+with|\\s+to)?\\s+(${bodies})\\b`, "gi");
 const degreePattern = new RegExp(`\\b(${bodies}|Fortune|Spirit)\\s+(?:is\\s+)?(?:at\\s+)?(\\d{1,2}°\\d{2}′)\\s+(Aries|Taurus|Gemini|Cancer|Leo|Virgo|Libra|Scorpio|Sagittarius|Capricorn|Aquarius|Pisces)\\b`, "gi");
-const dignityPattern = new RegExp(`\\b(${bodies})\\s+(?:has|holds|is\\s+in|is)\\s+(domicile|exaltation|detriment|fall)\\b`, "gi");
+const dignityPattern = new RegExp(`\\b(${bodies})\\s+(?:has|holds|is\\s+in|is)\\s+(domicile|exaltation|triplicity|bound|face|detriment|fall)\\b`, "gi");
+const conditionPattern = new RegExp(`\\b(${bodies})\\s+(retrograde|direct|stationing direct|stationing retrograde|combust|under the beams|cazimi)\\b`, "gi");
 const housePattern = new RegExp(`\\b(${bodies})\\s+(?:is\\s+)?(?:in|occupies|falls\\s+in|is\\s+placed\\s+in)\\s+(?:the\\s+)?(first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|eleventh|twelfth|1st|2nd|3rd|4th|5th|6th|7th|8th|9th|10th|11th|12th)\\s+house\\b`, "gi");
 const rulerPattern = new RegExp(`\\b(${bodies})\\s+(?:rules|is\\s+the\\s+ruler\\s+of)\\s+(?:the\\s+)?(first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|eleventh|twelfth|1st|2nd|3rd|4th|5th|6th|7th|8th|9th|10th|11th|12th)\\s+house\\b`, "gi");
 const houseNumber: Record<string, number> = { first: 1, "1st": 1, second: 2, "2nd": 2, third: 3, "3rd": 3, fourth: 4, "4th": 4, fifth: 5, "5th": 5, sixth: 6, "6th": 6, seventh: 7, "7th": 7, eighth: 8, "8th": 8, ninth: 9, "9th": 9, tenth: 10, "10th": 10, eleventh: 11, "11th": 11, twelfth: 12, "12th": 12 };
@@ -64,11 +65,15 @@ function technicalEvidence(facts: ProductFacts) {
   const dignities = new Set<string>();
   const houses = new Set<string>();
   const rulers = new Set<string>();
+  const conditions = new Set<string>();
   for (const chart of relevantCharts(facts)) {
     for (const item of chart.placements) {
       degrees.add(`${item.body}|${item.degreeLabel}|${item.sign}`.toLowerCase());
       houses.add(`${item.body}|${item.house}`.toLowerCase());
       for (const dignity of item.dignities) dignities.add(`${item.body}|${dignity}`.toLowerCase());
+      conditions.add(`${item.body}|${item.condition.motion}`.toLowerCase());
+      if (item.condition.station) conditions.add(`${item.body}|${item.condition.station}`.toLowerCase());
+      if (item.condition.solarCondition) conditions.add(`${item.body}|${item.condition.solarCondition}`.toLowerCase());
     }
     degrees.add(`ascendant|${chart.angles.ascendant.degreeLabel}|${chart.angles.ascendant.sign}`.toLowerCase());
     degrees.add(`midheaven|${chart.angles.midheaven.degreeLabel}|${chart.angles.midheaven.sign}`.toLowerCase());
@@ -81,7 +86,7 @@ function technicalEvidence(facts: ProductFacts) {
     }
   }
   for (const item of facts.annual?.solarReturnEvidence.returnToNatalAspects || []) degrees.add(`${item.returnBody}|${item.orbLabel}|orb`.toLowerCase());
-  return { degrees, dignities, houses, rulers };
+  return { degrees, dignities, houses, rulers, conditions };
 }
 
 export function validateProductReport(blueprint: ReportBlueprint, facts: ProductFacts, report: ProductReport): string[] {
@@ -93,7 +98,8 @@ export function validateProductReport(blueprint: ReportBlueprint, facts: Product
   const total = wordCount(reportText(report));
   if (total < blueprint.targetWords[0] || total > blueprint.targetWords[1] * 1.08) errors.push(`word-count:${total}:${blueprint.targetWords[0]}-${blueprint.targetWords[1]}`);
   const text = reportText(report);
-  if (/\b(as an ai|system prompt|developer instruction|according to the supplied json|the prompt asks|i was instructed)\b/i.test(text)) errors.push("instruction-artifact");
+  if (/\b(as an ai|system prompt|developer instruction|according to the supplied json|the prompt asks|i was instructed|trace dispositors from the supplied evidence|judge each through|keep health language symbolic)\b/i.test(text)) errors.push("instruction-artifact");
+  if (/(^|\s)(\*\*|##|```|__|~~)(?=\s|\S)/m.test(text)) errors.push("markdown-artifact");
   const forbidden: Partial<Record<typeof blueprint.tier, RegExp>> = {
     love: /\b(soulmate|guaranteed marriage|attachment disorder)\b/i,
     synastry: /\b(soulmate|compatibility score|guaranteed to last|you should leave|you should stay)\b/i,
@@ -111,6 +117,9 @@ export function validateProductReport(blueprint: ReportBlueprint, facts: Product
   }
   for (const match of text.matchAll(dignityPattern)) {
     if (!technical.dignities.has(`${match[1]}|${match[2]}`.toLowerCase())) errors.push(`unsupported-dignity:${match[1]}-${match[2]}`);
+  }
+  for (const match of text.matchAll(conditionPattern)) {
+    if (!technical.conditions.has(`${match[1]}|${match[2]}`.toLowerCase())) errors.push(`unsupported-condition:${match[1]}-${match[2]}`);
   }
   for (const match of text.matchAll(housePattern)) {
     const house = houseNumber[match[2]!.toLowerCase()];

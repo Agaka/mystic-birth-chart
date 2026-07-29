@@ -1268,6 +1268,12 @@ Newsletter:
 - The worker retries failed fulfillment up to three times, recovers unfinished orders after a container restart, and reuses an already-rendered PDF when only delivery failed so an email retry does not spend AI credits again.
 - The Hermetic Kabbalah correspondence dataset itself was not expanded or changed in this pass. The PDF prints only the existing closed/versioned system record, planetary spheres, selected natal quinances, and zodiac paths for later owner audit.
 
+### 2026-07-29 Complete natal refinement
+
+- Complete now carries deterministic motion, daily speed, station proximity, solar condition, mundane condition, sect condition, full essential dignities, and applying/separating status into both validation and the technical record.
+- Outer-planet aspects wider than 3 degrees are excluded by default. Sign-based reception is explicitly documented as not requiring an aspect.
+- The Complete blueprint targets 14,000-17,000 words and 48-55 pages. Its PDF includes an At a Glance page, ranked testimony, customer-facing chapter plates, Markdown sanitation, heading fitting, page-numbered contents, and a discreet automated Full Cycle Dossier next step.
+
 Social:
 
 - Create Instagram.

@@ -9,7 +9,7 @@ test("every public reading tier has an automated production blueprint", () => {
 
 test("the product ladder keeps materially different report scopes", () => {
   assert.deepEqual(reportCatalog.basic.targetPages, [16, 20]);
-  assert.deepEqual(reportCatalog.complete.targetPages, [45, 60]);
+  assert.deepEqual(reportCatalog.complete.targetPages, [48, 55]);
   assert.deepEqual(reportCatalog.dossier.targetPages, [75, 100]);
   assert.equal(reportCatalog.synastry.requiresPartner, true);
   assert.equal(reportCatalog.dossier.requiresAnnualCycle, true);

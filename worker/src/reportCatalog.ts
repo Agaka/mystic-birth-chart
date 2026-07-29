@@ -21,9 +21,9 @@ export type ReportBlueprint = {
 
 const natalFoundation: ReportChapter[] = [
   { key: "chartArchitecture", title: "Chart Architecture", purpose: "The ranked structure, sect, angles, house rulers, dignities, receptions, and repeated testimony that organize the natal figure." },
-  { key: "authority", title: "Temperament and Planetary Authority", purpose: "Sect, distribution of authority, the luminaries, chart ruler, angular planets, and major strengths or pressures." },
+  { key: "authority", title: "Sect and Planetary Authority", purpose: "Sect, distribution of authority, the luminaries, chart ruler, angular planets, and major strengths or pressures." },
   { key: "planetaryJudgments", title: "The Seven Traditional Planets", purpose: "An individual but integrated judgment of Sun, Moon, Mercury, Venus, Mars, Jupiter, and Saturn, with modern planets only as supporting layers." },
-  { key: "dispositorsReceptions", title: "Dispositors, Receptions, and Repeated Testimony", purpose: "Trace dispositors and receptions from the supplied evidence, identify cycles or final dispositors, and explain contradictions and themes repeated by multiple techniques." },
+  { key: "dispositorsReceptions", title: "Dispositors, Receptions, and Repeated Testimony", purpose: "Follow dispositors and sign-based receptions, identify cycles or final dispositors, and explain contradictions and themes repeated by multiple techniques." },
   { key: "houses1to4", title: "Houses One Through Four", purpose: "Identity and direction; resources; learning and local environment; home, ancestry, and foundations. Judge each through sign, ruler condition, occupants, aspects, and reception." },
   { key: "houses5to8", title: "Houses Five Through Eight", purpose: "Creativity and pleasure; service and maintenance; relationship and commitment; shared resources, trust, and dependency. Keep health language symbolic and non-diagnostic." },
   { key: "houses9to12", title: "Houses Nine Through Twelve", purpose: "Study and worldview; vocation and authority; alliances and future projects; retreat and private life. Judge each through the supplied house evidence." },
@@ -38,7 +38,7 @@ export const reportCatalog: Record<ReportTier, ReportBlueprint> = {
   },
   complete: {
     tier: "complete", fileName: "complete-natal-reading.pdf", title: "Complete Natal Reading", eyebrow: "Complete Natal Study",
-    targetPages: [45, 60], targetWords: [12000, 18000], requiresPartner: false, requiresAnnualCycle: false, recurring: false,
+    targetPages: [48, 55], targetWords: [14000, 17000], requiresPartner: false, requiresAnnualCycle: false, recurring: false,
     chapters: natalFoundation,
   },
   love: {

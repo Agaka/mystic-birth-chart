@@ -27,6 +27,8 @@ export type ReceptionEvidence = {
   kind: "domicile" | "exaltation" | "mutual-domicile";
   planets: TraditionalPlanet[];
   description: string;
+  methodology: "sign-based reception; aspect not required";
+  aspect?: ChartAspect;
 };
 
 export type NatalFocusPacket = {
@@ -97,13 +99,13 @@ function buildReceptions(chart: FullChart): ReceptionEvidence[] {
   const result: ReceptionEvidence[] = [];
   for (const item of planets) {
     const receiver = rulers[item.sign];
-    if (receiver !== item.body) result.push({ kind: "domicile", planets: [receiver, item.body], description: `${receiver} receives ${item.body} by domicile.` });
+    if (receiver !== item.body) result.push({ kind: "domicile", planets: [receiver, item.body], description: `${receiver} receives ${item.body} by domicile; this report uses sign-based reception, so an aspect is not required.`, methodology: "sign-based reception; aspect not required" });
     const exaltationReceiver = (Object.entries(exaltations) as Array<[TraditionalPlanet, Sign]>).find(([, sign]) => sign === item.sign)?.[0];
-    if (exaltationReceiver && exaltationReceiver !== item.body) result.push({ kind: "exaltation", planets: [exaltationReceiver, item.body], description: `${exaltationReceiver} receives ${item.body} by exaltation.` });
+    if (exaltationReceiver && exaltationReceiver !== item.body) result.push({ kind: "exaltation", planets: [exaltationReceiver, item.body], description: `${exaltationReceiver} receives ${item.body} by exaltation; this report uses sign-based reception, so an aspect is not required.`, methodology: "sign-based reception; aspect not required" });
   }
   for (let first = 0; first < planets.length; first += 1) for (let second = first + 1; second < planets.length; second += 1) {
     const a = planets[first]!; const b = planets[second]!;
-    if (rulers[a.sign] === b.body && rulers[b.sign] === a.body) result.push({ kind: "mutual-domicile", planets: [a.body, b.body], description: `${a.body} and ${b.body} receive one another by domicile.` });
+    if (rulers[a.sign] === b.body && rulers[b.sign] === a.body) result.push({ kind: "mutual-domicile", planets: [a.body, b.body], description: `${a.body} and ${b.body} receive one another by domicile; this report uses sign-based reception, so an aspect is not required.`, methodology: "sign-based reception; aspect not required" });
   }
   return result;
 }

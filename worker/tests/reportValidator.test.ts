@@ -56,6 +56,6 @@ test("normalizes exact degree claims in natal-only reports from calculated facts
 
 test("page validation enforces the product promise", () => {
   assert.deepEqual(validateRenderedPdf({ ...reportCatalog.love, targetPages: [24, 32] }, 28), []);
-  assert.deepEqual(validateRenderedPdf(reportCatalog.complete, 65), []);
+  assert.deepEqual(validateRenderedPdf(reportCatalog.complete, 55), []);
   assert.match(validateRenderedPdf(reportCatalog.love, 8)[0]!, /page-count/);
 });
