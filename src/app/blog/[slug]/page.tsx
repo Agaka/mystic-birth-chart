@@ -9,6 +9,8 @@ import {
 import { socialImage } from "@/lib/metadata";
 import { siteConfig } from "@/lib/site";
 
+export const revalidate = 900;
+
 interface ArticlePageProps {
   params: Promise<{ slug: string }>;
 }
@@ -35,7 +37,7 @@ export async function generateMetadata({
       description: article.excerpt,
       type: "article",
       url: `/blog/${slug}`,
-      publishedTime: article.date,
+      publishedTime: article.publishAt,
       modifiedTime: article.updatedDate,
       authors: [article.author],
       images: [{ ...socialImage, alt: article.title }],
@@ -76,7 +78,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       name: siteConfig.name,
       url: siteConfig.url,
     },
-    datePublished: article.date,
+    datePublished: article.publishAt,
     dateModified: article.updatedDate,
     mainEntityOfPage: articleUrl,
     url: articleUrl,

@@ -6,6 +6,8 @@ import { getAllArticles, getFeaturedArticles } from "@/lib/articles";
 import { categories } from "@/lib/categories";
 import { createPageMetadata } from "@/lib/metadata";
 
+export const revalidate = 900;
+
 export const metadata: Metadata = createPageMetadata({
   title: "The Astrology Reading Room",
   description:

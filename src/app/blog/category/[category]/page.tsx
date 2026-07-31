@@ -6,6 +6,8 @@ import { getArticlesByCategory } from "@/lib/articles";
 import { categories, getCategoryBySlug } from "@/lib/categories";
 import { createPageMetadata } from "@/lib/metadata";
 
+export const revalidate = 900;
+
 interface CategoryPageProps {
   params: Promise<{ category: string }>;
 }

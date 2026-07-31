@@ -3,6 +3,8 @@ import { getAllArticles } from "@/lib/articles";
 import { categories } from "@/lib/categories";
 import { siteConfig } from "@/lib/site";
 
+export const revalidate = 900;
+
 const STATIC_LAST_MODIFIED = "2026-07-12";
 
 const publicRoutes = [

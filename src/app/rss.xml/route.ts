@@ -1,6 +1,8 @@
 import { getAllArticles } from "@/lib/articles";
 import { siteConfig } from "@/lib/site";
 
+export const revalidate = 900;
+
 function escapeXml(value: string): string {
   return value
     .replace(/&/g, "&amp;")
@@ -22,7 +24,7 @@ export async function GET() {
           <description>${escapeXml(article.excerpt)}</description>
           <category>${escapeXml(article.category)}</category>
           <dc:creator>${escapeXml(siteConfig.editorialName)}</dc:creator>
-          <pubDate>${new Date(article.date).toUTCString()}</pubDate>
+          <pubDate>${new Date(article.publishAt).toUTCString()}</pubDate>
         </item>
       `,
     )
@@ -42,7 +44,7 @@ export async function GET() {
   return new Response(xml, {
     headers: {
       "Content-Type": "application/rss+xml; charset=utf-8",
-      "Cache-Control": "public, max-age=3600, s-maxage=3600",
+      "Cache-Control": "public, max-age=900, s-maxage=900",
     },
   });
 }

@@ -4,6 +4,7 @@ import matter from "gray-matter";
 import readingTime from "reading-time";
 import { categories } from "@/lib/categories";
 import { siteConfig } from "@/lib/site";
+import { isArticlePublished } from "@/lib/articlePublishing";
 
 const CONTENT_DIR = path.join(process.cwd(), "src/content/articles");
 
@@ -14,6 +15,7 @@ export interface ArticleMeta {
   category: string;
   categorySlug: string;
   date: string;
+  publishAt: string;
   updatedDate: string;
   author: string;
   readingTime: string;
@@ -40,13 +42,14 @@ function normalizedArticleData(data: Record<string, unknown>) {
     categorySlug:
       matchingCategory?.slug || String(data.categorySlug || "chart-basics"),
     date,
+    publishAt: String(data.publishAt || `${date}T00:00:00.000Z`),
     updatedDate: String(data.updated || data.dateModified || date),
     author: siteConfig.editorialName,
     featured: Boolean(data.featured),
   };
 }
 
-export function getAllArticles(): ArticleMeta[] {
+export function getAllArticles(now = new Date()): ArticleMeta[] {
   const files = fs.readdirSync(CONTENT_DIR).filter((f) => f.endsWith(".md"));
 
   const articles = files.map((filename) => {
@@ -63,12 +66,15 @@ export function getAllArticles(): ArticleMeta[] {
     } as ArticleMeta;
   });
 
-  return articles.sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
+  return articles
+    .filter((article) => isArticlePublished(article.date, article.publishAt, now))
+    .sort(
+      (a, b) =>
+        new Date(b.publishAt).getTime() - new Date(a.publishAt).getTime(),
+    );
 }
 
-export function getArticleBySlug(slug: string): Article | null {
+export function getArticleBySlug(slug: string, now = new Date()): Article | null {
   const filePath = path.join(CONTENT_DIR, `${slug}.md`);
 
   if (!fs.existsSync(filePath)) return null;
@@ -77,6 +83,10 @@ export function getArticleBySlug(slug: string): Article | null {
   const { data, content } = matter(fileContent);
   const stats = readingTime(content);
   const normalized = normalizedArticleData(data);
+
+  if (!isArticlePublished(normalized.date, normalized.publishAt, now)) {
+    return null;
+  }
 
   return {
     slug,
