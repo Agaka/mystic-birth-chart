@@ -17,12 +17,20 @@ const contentSecurityPolicy = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://www.google-analytics.com https://www.googletagmanager.com",
   "font-src 'self' data:",
-  "connect-src 'self' https://api.stripe.com https://checkout.stripe.com https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://geocoding-api.open-meteo.com https://www.promotekit.com", "frame-src https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com",
+  "connect-src 'self' https://api.stripe.com https://checkout.stripe.com https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://geocoding-api.open-meteo.com https://www.promotekit.com", "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com",
   `form-action 'self' https://checkout.stripe.com${newsletterOrigin ? ` ${newsletterOrigin}` : ""}`,
   "base-uri 'self'",
   "object-src 'none'",
   "frame-ancestors 'none'",
   ...(isDevelopment ? [] : ["upgrade-insecure-requests"]),
+].join("; ");
+
+// These public demonstration PDFs may be framed by Mystic Birth Chart itself only.
+const samplePdfContentSecurityPolicy = [
+  "default-src 'self'",
+  "img-src 'self' data: blob:",
+  "object-src 'none'",
+  "frame-ancestors 'self'",
 ].join("; ");
 
 const nextConfig: NextConfig = {
@@ -48,6 +56,14 @@ const nextConfig: NextConfig = {
                 value: "max-age=63072000; includeSubDomains; preload",
               },
             ]),
+        ],
+      },
+      {
+        source: "/samples/:path*.pdf",
+        headers: [
+          { key: "Content-Security-Policy", value: samplePdfContentSecurityPolicy },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
         ],
       },
     ];

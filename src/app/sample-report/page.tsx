@@ -13,6 +13,7 @@ const samples: Array<{
   action: string;
   href: string;
   pdf: string;
+  previewPages: number;
   primary?: boolean;
 }> = [
   {
@@ -24,6 +25,7 @@ const samples: Array<{
     action: "Get Essential Reading - $17",
     href: getBasicCheckoutUrl(),
     pdf: "/samples/essential-birth-chart-reading-preview.pdf",
+    previewPages: 11,
     primary: true,
   },
   {
@@ -35,6 +37,7 @@ const samples: Array<{
     action: "Get Complete Reading - $97",
     href: getCompleteCheckoutUrl(),
     pdf: "/samples/complete-natal-reading-preview.pdf",
+    previewPages: 11,
   },
   {
     id: "kabbalah",
@@ -45,6 +48,7 @@ const samples: Array<{
     action: "Explore Hermetic Kabbalah Reading - $149",
     href: "/checkout/kabbalah",
     pdf: "/samples/hermetic-kabbalah-reading-preview.pdf",
+    previewPages: 11,
   },
 ];
 
@@ -124,7 +128,7 @@ export default function SampleReportPage() {
                 rel="noreferrer"
                 className={`mt-4 inline-flex min-h-11 items-center font-ui text-sm font-semibold underline decoration-gold/55 underline-offset-4 transition-colors ${index % 2 === 0 ? "text-gold-light hover:text-ivory" : "text-aubergine hover:text-gold-dark"}`}
               >
-                Open the 5-page PDF preview
+                Open the {sample.previewPages}-page PDF preview
               </a>
               <p className={`mt-5 font-ui text-xs leading-relaxed ${index % 2 === 0 ? "text-ivory/46" : "text-ink/48"}`}>
                 These samples show the report&apos;s voice and architecture. The final emphasis always depends on the submitted chart.
