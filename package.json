@@ -11,6 +11,7 @@
     "test": "node --test --experimental-strip-types tests/*.test.ts",
     "audit:articles": "node scripts/audit-articles.mjs",
     "preview:free-pdf": "node --experimental-strip-types scripts/generate-free-chart-pdf-sample.ts",
+    "preview:sample-pdfs": "node scripts/generate-sample-report-previews.mjs",
     "verify:runtime": "node scripts/verify-runtime.mjs"
   },
   "dependencies": {

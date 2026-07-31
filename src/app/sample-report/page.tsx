@@ -12,6 +12,7 @@ const samples: Array<{
   body: string;
   action: string;
   href: string;
+  pdf: string;
   primary?: boolean;
 }> = [
   {
@@ -22,6 +23,7 @@ const samples: Array<{
       "See the focused first synthesis: the chart's central sentence, its three dominant testimonies, and a clear explanation of why the free preview is only the doorway.",
     action: "Get Essential Reading - $17",
     href: getBasicCheckoutUrl(),
+    pdf: "/samples/essential-birth-chart-reading-preview.pdf",
     primary: true,
   },
   {
@@ -32,6 +34,7 @@ const samples: Array<{
       "See how a fuller natal study ranks the chart's evidence before applying it to relationships, work, money, and practical direction.",
     action: "Get Complete Reading - $97",
     href: getCompleteCheckoutUrl(),
+    pdf: "/samples/complete-natal-reading-preview.pdf",
   },
   {
     id: "kabbalah",
@@ -41,6 +44,7 @@ const samples: Array<{
       "See how a chart-led Hermetic practice is approached with reviewed correspondences, practical restraint, and no invented promises.",
     action: "Explore Hermetic Kabbalah Reading - $149",
     href: "/checkout/kabbalah",
+    pdf: "/samples/hermetic-kabbalah-reading-preview.pdf",
   },
 ];
 
@@ -114,11 +118,44 @@ export default function SampleReportPage() {
               >
                 {sample.action}
               </Button>
+              <a
+                href={sample.pdf}
+                target="_blank"
+                rel="noreferrer"
+                className={`mt-4 inline-flex min-h-11 items-center font-ui text-sm font-semibold underline decoration-gold/55 underline-offset-4 transition-colors ${index % 2 === 0 ? "text-gold-light hover:text-ivory" : "text-aubergine hover:text-gold-dark"}`}
+              >
+                Open the 5-page PDF preview
+              </a>
               <p className={`mt-5 font-ui text-xs leading-relaxed ${index % 2 === 0 ? "text-ivory/46" : "text-ink/48"}`}>
                 These samples show the report&apos;s voice and architecture. The final emphasis always depends on the submitted chart.
               </p>
             </div>
-            <SampleReportPreview kind={sample.id} />
+            <div className="space-y-7">
+              <SampleReportPreview kind={sample.id} />
+              <div className="overflow-hidden border border-gold/30 bg-ivory shadow-[0_20px_65px_rgba(0,0,0,0.18)]">
+                <div className="flex items-center justify-between gap-4 border-b border-gold/20 bg-aubergine px-5 py-4 text-ivory">
+                  <p className="font-ui text-xs font-semibold uppercase tracking-[0.16em] text-gold-light">
+                    PDF document preview
+                  </p>
+                  <a
+                    href={sample.pdf}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-ui text-xs font-semibold text-ivory underline decoration-gold underline-offset-4 hover:text-gold-light"
+                  >
+                    Open full size
+                  </a>
+                </div>
+                <iframe
+                  src={`${sample.pdf}#view=FitH`}
+                  title={`${sample.title} PDF preview`}
+                  loading="lazy"
+                  className="h-[560px] w-full bg-ivory md:h-[680px]"
+                >
+                  <a href={sample.pdf}>Open the PDF preview.</a>
+                </iframe>
+              </div>
+            </div>
           </div>
         </section>
       ))}
