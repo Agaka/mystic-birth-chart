@@ -1274,6 +1274,14 @@ Newsletter:
 - Outer-planet aspects wider than 3 degrees are excluded by default. Sign-based reception is explicitly documented as not requiring an aspect.
 - The Complete blueprint targets 14,000-17,000 words and 48-55 pages. Its PDF includes an At a Glance page, ranked testimony, customer-facing chapter plates, Markdown sanitation, heading fitting, page-numbered contents, and a discreet automated Full Cycle Dossier next step.
 
+### 2026-07-31 scheduled editorial publishing
+
+- Articles may now declare an exact ISO `publishAt` timestamp in addition to their display `date`. Publication checks use the timestamp rather than relying on a manual future deploy.
+- Future articles remain private everywhere until release: blog index, category pages, related articles, RSS, sitemap, metadata generation, and direct slug requests. Invalid scheduling metadata also fails closed.
+- Blog, article, category, RSS, and sitemap routes revalidate every 15 minutes so scheduled releases appear automatically without a new deployment.
+- The article audit enforces valid zoned timestamps, a minimum of 1,800 words for scheduled editorial pieces, a source section, at least three internal article links, no duplicate time slots, no more than two releases per day, no long duplicated paragraphs, and expanded instruction-leak detection.
+- A fourteen-article traditional-first series is scheduled for July 31 through August 6, 2026, at 09:00 and 16:00 America/New_York. It covers advanced technique, history of astrology, Hermetic philosophy, and safe astrological practice without drifting into generic occult content.
+
 Social:
 
 - Create Instagram.
