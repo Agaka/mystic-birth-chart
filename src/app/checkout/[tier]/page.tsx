@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AnalyticsEvent } from "@/components/AnalyticsEvent";
 import { CheckoutForm } from "@/components/CheckoutForm";
@@ -41,6 +42,7 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
 
   const offer = getReadingOffer(tier);
   const isAutomated = offer.tier === "basic";
+  const sampleAnchor = offer.tier === "kabbalah" ? "kabbalah" : offer.tier === "basic" ? "essential" : "complete";
 
   return (
     <>
@@ -82,6 +84,12 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
                   ? "Enter the birth details needed to generate your instant reading. The final card payment is handled securely by Stripe."
                   : "Enter the details needed for your written chart reading. The final card payment is handled securely by Stripe."}
               </p>
+              <Link
+                href={`/sample-report#${sampleAnchor}`}
+                className="mt-5 inline-flex min-h-11 items-center font-ui text-sm font-semibold text-gold-light underline decoration-gold/55 underline-offset-4 transition-colors hover:text-ivory"
+              >
+                See an editorial sample before payment
+              </Link>
             </div>
             <aside className="border border-gold/24 bg-ink/45 p-6">
               <p className="font-ui text-xs font-semibold uppercase tracking-[0.2em] text-gold/70">
@@ -150,6 +158,11 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
                   ? `${offer.product.delivery}. It is generated automatically from your birth data, not hand-prepared. You receive a written email reading you can save and revisit.`
                   : `${offer.product.delivery}. ${offer.product.disclosure} You receive a written PDF you can save, revisit, and study at your own pace.`}
               </p>
+              {offer.isSubscription && (
+                <p className="mt-4 border-t border-ink/10 pt-4 text-sm leading-relaxed text-ink/62">
+                  You can manage payment details, cancel, or reactivate in the secure Stripe portal after purchase. Delivered Almanac editions remain available in your private library.
+                </p>
+              )}
             </div>
 
             <div className="border border-ink/10 bg-white/45 p-6">

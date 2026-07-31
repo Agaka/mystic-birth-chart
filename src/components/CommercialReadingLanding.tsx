@@ -11,6 +11,7 @@ import { siteConfig } from "@/lib/site";
 
 export function CommercialReadingLanding({ config }: { config: CommercialLandingConfig }) {
   const offer = getReadingOffer(config.tier);
+  const sampleAnchor = config.tier === "kabbalah" ? "kabbalah" : config.tier === "basic" ? "essential" : "complete";
   const relatedArticles = config.relatedSlugs
     .map((slug) => getArticleBySlug(slug))
     .filter((article) => article !== null);
@@ -105,8 +106,8 @@ export function CommercialReadingLanding({ config }: { config: CommercialLanding
             <Button href={offer.checkoutPath} size="lg">
               Order {offer.product.name} - {offer.product.price}
             </Button>
-            <Button href="/sample-report" size="lg" variant="secondary">
-              View Sample Report
+            <Button href={`/sample-report#${sampleAnchor}`} size="lg" variant="secondary">
+              See a Sample Reading
             </Button>
           </div>
           <p className="mt-4 font-ui text-xs uppercase tracking-[0.12em] text-ivory/48">
@@ -126,10 +127,10 @@ export function CommercialReadingLanding({ config }: { config: CommercialLanding
             </h2>
             <p className="mt-5 text-base leading-relaxed text-ink/66">{config.excerpt}</p>
             <Link
-              href="/sample-report"
+              href={`/sample-report#${sampleAnchor}`}
               className="mt-6 inline-flex min-h-11 items-center font-ui text-sm font-semibold text-aubergine underline decoration-gold/55 underline-offset-4"
             >
-              Read the fictional Complete sample
+              Read the editorial sample
             </Link>
           </div>
 

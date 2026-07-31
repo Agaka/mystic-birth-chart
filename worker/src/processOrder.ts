@@ -38,7 +38,8 @@ export async function processReportOrder(store: EssentialStore, orderId: string)
       const pdf = await readFile(order.reportPath);
       const base = (process.env.PUBLIC_WORKER_URL || "").replace(/\/$/, ""); if (!base) throw new Error("public-worker-url-not-configured");
       const deliveryUrl = order.tier === "almanac" && order.libraryToken ? `${base}/library/${order.libraryToken}` : `${base}/reports/${order.reportToken}`;
-      await sendReportDelivery({ to: order.customer.email, name: order.customer.name, url: deliveryUrl, pdf, title: blueprint.title, eyebrow: blueprint.eyebrow, fileName: blueprint.fileName });
+      const manageUrl = order.tier === "almanac" && order.libraryToken ? `https://mysticbirthchart.com/api/almanac/portal?token=${encodeURIComponent(order.libraryToken)}` : undefined;
+      await sendReportDelivery({ to: order.customer.email, name: order.customer.name, url: deliveryUrl, pdf, title: blueprint.title, eyebrow: blueprint.eyebrow, fileName: blueprint.fileName, manageUrl });
       store.markDelivered(orderId); return;
     }
     const facts = await buildProductFacts(order);
@@ -77,7 +78,8 @@ export async function processReportOrder(store: EssentialStore, orderId: string)
     const base = (process.env.PUBLIC_WORKER_URL || "").replace(/\/$/, "");
     if (!base) throw new Error("public-worker-url-not-configured");
     const deliveryUrl = order.tier === "almanac" && order.libraryToken ? `${base}/library/${order.libraryToken}` : `${base}/reports/${order.reportToken}`;
-    await sendReportDelivery({ to: order.customer.email, name: order.customer.name, url: deliveryUrl, pdf, title: blueprint.title, eyebrow: blueprint.eyebrow, fileName: blueprint.fileName });
+    const manageUrl = order.tier === "almanac" && order.libraryToken ? `https://mysticbirthchart.com/api/almanac/portal?token=${encodeURIComponent(order.libraryToken)}` : undefined;
+    await sendReportDelivery({ to: order.customer.email, name: order.customer.name, url: deliveryUrl, pdf, title: blueprint.title, eyebrow: blueprint.eyebrow, fileName: blueprint.fileName, manageUrl });
     store.markDelivered(orderId);
   } catch (error) {
     store.markRetryPending(orderId, error instanceof Error ? error.message.slice(0, 80) : "unknown");
