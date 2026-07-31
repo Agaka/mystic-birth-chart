@@ -174,7 +174,11 @@ export function ReadingOfferCards() {
                     href={offer.checkoutPath}
                     size="md"
                     variant={premium || featured ? "primary" : "secondary"}
-                    className="w-full"
+                    className={`w-full ${
+                      premium || featured
+                        ? ""
+                        : "border-gold/70 bg-ivory/80 text-aubergine shadow-[0_8px_22px_rgba(48,27,23,0.08)] hover:border-gold-dark hover:bg-gold/15 hover:text-aubergine"
+                    }`}
                     analytics={{
                       event: "select_item",
                       params: {
